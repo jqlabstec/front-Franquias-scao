@@ -1,0 +1,93 @@
+
+:root {
+  /* Tema claro para combinar com o login */
+  --bg: #f8fafc;
+  --card: #ffffff;
+  --surface: #ffffff;
+  --text: #0f172a;
+  --muted: #64748b;
+  --border: #e5e7eb;
+  --ok: #22c55e;
+  --warn: #f59e0b;
+  --danger: #ef4444;
+  --shadow: 0 12px 30px rgba(2, 6, 23, 0.08);
+
+  /* Troque por imagem se quiser: url('../assets/img/hero.jpg') center/cover no-repeat */
+  --hero-bg: linear-gradient(135deg, #dcfce7 0%, #bbf7d0 35%, #a7f3d0 60%, #99f6e4 100%);
+}
+
+* { box-sizing: border-box; }
+html, body { height: 100%; }
+body {
+  margin: 0;
+  font-family: system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, "Helvetica Neue", Arial, "Noto Sans";
+  color: var(--text);
+  background: var(--bg);
+}
+
+
+.shell {
+  min-height: calc(100vh - 56px);
+  display: grid;
+  place-items: center;
+  padding: 24px;
+}
+.card{ width:min(100%,1100px); background:#fff; border:1px solid var(--border); border-radius:18px; box-shadow:var(--shadow); padding:18px; }
+.card-head{ display:flex; justify-content:space-between; align-items:center; gap:12px; }
+.filters{ display:flex; flex-wrap:wrap; gap:8px; margin:12px 0 8px; }
+.filters input, .filters select{ padding:10px 12px; border:1px solid var(--border); border-radius:10px; }
+.btn-primary{ padding:10px 12px; border:none; border-radius:10px; background:linear-gradient(180deg,#22c55e,#16a34a); color:#fff; font-weight:700; cursor:pointer; text-decoration:none; }
+.btn-ghost{ padding:10px 12px; border:1px solid var(--border); border-radius:10px; background:#fff; cursor:pointer; }
+.banner{ margin:8px 0; padding:10px 12px; border-radius:10px; border:1px solid #86efac; background:#ecfdf5; color:#065f46; }
+.banner.warn{ border-color:#fcd34d; background:#fffbeb; color:#92400e; }
+.hidden{ display:none; }
+.table-wrap{ overflow:auto; border:1px solid var(--border); border-radius:12px; }
+.tbl{ width:100%; border-collapse:collapse; }
+.tbl th,.tbl td{ padding:10px 12px; border-bottom:1px solid var(--border); white-space:nowrap; }
+.muted{ color:var(--muted); }
+.pill{ display:inline-block; padding:2px 8px; border-radius:999px; font-size:12px; font-weight:700; }
+.pill.ok{ background:#dcfce7; color:#166534; border:1px solid #86efac; }
+.pill.no{ background:#fee2e2; color:#991b1b; border:1px solid #fecaca; }
+.pager{ display:flex; align-items:center; gap:8px; justify-content:flex-end; margin-top:10px; }
+.link{ color:#2563eb; cursor:pointer; text-decoration:underline; }
+.switch{ cursor:pointer; }
+/* Apenas complementos mínimos ao seu base.css */
+.field label { display:block; margin-bottom:6px; }
+.field input, .field select { width:100%; padding:10px 12px; border:1px solid var(--border); border-radius:10px; }
+.tbl td, .tbl th { white-space: nowrap; }
+.banner.warn { border-color:#fcd34d; background:#fffbeb; color:#92400e; }
+.tbl td, .tbl th { white-space: nowrap; text-align: center; }
+
+
+  .card .field input, .card .field select {
+  height: 38px;
+}
+
+.tbl td, .tbl th { white-space: nowrap; }
+
+
+/* Alinhar o conteúdo ao topo e reduzir o espaçamento vertical */
+.shell {
+  display: grid;
+  align-content: start;   /* evita grudar no topo e não centraliza a tela inteira */
+  justify-items: stretch;
+  row-gap: 20px;          /* espaço entre os cards dentro da shell */
+  padding: 110px 24px 24px;/* aumenta padding-top para não ficar colado */
+  min-height: 100vh;      /* permite o fundo “respirar” */
+}
+
+/* Cards com largura e sombra como já está */
+.card {
+  width: min(100%, 1100px);
+  background: #fff;
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  box-shadow: var(--shadow);
+  padding: 18px;
+  margin: 0 auto;         /* centraliza horizontalmente sem afetar o topo */
+}
+
+/* Garantir espaçamento consistente entre cards mesmo fora da shell grid */
+.card + .card {
+  margin-top: 20px;
+}

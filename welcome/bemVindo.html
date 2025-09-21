@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Bem-vindo · Sistema de Franquias</title>
+
+    <!-- Sidebar -->
+    <link rel="stylesheet" href="../saidbar/saidebar.css" />
+    <script>window.SIDEBAR_ACTIVE = 'welcome';</script>
+    <script src="../saidbar/saidebar.js" defer></script>
+
+    <!-- Estilos da página -->
+    <link rel="stylesheet" href="./bemVindo.css" />
+    <script src="./bemVindo.js" defer></script>
+  </head>
+  <body>
+    <div class="app-layout">
+      <!-- Sidebar será montada aqui -->
+      <aside id="sidebar-root"></aside>
+
+      <!-- Conteúdo da página -->
+      <div class="app-content">
+        <header class="topbar">
+          <div class="brand">Sistema Franquias</div>
+          <nav class="actions">
+            <button id="checkDb">Checar DB</button>
+            <button id="logout" class="danger">Sair</button>
+          </nav>
+        </header>
+
+        <main class="shell">
+          <section class="card">
+            <!-- Painel de informações (esquerda) -->
+            <div class="info-pane">
+              <h1>Bem-vindo<span id="userName"></span> 👋</h1>
+              <p class="muted">Você está autenticado. Esta é uma tela provisória.</p>
+
+              <div class="grid">
+                <div class="tile">
+                  <h3>Usuário</h3>
+                  <p><b>E-mail:</b> <span id="userEmail">—</span></p>
+                  <p><b>Papel:</b> <span id="userRole">—</span></p>
+                </div>
+                <div class="tile">
+                  <h3>Franquia</h3>
+                  <p><b>ID:</b> <span id="franchiseId">—</span></p>
+                  <p><b>Nome:</b> <span id="franchiseName">—</span></p>
+                </div>
+              </div>
+
+              <div id="status" class="banner hidden"></div>
+            </div>
+
+            <!-- Painel visual (direita) -->
+            <aside class="hero-pane">
+              <div class="hero-content">
+                <h2>Gestão simplificada para uma vida saudável</h2>
+                <p>Controle integrado de franquias, compras, vendas e finanças.</p>
+              </div>
+            </aside>
+          </section>
+        </main>
+      </div>
+    </div>
+  </body>
+</html>

@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Criar Franquia · Admin</title>
+
+  <!-- Sidebar e estilos -->
+  <link rel="stylesheet" href="../../../saidbar/saidebar.css" />
+  <link rel="stylesheet" href="./style.css" />
+  <script>window.SIDEBAR_ACTIVE='franchise-create';</script>
+  <script src="../../../saidbar/saidebar.js" defer></script>
+
+  <!-- Script da página -->
+  <script src="./script.js" defer></script>
+</head>
+<body>
+  <div class="app-layout">
+    <aside id="sidebar-root"></aside>
+
+    <div class="app-content">
+      <main class="shell">
+        <section class="card">
+          <h1>Criar franquia</h1>
+          <p class="muted">Somente ADMIN.</p>
+
+          <form id="franchiseForm" novalidate>
+            <div class="grid">
+              <div class="field">
+                <label for="name">Nome</label>
+                <input id="name" required />
+              </div>
+
+              <div class="field">
+                <label for="cnpj">CNPJ</label>
+                <input id="cnpj" type="text" inputmode="numeric" pattern="[0-9]*" />
+                <button type="button" id="genCnpjBtn" class="btn-ghost">Gerar</button>
+              </div>
+
+              <div class="field">
+                <label for="code">Code (opcional)</label>
+                <input id="code" placeholder="vita-norte" />
+              </div>
+
+              <div class="field">
+                <label for="subdomain">Subdomínio (opcional)</label>
+                <input id="subdomain" placeholder="vita-norte" />
+              </div>
+
+              <div class="field checkbox">
+                <label><input type="checkbox" id="isActive" checked /> Ativa</label>
+              </div>
+            </div>
+
+            <button id="submitBtn" type="submit">Criar</button>
+            <div id="status" class="banner hidden"></div>
+          </form>
+        </section>
+      </main>
+    </div>
+  </div>
+</body>
+</html>

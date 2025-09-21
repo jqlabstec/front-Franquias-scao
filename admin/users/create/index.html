@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>Novo Usuário · Admin</title>
+  <link rel="stylesheet" href="../../../saidbar/saidebar.css"/>
+  <link rel="stylesheet" href="./style.css"/>
+  <script>window.SIDEBAR_ACTIVE='users-list';</script>
+  <script src="../../../saidbar/saidebar.js" defer></script>
+  <script src="./script.js" defer></script>
+</head>
+<body>
+  <div class="app-layout">
+    <aside id="sidebar-root"></aside>
+    <div class="app-content">
+      <main class="shell">
+        <section class="card">
+          <h1>Novo Usuário</h1>
+          <form id="userForm" class="grid">
+            <div class="field">
+              <label>Nome</label>
+              <input id="name" required />
+            </div>
+            <div class="field">
+              <label>E-mail</label>
+              <input id="email" type="email" required />
+            </div>
+            <div class="field">
+              <label>Senha</label>
+              <input id="password" type="password" minlength="8" required />
+            </div>
+            <div class="field">
+              <label>Perfil</label>
+              <select id="role">
+                <option value="EMPLOYEE">EMPLOYEE</option>
+                <option value="FRANCHISE_OWNER">FRANCHISE_OWNER</option>
+                <option value="ADMIN">ADMIN</option>
+              </select>
+            </div>
+            <div class="field" id="franchiseField">
+              <label>Franquia</label>
+              <select id="franchiseId"></select>
+            </div>
+            <div class="field inline">
+              <label><input id="isActive" type="checkbox" checked /> Ativo</label>
+            </div>
+            <div class="actions">
+              <button id="submitBtn" class="btn-primary" type="submit">Criar</button>
+              <a class="btn-ghost" href="../index/index.html">Voltar</a>
+            </div>
+            <div id="status" class="banner hidden"></div>
+          </form>
+        </section>
+      </main>
+    </div>
+  </div>
+</body>
+</html>

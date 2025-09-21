@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Franquias · Admin</title>
+
+  <link rel="stylesheet" href="../../../saidbar/saidebar.css" />
+  <link rel="stylesheet" href="./style.css" />
+  <script>window.SIDEBAR_ACTIVE='franchises-list';</script>
+  <script src="../../../saidbar/saidebar.js" defer></script>
+  <script src="./script.js" defer></script>
+</head>
+<body>
+  <div class="app-layout">
+    <aside id="sidebar-root"></aside>
+
+    <div class="app-content">
+      <main class="shell">
+        <section class="card">
+          <div class="card-head">
+            <h1>Franquias</h1>
+            <a class="btn-primary" href="../create/index.html">+ Nova franquia</a>
+          </div>
+
+          <form id="filterForm" class="filters">
+            <input id="q" placeholder="Buscar: nome, code ou CNPJ" />
+            <input id="from" type="date" />
+            <span class="sep">→</span>
+            <input id="to" type="date" />
+            <button type="submit" class="btn-primary">Buscar</button>
+            <button type="button" id="clearBtn" class="btn-ghost">Limpar</button>
+          </form>
+
+          <div id="status" class="banner hidden"></div>
+
+          <div class="table-wrap">
+            <table class="tbl" id="tbl">
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>Nome</th>
+                  <th>CNPJ</th>
+                  <th>Code</th>
+                  <th>Subdomínio</th>
+                  <th>Ativa</th>
+                  <th>Criada em</th>
+                </tr>
+              </thead>
+              <tbody id="tbody">
+                <tr><td colspan="7" class="muted">Sem resultados</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="pager">
+            <button id="prevBtn" class="btn-ghost">&laquo; Anterior</button>
+            <span id="pageInfo" class="muted">-</span>
+            <button id="nextBtn" class="btn-ghost">Próxima &raquo;</button>
+          </div>
+        </section>
+      </main>
+    </div>
+  </div>
+</body>
+</html>

@@ -1,0 +1,159 @@
+<!doctype html>
+<html lang="pt-BR">
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Estoque · Ajuste rápido</title>
+  <link rel="stylesheet" href="../../../saidbar/saidebar.css" />
+  <link rel="stylesheet" href="../../../../styles/base.css" />
+  <link rel="stylesheet" href="./index.css" />
+  <script>window.SIDEBAR_ACTIVE = 'inventory-adjust';</script>
+  <script src="../../../saidbar/saidebar.js" defer></script>
+  <script src="./index.js" defer></script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.all.min.js" defer></script>
+  <style>
+    .autocomplete {
+      position: relative;
+    }
+
+    .autocomplete-list {
+      position: absolute;
+      z-index: 20;
+      left: 0;
+      right: 0;
+      top: 100%;
+      background: #fff;
+      border: 1px solid #ddd;
+      border-top: none;
+      max-height: 220px;
+      overflow: auto;
+      box-shadow: 0 6px 20px rgba(0, 0, 0, .08);
+    }
+
+    .autocomplete-item {
+      padding: 8px 10px;
+      cursor: pointer;
+    }
+
+    .autocomplete-item:hover {
+      background: #f5f5f7;
+    }
+
+    .muted-hint {
+      font-size: 12px;
+      color: #667085;
+      margin-top: 4px;
+    }
+
+    .tbl .btn-link {
+      color: #6b21a8;
+      font-weight: 600;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="app-layout">
+    <aside id="sidebar-root"></aside>
+    <div class="app-content">
+      <main class="shell">
+        <section class="card">
+          <div class="card-head">
+            <h1>Estoque • Ajuste rápido</h1>
+            <a class="btn-ghost" href="../index/index.html">Ver saldos</a>
+          </div>
+
+          <form id="form" class="filters"
+            style="display:grid;grid-template-columns:repeat(2,minmax(220px,1fr));gap:8px;">
+            <div class="field autocomplete" style="grid-column: span 1;">
+              <label>Produto</label>
+              <input id="productSearch" type="text" autocomplete="off" placeholder="Busque por nome, código ou NCM" />
+              <input id="productId" type="hidden" required />
+              <div id="productList" class="autocomplete-list" style="display:none;"></div>
+              <div id="productHint" class="muted-hint">Selecione um produto na lista.</div>
+            </div>
+
+            <div class="field">
+              <label>Tipo</label>
+              <select id="type" required>
+                <option value="ADJUST_IN">Entrada (ajuste)</option>
+                <option value="ADJUST_OUT">Saída (ajuste)</option>
+                <option value="PURCHASE">Compra</option>
+                <option value="SALE">Venda</option>
+                <option value="PRODUCTION_CONSUME">Consumo produção</option>
+                <option value="PRODUCTION_YIELD">Produção (yield)</option>
+                <option value="RETURN">Devolução</option>
+              </select>
+            </div>
+
+            <div class="field">
+              <label>Quantidade</label>
+              <input id="qty" type="number" step="0.001" min="0.0001" required placeholder="Ex.: 10.000" />
+              <div id="stockHint" class="muted-hint"></div>
+            </div>
+
+            <div class="field">
+              <label>Custo unitário (opcional, entradas)</label>
+              <input id="unitCost" type="number" step="0.000001" min="0" placeholder="Ex.: 25.50" />
+              <div id="costHint" class="muted-hint"></div>
+            </div>
+
+            <div class="field" style="grid-column:span 2;">
+              <label>Notas (opcional)</label>
+              <input id="notes" type="text" maxlength="120" placeholder="Observações" />
+            </div>
+
+            <div class="actions" style="grid-column:span 2;display:flex;gap:8px;">
+              <button class="btn-primary" type="submit">Registrar</button>
+              <button class="btn-ghost" type="button" id="btnClear">Limpar</button>
+            </div>
+          </form>
+
+          <div id="status" class="banner hidden"></div>
+
+          <h2 style="margin:16px 0 8px;">Últimas movimentações</h2>
+          <div class="filters">
+            <input id="txQuery" type="text" placeholder="Filtrar por nome ou código" />
+            <select id="txType">
+              <option value="">Tipo: Todos</option>
+              <option value="ADJUST_IN">ADJUST_IN</option>
+              <option value="ADJUST_OUT">ADJUST_OUT</option>
+              <option value="PURCHASE">PURCHASE</option>
+              <option value="SALE">SALE</option>
+              <option value="PRODUCTION_CONSUME">PRODUCTION_CONSUME</option>
+              <option value="PRODUCTION_YIELD">PRODUCTION_YIELD</option>
+              <option value="RETURN">RETURN</option>
+            </select>
+            <button id="txSearch" class="btn-primary" type="button">Buscar</button>
+          </div>
+
+          <div class="table-wrap">
+            <table class="tbl">
+              <thead>
+                <tr>
+                  <th>Data</th>
+                  <th>Produto</th>
+                  <th>Tipo</th>
+                  <th>Qtd</th>
+                  <th>Custo Unit.</th>
+                  <th>Origem</th>
+                  <th>Notas</th>
+                  <th>Ações</th>
+                </tr>
+              </thead>
+              <tbody id="txBody">
+                <tr>
+                  <td colspan="8" class="muted">Sem resultados</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+      </main>
+    </div>
+  </div>
+</body>
+
+</html>

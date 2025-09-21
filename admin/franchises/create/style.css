@@ -1,0 +1,97 @@
+/* Reaproveita variáveis definidas na sidebar.css */
+:root {
+  /* Tema claro para combinar com o login */
+  --bg: #f8fafc;
+  --card: #ffffff;
+  --surface: #ffffff;
+  --text: #0f172a;
+  --muted: #64748b;
+  --border: #e5e7eb;
+  --ok: #22c55e;
+  --warn: #f59e0b;
+  --danger: #ef4444;
+  --shadow: 0 12px 30px rgba(2, 6, 23, 0.08);
+
+  /* Troque por imagem se quiser: url('../assets/img/hero.jpg') center/cover no-repeat */
+  --hero-bg: linear-gradient(135deg, #dcfce7 0%, #bbf7d0 35%, #a7f3d0 60%, #99f6e4 100%);
+}
+
+* { box-sizing: border-box; }
+html, body { height: 100%; }
+body {
+  margin: 0;
+  font-family: system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, "Helvetica Neue", Arial, "Noto Sans";
+  color: var(--text);
+  background: var(--bg);
+}
+
+.shell{
+  min-height: calc(100vh - 0px);
+  display: grid;
+  place-items: center;
+  padding: 24px;
+}
+.card{
+  width: min(100%, 900px);
+  background: #fff;
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  box-shadow: var(--shadow);
+  padding: 24px;
+}
+h1{ margin: 0 0 8px; font-weight: 800; }
+.muted{ color: var(--muted); margin-top: 0; }
+
+.grid{
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px,1fr));
+  gap: 12px;
+  margin-top: 14px;
+}
+.field{ display: flex; flex-direction: column; gap: 6px; }
+.checkbox{ align-self: end; }
+
+input{
+  padding: 10px 12px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: #fff;
+}
+input:focus{
+  outline: none;
+  border-color: #22c55e;
+  box-shadow: 0 0 0 3px rgba(34,197,94,.18);
+}
+
+button{
+  margin-top: 14px;
+  padding: 12px;
+  border: none;
+  border-radius: 10px;
+  background: linear-gradient(180deg,#22c55e,#16a34a);
+  color: #0f172a;
+  font-weight: 700;
+  cursor: pointer;
+}
+button[disabled]{ opacity: .7; cursor: not-allowed; }
+
+.banner{
+  margin-top: 12px;
+  padding: 10px 12px;
+  border-radius: 10px;
+  border: 1px solid #86efac;
+  background: #ecfdf5;
+  color: #065f46;
+}
+.banner.warn{
+  border-color: #fcd34d;
+  background: #fffbeb;
+  color: #92400e;
+}
+.hidden{ display: none; }
+
+.btn-ghost{
+  padding: 10px 12px; border:1px solid var(--border); background:#fff;
+  border-radius:10px; cursor:pointer; white-space:nowrap;
+}
+

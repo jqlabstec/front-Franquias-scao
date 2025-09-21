@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>Usuários · Admin</title>
+  <link rel="stylesheet" href="../../../saidebar/saidebar.css"/>
+  <link rel="stylesheet" href="./style.css"/>
+  <script>window.SIDEBAR_ACTIVE='users-list';</script>
+  <script src="../../../saidebar/saidebar.js" defer></script>
+  <script src="./script.js" defer></script>
+</head>
+<body>
+  <div class="app-layout">
+    <aside id="sidebar-root"></aside>
+    <div class="app-content">
+      <main class="shell">
+        <section class="card">
+          <div class="card-head">
+            <h1>Usuários</h1>
+            <a class="btn-primary" href="../create/index.html">+ Novo usuário</a>
+          </div>
+
+          <form id="filterForm" class="filters">
+            <input id="q" placeholder="Buscar: nome ou e-mail"/>
+            <select id="role">
+              <option value="">Perfil: Todos</option>
+              <option value="ADMIN">ADMIN</option>
+              <option value="FRANCHISE_OWNER">FRANCHISE_OWNER</option>
+              <option value="EMPLOYEE">EMPLOYEE</option>
+            </select>
+            <select id="active">
+              <option value="">Ativo: Todos</option>
+              <option value="true">Apenas ativos</option>
+              <option value="false">Apenas inativos</option>
+            </select>
+            <button class="btn-primary" type="submit">Buscar</button>
+            <button class="btn-ghost" type="button" id="clearBtn">Limpar</button>
+          </form>
+
+          <div id="status" class="banner hidden"></div>
+
+          <div class="table-wrap">
+            <table class="tbl">
+              <thead>
+              <tr>
+                <th>ID</th><th>Nome</th><th>E-mail</th><th>Perfil</th><th>Franquia</th><th>Ativo</th><th>Criado</th><th>Ações</th>
+              </tr>
+              </thead>
+              <tbody id="tbody">
+              <tr><td colspan="8" class="muted">Sem resultados</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="pager">
+            <button id="prevBtn" class="btn-ghost">&laquo; Anterior</button>
+            <span id="pageInfo" class="muted">-</span>
+            <button id="nextBtn" class="btn-ghost">Próxima &raquo;</button>
+          </div>
+        </section>
+      </main>
+    </div>
+  </div>
+</body>
+</html>

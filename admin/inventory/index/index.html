@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>Estoque · Saldos</title>
+  <link rel="stylesheet" href="../../../saidbar/saidebar.css"/>
+  <link rel="stylesheet" href="../../../../styles/base.css"/>
+  <link rel="stylesheet" href="./index.css"/>
+  <script>window.SIDEBAR_ACTIVE='inventory-balances';</script>
+  <script src="../../../saidbar/saidebar.js" defer></script>
+  <script src="./index.js" defer></script>
+</head>
+<body>
+  <div class="app-layout">
+    <aside id="sidebar-root"></aside>
+    <div class="app-content">
+      <main class="shell">
+        <section class="card">
+          <div class="card-head">
+            <h1>Estoque • Saldos</h1>
+            <a class="btn-primary" href="../adjust/index.html">Ajuste rápido</a>
+          </div>
+
+          <form id="filterForm" class="filters">
+            <input id="q" placeholder="Buscar por nome ou NCM"/>
+            <label style="display:flex;align-items:center;gap:8px;">
+              <input id="belowMin" type="checkbox"/>
+              <span>Apenas abaixo do mínimo</span>
+            </label>
+            <button class="btn-primary" type="submit">Buscar</button>
+            <button class="btn-ghost" type="button" id="clearBtn">Limpar</button>
+          </form>
+
+          <div id="status" class="banner hidden"></div>
+
+          <div class="table-wrap">
+            <table class="tbl">
+              <thead>
+                <tr>
+                  <th>Produto</th>
+                  <th>Unid.</th>
+                  <th>Qtd</th>
+                  <th>Custo Médio</th>
+                  <th>Mín.</th>
+                  <th>Atualizado</th>
+                </tr>
+              </thead>
+              <tbody id="tbody">
+                <tr><td colspan="6" class="muted">Sem resultados</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="pager">
+            <button id="prevBtn" class="btn-ghost">&laquo; Anterior</button>
+            <span id="pageInfo" class="muted">-</span>
+            <button id="nextBtn" class="btn-ghost">Próxima &raquo;</button>
+          </div>
+        </section>
+      </main>
+    </div>
+  </div>
+</body>
+</html>

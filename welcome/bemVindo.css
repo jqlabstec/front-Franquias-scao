@@ -1,0 +1,131 @@
+:root {
+  /* Tema claro para combinar com o login */
+  --bg: #f8fafc;
+  --card: #ffffff;
+  --surface: #ffffff;
+  --text: #0f172a;
+  --muted: #64748b;
+  --border: #e5e7eb;
+  --ok: #22c55e;
+  --warn: #f59e0b;
+  --danger: #ef4444;
+  --shadow: 0 12px 30px rgba(2, 6, 23, 0.08);
+
+  /* Troque por imagem se quiser: url('../assets/img/hero.jpg') center/cover no-repeat */
+  --hero-bg: linear-gradient(135deg, #dcfce7 0%, #bbf7d0 35%, #a7f3d0 60%, #99f6e4 100%);
+}
+
+* { box-sizing: border-box; }
+html, body { height: 100%; }
+body {
+  margin: 0;
+  font-family: system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, "Helvetica Neue", Arial, "Noto Sans";
+  color: var(--text);
+  background: var(--bg);
+}
+
+/* Topbar clara */
+.topbar { display: none !important; }
+.brand { font-weight: 700; }
+.actions { display: flex; gap: 8px; }
+.actions button {
+  padding: 8px 12px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--card);
+  color: var(--text);
+  cursor: pointer;
+}
+.actions .danger {
+  border-color: #fecaca;
+  color: #991b1b;
+}
+
+/* Container central e card em duas colunas */
+.shell {
+  min-height: calc(100vh - 56px);
+  display: grid;
+  place-items: center;
+  padding: 24px;
+}
+
+.card {
+  width: min(100%, 1120px);
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  overflow: hidden;
+  box-shadow: var(--shadow);
+  display: grid;
+  grid-template-columns: 1fr; /* mobile */
+}
+
+/* Painel de informações */
+.info-pane {
+  padding: clamp(20px, 4vw, 36px);
+}
+h1 { margin: 0 0 8px; font-size: clamp(22px, 3.2vw, 28px); font-weight: 800; }
+h1 span { margin-left: 8px; color: var(--ok); }
+.muted { color: var(--muted); margin-top: 0; }
+
+.grid {
+  margin-top: 16px;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 12px;
+}
+.tile {
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 12px;
+  background: #f9fafb;
+}
+
+/* Banner de status */
+.banner {
+  margin-top: 16px;
+  padding: 10px 12px;
+  border-radius: 10px;
+  border: 1px solid #86efac;
+  background: #ecfdf5;
+  color: #065f46;
+  font-size: 14px;
+}
+.banner.warn {
+  border-color: #fcd34d;
+  background: #fffbeb;
+  color: #92400e;
+}
+.hidden { display: none; }
+
+/* Painel visual (hero) */
+.hero-pane {
+  display: none;           /* mobile: esconde */
+  background: var(--hero-bg);
+  position: relative;
+}
+.hero-pane::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(1200px 600px at 90% -20%, rgba(2,6,23,0.06), transparent 60%),
+    linear-gradient(180deg, rgba(2,6,23,0.03), rgba(2,6,23,0.06));
+}
+.hero-content {
+  position: relative;
+  z-index: 1;
+  max-width: 520px;
+  padding: clamp(22px, 5vw, 40px);
+  margin: min(10vh, 120px) clamp(22px, 5vw, 40px);
+  border-left: 3px solid rgba(22, 163, 74, 0.7);
+  color: #063d2b;
+}
+.hero-content h2 { margin: 0 0 8px; font-size: clamp(22px, 3.2vw, 28px); }
+.hero-content p { margin: 0; color: #0b5b40; }
+
+/* Desktop: duas colunas, info + hero dentro do mesmo card */
+@media (min-width: 980px) {
+  .card { grid-template-columns: 1.05fr 0.95fr; }
+  .hero-pane { display: block; }
+}

@@ -1,0 +1,66 @@
+:root {
+  /* Tema claro para combinar com o login */
+  --bg: #f8fafc;
+  --card: #ffffff;
+  --surface: #ffffff;
+  --text: #0f172a;
+  --muted: #64748b;
+  --border: #e5e7eb;
+  --ok: #22c55e;
+  --warn: #f59e0b;
+  --danger: #ef4444;
+  --shadow: 0 12px 30px rgba(2, 6, 23, 0.08);
+
+  /* Troque por imagem se quiser: url('../assets/img/hero.jpg') center/cover no-repeat */
+  --hero-bg: linear-gradient(135deg, #dcfce7 0%, #bbf7d0 35%, #a7f3d0 60%, #99f6e4 100%);
+}
+
+* { box-sizing: border-box; }
+html, body { height: 100%; }
+body {
+  margin: 0;
+  font-family: system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, "Helvetica Neue", Arial, "Noto Sans";
+  color: var(--text);
+  background: var(--bg);
+}
+
+
+.shell {
+  min-height: calc(100vh - 56px);
+  display: grid;
+  place-items: center;
+  padding: 24px;
+}
+.card{
+  width:min(100%, 1100px); background:#fff; border:1px solid var(--border);
+  border-radius:18px; box-shadow:var(--shadow); padding:18px;
+}
+.card-head{ display:flex; justify-content:space-between; align-items:center; gap:12px; }
+h1{ margin:0; font-weight:800; }
+.muted{ color:var(--muted); }
+
+.filters{ display:flex; flex-wrap:wrap; gap:8px; margin:12px 0 8px; }
+.filters input{ padding:10px 12px; border:1px solid var(--border); border-radius:10px; }
+.sep{ align-self:center; color:var(--muted); }
+.btn-primary{
+  padding:10px 12px; border:none; border-radius:10px; background:linear-gradient(180deg,#22c55e,#16a34a); color:#fff; font-weight:700; cursor:pointer; text-decoration:none; display:inline-block;
+}
+.btn-ghost{
+  padding:10px 12px; border:1px solid var(--border); border-radius:10px; background:#fff; cursor:pointer;
+}
+
+.banner{ margin:8px 0; padding:10px 12px; border-radius:10px; border:1px solid #86efac; background:#ecfdf5; color:#065f46; }
+.banner.warn{ border-color:#fcd34d; background:#fffbeb; color:#92400e; }
+.hidden{ display:none; }
+
+.table-wrap{ overflow:auto; border:1px solid var(--border); border-radius:12px; }
+.tbl{ width:100%; border-collapse:collapse; }
+.tbl th, .tbl td{ padding:10px 12px; border-bottom:1px solid var(--border); white-space:nowrap; }
+.tbl tr:last-child td{ border-bottom:none; }
+.pill{
+  display:inline-block; padding:2px 8px; border-radius:999px; font-size:12px; font-weight:700;
+}
+.pill.ok{ background:#dcfce7; color:#166534; border:1px solid #86efac; }
+.pill.no{ background:#fee2e2; color:#991b1b; border:1px solid #fecaca; }
+
+.pager{ display:flex; align-items:center; gap:8px; justify-content:flex-end; margin-top:10px; }
