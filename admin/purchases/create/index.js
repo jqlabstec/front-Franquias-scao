@@ -19,7 +19,7 @@ function getAuth(){
 }
 function fmtMoney(n){ const x = Number(n||0); return x.toLocaleString('pt-BR',{minimumFractionDigits:2, maximumFractionDigits:6}); }
 
-const state = { items: [] };
+const state = { items: [], xmlContent: undefined };
 
 function renderItems(){
   const tb = document.getElementById('tbodyItems');
@@ -63,6 +63,49 @@ async function postPurchase(body, token){
   return data;
 }
 
+/* ====== Pré-parse do XML (NÃO cria compra) ====== */
+async function parseXml(file, token){
+  const fd = new FormData();
+  fd.append('file', file);
+  const r = await fetch(`${API}/purchases/parse-xml`, {
+    method: 'POST',
+    headers: { Authorization: `Bearer ${token}` },
+    body: fd
+  });
+  const data = await r.json().catch(()=> ({}));
+  if (!r.ok) {
+    throw new Error(data?.message || 'Falha ao processar XML');
+  }
+  return data; // { invoiceNumber, supplierName, purchaseDate, items[], xmlContent }
+}
+
+function fillHeaderFromParsed(p){
+  try{
+    document.getElementById('invoiceNumber').value = p.invoiceNumber || '';
+    document.getElementById('supplierName').value = p.supplierName || '';
+    // p.purchaseDate pode vir ISO string; manter formato datetime-local (YYYY-MM-DDTHH:mm)
+    if (p.purchaseDate) {
+      const d = new Date(p.purchaseDate);
+      const z = new Date(d.getTime() - d.getTimezoneOffset()*60000); // normaliza para local
+      document.getElementById('purchaseDate').value = z.toISOString().slice(0,16);
+    } else {
+      document.getElementById('purchaseDate').value = '';
+    }
+  } catch {}
+}
+
+function loadItemsFromParsed(p){
+  state.items = (p.items || []).map(it => ({
+    code: it.code,
+    name: it.name,
+    quantity: Number(it.quantity),
+    unitCostAtPurchase: Number(it.unitCostAtPurchase),
+  }));
+  state.xmlContent = p.xmlContent || undefined;
+  renderItems();
+}
+/* ====== FIM PRÉ-PARSE ====== */
+
 document.addEventListener('DOMContentLoaded', ()=>{
   const auth = getAuth(); if(!auth?.token){ location.href='../../../login/index.html'; return; }
 
@@ -77,11 +120,12 @@ document.addEventListener('DOMContentLoaded', ()=>{
   const itQty = document.getElementById('itQty');
   const itUnitCost = document.getElementById('itUnitCost');
 
+  // Adicionar item manual
   document.getElementById('btnAddItem').addEventListener('click', ()=>{
     const qty = Number(itQty.value);
     const unit = Number(itUnitCost.value);
     if (!qty || qty <= 0) { toastError('Informe quantidade'); return; }
-    if (unit < 0) { toastError('Custo inválido'); return; }
+    if (Number.isNaN(unit) || unit < 0) { toastError('Custo inválido'); return; }
     state.items.push({
       code: itCode.value.trim() || undefined,
       name: itName.value.trim() || undefined,
@@ -92,6 +136,7 @@ document.addEventListener('DOMContentLoaded', ()=>{
     renderItems();
   });
 
+  // Remover item
   document.getElementById('tbodyItems').addEventListener('click', (ev)=>{
     const btn = ev.target.closest('button[data-del]');
     if (!btn) return;
@@ -100,10 +145,12 @@ document.addEventListener('DOMContentLoaded', ()=>{
     renderItems();
   });
 
+  // Limpar itens
   document.getElementById('btnClearItems').addEventListener('click', ()=>{
     state.items = []; renderItems();
   });
 
+  // Salvar compra
   document.getElementById('btnSave').addEventListener('click', async ()=>{
     if (!supplierName.value.trim()) { toastError('Informe o fornecedor'); return; }
     if (state.items.length === 0) { toastError('Adicione ao menos um item'); return; }
@@ -127,7 +174,8 @@ document.addEventListener('DOMContentLoaded', ()=>{
         name: it.name,
         quantity: it.quantity,
         unitCostAtPurchase: it.unitCostAtPurchase
-      }))
+      })),
+      xmlContent: state.xmlContent || undefined, // se veio do parse
     };
 
     try{
@@ -135,12 +183,57 @@ document.addEventListener('DOMContentLoaded', ()=>{
       toastSuccess('Compra registrada!');
       // reset
       invoiceNumber.value=''; purchaseDate.value=''; supplierName.value=''; paymentDueDate.value=''; isPaid.value='false';
-      state.items=[]; renderItems();
+      state.items=[]; state.xmlContent = undefined; renderItems();
     }catch(e){
       Swal.fire({
         icon:'error', title:'Falha ao salvar', html:`<div style="color:var(--muted)">${e.message}</div>`,
         buttonsStyling:false, didRender:()=>{ Swal.getConfirmButton()?.setAttribute('style',btnGhostStyle); }
       });
+    }
+  });
+
+  // ====== Importar XML (pré-parse) ======
+  const btnImport = document.getElementById('btnImportXml');
+  const xmlInput = document.getElementById('xmlFile');
+
+  btnImport?.addEventListener('click', ()=> xmlInput?.click());
+
+  xmlInput?.addEventListener('change', async ()=>{
+    const file = xmlInput.files?.[0];
+    if (!file) return;
+
+    const c = await Swal.fire({
+      icon:'question',
+      title:'Importar XML?',
+      text:`Arquivo: ${file.name}`,
+      showCancelButton:true,
+      confirmButtonText:'Processar',
+      cancelButtonText:'Cancelar',
+      buttonsStyling:false,
+      didRender:()=>{ 
+        Swal.getConfirmButton()?.setAttribute('style',btnPrimaryStyle); 
+        Swal.getCancelButton()?.setAttribute('style',btnGhostStyle);
+        Swal.getActions().style.gap='8px';
+      }
+    });
+    if (!c.isConfirmed) { xmlInput.value=''; return; }
+
+    try{
+      const parsed = await parseXml(file, auth.token);
+      toastSuccess('XML processado — revise e salve a compra.');
+      fillHeaderFromParsed(parsed);
+      loadItemsFromParsed(parsed);
+      // Agora você pode ajustar vencimento e se está pago antes de salvar.
+    }catch(e){
+      Swal.fire({
+        icon:'error',
+        title:'Falha ao processar XML',
+        html:`<div style="color:var(--muted)">${e.message || 'Erro'}</div>`,
+        buttonsStyling:false,
+        didRender:()=>{ Swal.getConfirmButton()?.setAttribute('style',btnGhostStyle); }
+      });
+    } finally {
+      xmlInput.value = ''; // limpa seleção
     }
   });
 

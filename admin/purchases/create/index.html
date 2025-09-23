@@ -23,12 +23,17 @@
     <div class="app-content">
       <main class="shell">
         <section class="card">
-          <div class="card-head">
-            <h1>Compras • Nova</h1>
-            <a class="btn-ghost" href="../index/index.html">Listar compras</a>
-          </div>
+
 
           <!-- Header da compra -->
+          <div class="card-head">
+            <h1>Compras • Nova</h1>
+            <div style="display:flex; gap:8px;">
+              <button class="btn-ghost" id="btnImportXml" type="button">Importar XML</button>
+              <a class="btn-ghost" href="../index/index.html">Listar compras</a>
+            </div>
+          </div>
+          <input type="file" id="xmlFile" accept=".xml,text/xml" style="display:none"/>
           <form id="formHeader" class="filters" style="display:grid;grid-template-columns:repeat(2,minmax(220px,1fr));gap:8px;">
             <div class="field">
               <label>Número da nota (opcional)</label>

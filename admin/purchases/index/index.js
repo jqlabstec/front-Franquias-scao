@@ -32,7 +32,7 @@ function renderList(items){
       <td>${fmtMoney(it.totalAmount)}</td>
       <td>${it.isPaid ? '<span class="pill ok">Sim</span>' : '<span class="pill no">Não</span>'}</td>
       <td>${it.paymentDueDate ? new Date(it.paymentDueDate).toLocaleDateString('pt-BR') : '—'}</td>
-      <td><a class="link" href="../show/index.html?id=${it.id}">Detalhes</a></td>
+      <td><a class="link" href="../details/index.html?id=${it.id}">Detalhes</a></td>
     `;
     tb.appendChild(tr);
   }
