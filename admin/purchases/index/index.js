@@ -26,14 +26,14 @@ function renderList(items){
   for(const it of items){
     const tr = document.createElement('tr');
     tr.innerHTML = `
-      <td>${fmtDate(it.purchaseDate)}</td>
-      <td>${it.invoiceNumber || '—'}</td>
-      <td>${it.supplierName}</td>
-      <td>${fmtMoney(it.totalAmount)}</td>
-      <td>${it.isPaid ? '<span class="pill ok">Sim</span>' : '<span class="pill no">Não</span>'}</td>
-      <td>${it.paymentDueDate ? new Date(it.paymentDueDate).toLocaleDateString('pt-BR') : '—'}</td>
-      <td><a class="link" href="../details/index.html?id=${it.id}">Detalhes</a></td>
-    `;
+<td>${fmtDateOnlyUTC(it.purchaseDate)}</td>
+  <td>${it.invoiceNumber || '—'}</td>
+  <td>${it.supplierName}</td>
+  <td>${fmtMoney(it.totalAmount)}</td>
+  <td>${it.isPaid ? '<span class="pill ok">Sim</span>' : '<span class="pill no">Não</span>'}</td>
+  <td>${fmtDateOnlyUTC(it.paymentDueDate)}</td>
+  <td><a class="link" href="../details/index.html?id=${it.id}">Detalhes</a></td>
+`;
     tb.appendChild(tr);
   }
 }
@@ -58,3 +58,20 @@ document.addEventListener('DOMContentLoaded', async ()=>{
   document.getElementById('btnSearch').addEventListener('click', reload);
   await reload();
 });
+
+
+
+function fmtDateOnlyUTC(d){
+  if (!d) return '—';
+  const dt = new Date(d);
+  const y = dt.getUTCFullYear();
+  const m = String(dt.getUTCMonth() + 1).padStart(2, '0');
+  const day = String(dt.getUTCDate()).padStart(2, '0');
+  return `${day}/${m}/${y}`;
+}
+
+function fmtDateTimeLocal(d){
+  if (!d) return '—';
+  const dt = new Date(d);
+  return isNaN(+dt) ? '—' : dt.toLocaleString('pt-BR');
+}

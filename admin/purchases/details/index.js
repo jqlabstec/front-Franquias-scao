@@ -75,39 +75,41 @@ function bindActions(){
   const id = new URLSearchParams(location.search).get('id');
   if(!id) return;
 
-  document.getElementById('btnTogglePaid').addEventListener('click', async ()=>{
-    try{
-      const updated = await patchPurchase(id, { isPaid: !state.purchase.isPaid }, auth.token);
-      state.purchase = updated;
-      renderHeader(updated);
-      toastSuccess('Status de pagamento atualizado');
-    }catch(e){ toastError(e.message); }
-  });
+document.getElementById('btnTogglePaid').addEventListener('click', async ()=>{
+  const auth = getAuth(); const id = new URLSearchParams(location.search).get('id');
+  try{
+    const updated = await patchPurchasePaid(id, !state.purchase.isPaid, auth.token);
+    state.purchase = updated;
+    renderHeader(updated);
+    toastSuccess('Status de pagamento atualizado');
+  }catch(e){ toastError(e.message); }
+});
 
-  document.getElementById('btnEditDue').addEventListener('click', async ()=>{
-    const { value: dateStr } = await Swal.fire({
-      title: 'Editar vencimento',
-      html: `<input id="swalDue" type="date" class="swal2-input" style="width:auto" value="${ state.purchase.paymentDueDate ? new Date(state.purchase.paymentDueDate).toISOString().slice(0,10) : '' }">`,
-      focusConfirm:false,
-      showCancelButton:true,
-      confirmButtonText:'Salvar',
-      cancelButtonText:'Cancelar',
-      buttonsStyling:false,
-      didRender:()=>{ 
-        Swal.getConfirmButton()?.setAttribute('style', btnPrimaryStyle);
-        Swal.getCancelButton()?.setAttribute('style', btnGhostStyle);
-        Swal.getActions().style.gap='8px';
-      },
-      preConfirm:()=> document.getElementById('swalDue')?.value || null
-    });
-    if (dateStr === undefined) return;
-    try{
-      const updated = await patchPurchase(id, { paymentDueDate: dateStr ? new Date(dateStr).toISOString() : null }, auth.token);
-      state.purchase = updated;
-      renderHeader(updated);
-      toastSuccess('Vencimento atualizado');
-    }catch(e){ toastError(e.message); }
+document.getElementById('btnEditDue').addEventListener('click', async ()=>{
+  const auth = getAuth(); const id = new URLSearchParams(location.search).get('id');
+  const { value: dateStr } = await Swal.fire({
+    title: 'Editar vencimento',
+    html: `<input id="swalDue" type="date" class="swal2-input" style="width:auto" value="${ state.purchase.paymentDueDate ? new Date(state.purchase.paymentDueDate).toISOString().slice(0,10) : '' }">`,
+    focusConfirm:false, showCancelButton:true,
+    confirmButtonText:'Salvar', cancelButtonText:'Cancelar',
+    buttonsStyling:false,
+    didRender:()=>{ 
+      Swal.getConfirmButton()?.setAttribute('style', btnPrimaryStyle);
+      Swal.getCancelButton()?.setAttribute('style', btnGhostStyle);
+      Swal.getActions().style.gap='8px';
+    },
+    preConfirm:()=> document.getElementById('swalDue')?.value || null
   });
+  if (dateStr === undefined) return;
+
+  try{
+    const iso = dateStr ? new Date(dateStr).toISOString() : null;
+    const updated = await patchPurchaseDueDate(id, iso, auth.token);
+    state.purchase = updated;
+    renderHeader(updated);
+    toastSuccess('Vencimento atualizado');
+  }catch(e){ toastError(e.message); }
+})
 
   document.getElementById('btnViewXml').addEventListener('click', ()=>{
     const xml = state.purchase?.xmlContent;
@@ -160,3 +162,26 @@ document.addEventListener('DOMContentLoaded', async ()=>{
     location.href = '../index/index.html';
   }
 });
+
+
+async function patchPurchasePaid(id, isPaid, token){
+  const r = await fetch(`${API}/purchases/${id}/pay`, {
+    method:'PATCH',
+    headers:{ 'Content-Type':'application/json', Authorization:`Bearer ${token}` },
+    body: JSON.stringify({ isPaid })
+  });
+  const data = await r.json().catch(()=> ({}));
+  if(!r.ok) throw new Error(data?.message || 'Falha ao atualizar pagamento');
+  return data;
+}
+
+async function patchPurchaseDueDate(id, isoDateOrNull, token){
+  const r = await fetch(`${API}/purchases/${id}/due-date`, {
+    method:'PATCH',
+    headers:{ 'Content-Type':'application/json', Authorization:`Bearer ${token}` },
+    body: JSON.stringify({ paymentDueDate: isoDateOrNull })
+  });
+  const data = await r.json().catch(()=> ({}));
+  if(!r.ok) throw new Error(data?.message || 'Falha ao atualizar vencimento');
+  return data;
+}

@@ -1,103 +1,107 @@
 <!doctype html>
 <html lang="pt-BR">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Detalhe da Compra</title>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>Compras · Detalhe</title>
+
   <link rel="stylesheet" href="../../../saidbar/saidebar.css"/>
-  <link rel="stylesheet" href="./index.css" />
-  <script>
-    window.API_BASE_URL = window.API_BASE_URL || 'http://localhost:3000/api/v1';
-  </script>
-  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <link rel="stylesheet" href="../../../../styles/base.css"/>
+  <link rel="stylesheet" href="./index.css"/>
+
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.all.min.js" defer></script>
+
+  <script>window.SIDEBAR_ACTIVE='purchases-list';</script>
   <script src="../../../saidbar/saidebar.js" defer></script>
+  <script src="./index.js" defer></script>
 </head>
 <body>
-
+  <div class="app-layout">
     <aside id="sidebar-root"></aside>
-  <main class="container">
-    <header class="page-header">
-      <h1>Detalhe da Compra <span id="hdrInvoice" class="muted"></span></h1>
-      <div class="actions">
-        <a class="btn btn-ghost" href="../index/index.html">Voltar</a>
-      </div>
-    </header>
+    <div class="app-content">
+      <main class="shell">
+        <section class="card">
+          <div class="card-head">
+            <h1>Compras • Detalhe <span id="hdrInvoice" class="muted"></span></h1>
+            <a class="btn-ghost" href="../index/index.html">Voltar</a>
+          </div>
 
-    <section class="grid">
-      <div class="card">
-        <div class="section-title">Cabeçalho</div>
-        <div class="grid-2">
-          <div>
-            <div class="muted">Fornecedor</div>
-            <div id="supplierName" class="strong"></div>
-          </div>
-          <div>
-            <div class="muted">Situação</div>
-            <div id="statusPaid"></div>
-          </div>
-          <div>
-            <div class="muted">Data da Compra</div>
-            <div id="purchaseDate"></div>
-          </div>
-          <div>
-            <div class="muted">Vencimento</div>
-            <div id="paymentDueDate"></div>
-          </div>
-        </div>
-        <div class="actions" style="margin-top:12px;">
-          <button id="btnTogglePaid" class="btn btn-primary">Alternar pago</button>
-          <button id="btnEditDue" class="btn btn-ghost">Editar vencimento</button>
-        </div>
-      </div>
+          <div class="detail-grid">
+            <div class="card sub">
+              <div class="section-title">Cabeçalho</div>
+              <div class="grid-2">
+                <div>
+                  <div class="muted">Fornecedor</div>
+                  <div id="supplierName" class="strong"></div>
+                </div>
+                <div>
+                  <div class="muted">Situação</div>
+                  <div id="statusPaid"></div>
+                </div>
+                <div>
+                  <div class="muted">Data da Compra</div>
+                  <div id="purchaseDate"></div>
+                </div>
+                <div>
+                  <div class="muted">Vencimento</div>
+                  <div id="paymentDueDate"></div>
+                </div>
+              </div>
+              <div class="actions">
+                <button id="btnTogglePaid" class="btn-primary">Alternar pago</button>
+                <button id="btnEditDue" class="btn-ghost">Editar vencimento</button>
+              </div>
+            </div>
 
-      <div class="card">
-        <div class="section-title">Totais</div>
-        <div class="grid-2">
-          <div>
-            <div class="muted">Subtotal Itens</div>
-            <div id="subtotal" class="strong"></div>
+            <div class="card sub">
+              <div class="section-title">Totais e XML</div>
+              <div class="grid-2">
+                <div>
+                  <div class="muted">Subtotal Itens</div>
+                  <div id="subtotal" class="strong"></div>
+                </div>
+                <div>
+                  <div class="muted">Total NF</div>
+                  <div id="total" class="strong"></div>
+                </div>
+              </div>
+              <div class="actions">
+                <button id="btnViewXml" class="btn-ghost">Visualizar XML</button>
+                <button id="btnDownloadXml" class="btn-ghost">Baixar XML</button>
+              </div>
+            </div>
           </div>
-          <div>
-            <div class="muted">Total NF</div>
-            <div id="total" class="strong"></div>
-          </div>
-        </div>
-        <div style="margin-top:12px;">
-          <div class="section-title">XML</div>
-          <div class="actions">
-            <button id="btnViewXml" class="btn btn-ghost">Visualizar</button>
-            <button id="btnDownloadXml" class="btn btn-ghost">Baixar XML</button>
-          </div>
-        </div>
-      </div>
-    </section>
+        </section>
 
-    <section class="card">
-      <div class="section-title">Itens</div>
-      <div class="table-wrap">
-        <table>
-          <thead>
-            <tr>
-              <th>#</th>
-              <th>Código</th>
-              <th>Produto</th>
-              <th class="mono">Qtde</th>
-              <th class="mono">Custo Unit.</th>
-              <th class="mono">Subtotal</th>
-            </tr>
-          </thead>
-          <tbody id="tbodyItems"></tbody>
-          <tfoot>
-            <tr>
-              <td colspan="5" style="text-align:right;">Total</td>
-              <td class="mono" id="tfootTotal">0,00</td>
-            </tr>
-          </tfoot>
-        </table>
-      </div>
-    </section>
-  </main>
-
-  <script src="./index.js"></script>
+        <section class="card">
+          <div class="section-title">Itens</div>
+          <div class="table-wrap">
+            <table class="tbl">
+              <thead>
+                <tr>
+                  <th>#</th>
+                  <th>Código</th>
+                  <th>Produto</th>
+                  <th>Qtde</th>
+                  <th>Custo Unit.</th>
+                  <th>Subtotal</th>
+                </tr>
+              </thead>
+              <tbody id="tbodyItems">
+                <tr><td colspan="6" class="muted">Sem itens</td></tr>
+              </tbody>
+              <tfoot>
+                <tr>
+                  <td colspan="5" style="text-align:right;">Total</td>
+                  <td id="tfootTotal">0,00</td>
+                </tr>
+              </tfoot>
+            </table>
+          </div>
+        </section>
+      </main>
+    </div>
+  </div>
 </body>
 </html>
