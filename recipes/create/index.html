@@ -1,0 +1,103 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>Receitas · Nova</title>
+
+  <link rel="stylesheet" href="../../../saidbar/saidebar.css"/>
+  <link rel="stylesheet" href="../../../../styles/base.css"/>
+  <link rel="stylesheet" href="./index.css"/>
+
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.all.min.js" defer></script>
+
+  <script>window.SIDEBAR_ACTIVE='recipes-create';</script>
+  <script src="../../../saidbar/saidebar.js" defer></script>
+  <script src="./index.js" defer></script>
+</head>
+<body>
+  <div class="app-layout">
+    <aside id="sidebar-root"></aside>
+    <div class="app-content">
+      <main class="shell">
+        <section class="card">
+          <div class="card-head">
+            <h1>Nova Receita</h1>
+            <a class="btn-ghost" href="../index/index.html">Cancelar</a>
+          </div>
+
+          <form id="formRecipe" class="form" autocomplete="off">
+            <div class="grid-2">
+              <div class="field">
+                <label>Nome</label>
+                <input id="name" type="text" required placeholder="Ex.: Frango desfiado"/>
+              </div>
+              <div class="field">
+                <label>Categoria</label>
+                <input id="category" type="text" placeholder="Ex.: Proteínas"/>
+              </div>
+            </div>
+
+            <div class="grid-3">
+              <div class="field">
+                <label>Rendimento</label>
+                <div class="inline">
+                  <input id="yieldQuantity" type="number" min="0.01" step="0.01" placeholder="Ex.: 10"/>
+                  <input id="yieldUnit" type="text" placeholder="Ex.: porções"/>
+                </div>
+                <div class="help">Opcional por enquanto; use quando souber porções.</div>
+              </div>
+              <div class="field">
+                <label>Tempo de preparo (min)</label>
+                <input id="preparationTimeMinutes" type="number" min="0" step="1" placeholder="Ex.: 40"/>
+              </div>
+              <div class="field">
+                <label>Validade / Tamanho porção</label>
+                <input id="servingSize" type="text" placeholder="Ex.: 250g por porção"/>
+              </div>
+            </div>
+
+            <div class="field">
+              <label>Descrição</label>
+              <input id="description" type="text" placeholder="Resumo opcional"/>
+            </div>
+
+            <div class="grid-2">
+              <div class="field">
+                <label>Tags (separadas por vírgula)</label>
+                <input id="tags" type="text" placeholder="ex.: lowcarb, congelável"/>
+              </div>
+              <div class="field">
+                <label>Imagem</label>
+                <input id="imageUrl" type="text" disabled value="placeholder (sem upload)"/>
+              </div>
+            </div>
+
+            <div class="field">
+              <label>Modo de preparo</label>
+              <textarea id="instructions" rows="5" placeholder="Passo a passo..."></textarea>
+            </div>
+
+            <div class="section-title">Ingredientes</div>
+            <div class="legend">Você pode escolher um produto do catálogo ou digitar um item livre.</div>
+
+            <div id="ingredients"></div>
+            <button id="btnAddIngredient" type="button" class="btn-ghost">Adicionar ingrediente</button>
+
+            <div class="totals">
+              <div><span class="muted">Custo total:</span> <strong id="costTotal">0,00</strong></div>
+              <div><span class="muted">Custo por porção:</span> <strong id="costPerPortion">—</strong></div>
+            </div>
+
+            <div style="display:flex; gap:10px; margin-top:18px;">
+              <button class="btn-primary" type="submit">Salvar</button>
+              <a class="btn-ghost" href="../index/index.html">Cancelar</a>
+            </div>
+          </form>
+        </section>
+      </main>
+    </div>
+  </div>
+</body>
+</html>

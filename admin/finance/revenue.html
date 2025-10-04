@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Financeiro · Faturamento por Canal</title>
+
+  <link rel="stylesheet" href="../../../saidbar/saidebar.css" />
+  <link rel="stylesheet" href="../finance/finance.css" />
+  <link rel="stylesheet" href="./revenue.css" />
+
+  <script>window.SIDEBAR_ACTIVE='finance-dashboard';</script>
+  <script src="../../../saidbar/saidebar.js" defer></script>
+  <script type="module" src="../vendor/helpers.js"></script>
+  <script type="module" src="./revenue.js" defer></script>
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+</head>
+<body>
+  <div class="app-layout">
+    <aside id="sidebar-root"></aside>
+
+    <div class="app-content">
+      <main class="shell">
+        <section class="card">
+          <div class="card-head">
+            <h1>Faturamento por canal (metas)</h1>
+            <div class="filters">
+              <select id="month"></select>
+              <select id="year"></select>
+              <button id="applyBtn" class="btn-primary">Carregar</button>
+              <button id="saveBtn" class="btn-ghost">Salvar metas</button>
+            </div>
+          </div>
+
+          <div class="table-wrap">
+            <table class="tbl" id="tbl">
+              <thead>
+                <tr>
+                  <th>Canal</th>
+                  <th class="num">Meta (R$)</th>
+                </tr>
+              </thead>
+              <tbody id="tbody">
+                <!-- linhas geradas pelo JS -->
+              </tbody>
+            </table>
+          </div>
+
+          <div class="card-foot">
+            <span class="muted">Use estas metas para comparar com o realizado no dashboard.</span>
+          </div>
+        </section>
+      </main>
+    </div>
+  </div>
+</body>
+</html>

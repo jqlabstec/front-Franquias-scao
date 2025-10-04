@@ -1,0 +1,111 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Financeiro · Custos (OPEX)</title>
+
+  <link rel="stylesheet" href="../../../saidbar/saidebar.css" />
+  <link rel="stylesheet" href="../finance/finance.css" />
+  <link rel="stylesheet" href="./opex.css" />
+
+  <script>window.SIDEBAR_ACTIVE='finance-dashboard';</script>
+  <script src="../../../saidbar/saidebar.js" defer></script>
+  <script type="module" src="../vendor/helpers.js"></script>
+  <script type="module" src="./opex.js" defer></script>
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+</head>
+<body>
+  <div class="app-layout">
+    <aside id="sidebar-root"></aside>
+
+    <div class="app-content">
+      <main class="shell">
+        <section class="card">
+          <div class="card-head">
+            <h1>Custos operacionais</h1>
+            <div class="filters">
+              <input id="q" placeholder="Buscar descrição" />
+              <select id="category">
+                <option value="">Categoria: todas</option>
+                <option value="FIXED">Fixos</option>
+                <option value="VARIABLE">Variáveis</option>
+              </select>
+              <input id="from" type="date" />
+              <span class="sep">→</span>
+              <input id="to" type="date" />
+              <button id="applyBtn" class="btn-primary">Aplicar</button>
+              <button id="newBtn" class="btn-ghost">+ Novo custo</button>
+            </div>
+          </div>
+
+          <div class="banner hidden" id="status"></div>
+
+          <div class="table-wrap">
+            <table class="tbl" id="tbl">
+              <thead>
+                <tr>
+                  <th>Data</th>
+                  <th>Descrição</th>
+                  <th>Categoria</th>
+                  <th>Base</th>
+                  <th>Recorrente</th>
+                  <th class="num">Valor</th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody id="tbody">
+                <tr><td colspan="7" class="muted">Sem resultados</td></tr>
+              </tbody>
+              <tfoot>
+                <tr>
+                  <th colspan="5" class="num">Total</th>
+                  <th class="num" id="tfoot-total">—</th>
+                  <th></th>
+                </tr>
+              </tfoot>
+            </table>
+          </div>
+        </section>
+
+        <!-- Modal simples -->
+        <dialog id="costDialog">
+          <form method="dialog" class="form">
+            <h3 id="dlgTitle">Novo custo</h3>
+            <div class="grid">
+              <label>Descrição
+                <input id="f-description" required />
+              </label>
+              <label>Valor (R$)
+                <input id="f-amount" type="number" step="0.01" min="0.01" required />
+              </label>
+              <label>Categoria
+                <select id="f-category" required>
+                  <option value="FIXED">FIXED</option>
+                  <option value="VARIABLE">VARIABLE</option>
+                </select>
+              </label>
+              <label>Data
+                <input id="f-date" type="date" required />
+              </label>
+              <label>Base
+                <select id="f-basis" required>
+                  <option value="ACCRUAL">ACCRUAL</option>
+                  <option value="CASH">CASH</option>
+                </select>
+              </label>
+              <label class="inline">
+                <input id="f-rec" type="checkbox" /> Recorrente
+              </label>
+            </div>
+            <menu>
+              <button id="dlgCancel" class="btn-ghost">Cancelar</button>
+              <button id="dlgSave" class="btn-primary">Salvar</button>
+            </menu>
+          </form>
+        </dialog>
+      </main>
+    </div>
+  </div>
+</body>
+</html>

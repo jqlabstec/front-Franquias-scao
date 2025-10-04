@@ -1,0 +1,116 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Financeiro · Dashboard</title>
+
+  <link rel="stylesheet" href="../../saidbar/saidebar.css" />
+  <link rel="stylesheet" href="../styles/dashboard.css" />
+  <link rel="stylesheet" href="../../admin/franchises/index/style.css" />
+
+  <script>window.SIDEBAR_ACTIVE='finance-dashboard';</script>
+  <script src="../../saidbar/saidebar.js" defer></script>
+  <script type="module" src="../../admin/vendor/helpers.js"></script>
+  <script type="module" src="../scripts/dashboard.js" defer></script>
+  
+</head>
+<body>
+  <div class="app-layout">
+    <aside id="sidebar-root"></aside>
+
+    <div class="app-content">
+      <main class="shell">
+        <!-- Cabeçalho com filtros -->
+        <section class="card">
+          <div class="card-head">
+            <h1>Dashboard Financeiro</h1>
+            <div class="filters">
+              <select id="month" class="input-select"></select>
+              <select id="year" class="input-select"></select>
+              <button id="applyBtn" class="btn-primary">Carregar</button>
+            </div>
+          </div>
+        </section>
+
+        <!-- Seção: Metas por Canal -->
+        <section class="card">
+          <div class="card-head">
+            <h2>Faturamento por canal (metas)</h2>
+          </div>
+
+          <div class="kpis" id="channelMetrics">
+            <!-- Preenchido via JS -->
+          </div>
+        </section>
+
+        <!-- Seção: Resultados -->
+        <section class="card">
+          <div class="card-head">
+            <h2>Resultados</h2>
+          </div>
+
+          <div class="table-wrap">
+            <table class="tbl">
+              <thead>
+                <tr>
+                  <th>Canal de venda</th>
+                  <th class="num">Loja</th>
+                  <th class="num">Delivery</th>
+                  <th class="num">Total</th>
+                  <th class="num">%</th>
+                </tr>
+              </thead>
+              <tbody id="resultsTable">
+                <tr><td colspan="5" class="muted">Carregando…</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <!-- Seção: Operacionais e Resultado -->
+        <section class="card">
+          <div class="card-head">
+            <h2>Operacionais e Resultado</h2>
+          </div>
+
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 40px;">
+            <!-- Canais de venda -->
+            <div class="table-wrap">
+              <h3 style="font-size: 16px; font-weight: 600; margin-bottom: 12px;">Canais de venda</h3>
+              <table class="tbl">
+                <thead>
+                  <tr>
+                    <th>Métrica</th>
+                    <th class="num">Loja</th>
+                    <th class="num">Delivery</th>
+                  </tr>
+                </thead>
+                <tbody id="channelsTable">
+                  <tr><td colspan="3" class="muted">Carregando…</td></tr>
+                </tbody>
+              </table>
+            </div>
+
+            <!-- Indicadores -->
+            <div class="table-wrap">
+              <h3 style="font-size: 16px; font-weight: 600; margin-bottom: 12px;">Indicadores</h3>
+              <table class="tbl">
+                <thead>
+                  <tr>
+                    <th>Nome</th>
+                    <th class="num">Valor</th>
+                  </tr>
+                </thead>
+                <tbody id="indicatorsTable">
+                  <tr><td colspan="2" class="muted">Carregando…</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+      </main>
+    </div>
+  </div>
+</body>
+</html>

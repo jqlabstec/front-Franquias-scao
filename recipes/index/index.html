@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>Receitas · Listar</title>
+
+  <link rel="stylesheet" href="../../../saidbar/saidebar.css"/>
+  <link rel="stylesheet" href="../../../../styles/base.css"/>
+  <link rel="stylesheet" href="./index.css"/>
+
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.all.min.js" defer></script>
+
+  <script>window.SIDEBAR_ACTIVE='recipes-list';</script>
+  <script src="../../../saidbar/saidebar.js" defer></script>
+  <script src="./index.js" defer></script>
+</head>
+<body>
+  <div class="app-layout">
+    <aside id="sidebar-root"></aside>
+    <div class="app-content">
+      <main class="shell">
+        <section class="card">
+          <div class="card-head">
+            <h1>Lista de Receitas</h1>
+            <a class="btn-ghost" href="../create/index.html" style="display:none;">Nova receita</a>
+          </div>
+
+          <div class="filters">
+            <input id="q" type="text" placeholder="Buscar por nome ou código"/>
+            <select id="category">
+              <option value="">Categoria: Todas</option>
+            </select>
+            <select id="tag">
+              <option value="">Tag: Todas</option>
+            </select>
+            <button id="btnSearch" class="btn-primary" type="button">Buscar</button>
+            <button id="btnClear" class="btn-ghost" type="button">Limpar Filtros</button>
+          </div>
+
+          <div id="count" class="muted" style="margin:6px 0;">—</div>
+
+          <div id="grid" class="grid"></div>
+        </section>
+      </main>
+    </div>
+  </div>
+</body>
+</html>

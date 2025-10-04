@@ -1,0 +1,132 @@
+:root {
+  /* Tema claro para combinar com o login */
+  --bg: #f8fafc;
+  --card: #ffffff;
+  --surface: #ffffff;
+  --text: #0f172a;
+  --muted: #64748b;
+  --border: #e5e7eb;
+  --ok: #22c55e;
+  --warn: #f59e0b;
+  --danger: #ef4444;
+  --shadow: 0 12px 30px rgba(2, 6, 23, 0.08);
+
+  /* Troque por imagem se quiser: url('../assets/img/hero.jpg') center/cover no-repeat */
+  --hero-bg: linear-gradient(135deg, #dcfce7 0%, #bbf7d0 35%, #a7f3d0 60%, #99f6e4 100%);
+}
+
+* { box-sizing: border-box; }
+html, body { height: 100%; }
+body {
+  margin: 0;
+  font-family: system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, "Helvetica Neue", Arial, "Noto Sans";
+  color: var(--text);
+  background: var(--bg);
+}
+
+/* Layout base da página com a sidebar já existente */
+.shell {
+  min-height: calc(100vh - 56px);
+  display: grid;
+  place-items: center;
+  padding: 24px;
+}
+
+/* Card principal */
+.card{
+  width:min(100%, 1100px);
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  box-shadow: var(--shadow);
+  padding: 18px;
+}
+.card-head{
+  display:flex; justify-content:space-between; align-items:center; gap:12px;
+  flex-wrap: wrap;
+}
+h1{ margin:0; font-weight:800; }
+.muted{ color:var(--muted); }
+
+/* Filtros (período) e botões */
+.filters{ display:flex; flex-wrap:wrap; gap:8px; margin:12px 0 8px; }
+.filters input{
+  padding:10px 12px; border:1px solid var(--border); border-radius:10px; background:#fff; color:var(--text);
+}
+.sep{ align-self:center; color:var(--muted); }
+.btn-primary{
+  padding:10px 12px; border:none; border-radius:10px;
+  background:linear-gradient(180deg,#22c55e,#16a34a);
+  color:#fff; font-weight:700; cursor:pointer; text-decoration:none; display:inline-block;
+}
+.btn-primary:hover{ filter:brightness(0.98); }
+.btn-ghost{
+  padding:10px 12px; border:1px solid var(--border); border-radius:10px; background:#fff; cursor:pointer; text-decoration:none; color:var(--text);
+}
+.btn-ghost:hover{ background:#f9fafb; }
+
+/* KPIs */
+.kpis{
+  display:grid; grid-template-columns: repeat(4, minmax(160px,1fr));
+  gap:12px; margin:12px 0 8px;
+}
+.kpi{
+  background:#fff; border:1px solid var(--border); border-radius:12px; padding:12px;
+}
+.kpi-title{ color:#666; font-size:12px; margin-bottom:6px; }
+.kpi-value{ font-size:20px; font-weight:700; }
+
+/* Tabela */
+.table-wrap{ overflow:auto; border:1px solid var(--border); border-radius:12px; margin-top:12px; }
+.tbl{ width:100%; border-collapse:collapse; background:#fff; }
+.tbl th, .tbl td{ padding:10px 12px; border-bottom:1px solid var(--border); white-space:nowrap; }
+.tbl thead th{ background:#f9fafb; text-align:left; font-weight:700; color:#0f172a; }
+.tbl tr:last-child td{ border-bottom:none; }
+.tbl .num{ text-align:right; }
+
+/* Badges reutilizáveis */
+.pill{
+  display:inline-block; padding:2px 8px; border-radius:999px; font-size:12px; font-weight:700;
+}
+.pill.ok{ background:#dcfce7; color:#166534; border:1px solid #86efac; }
+.pill.no{ background:#fee2e2; color:#991b1b; border:1px solid #fecaca; }
+
+/* Banner (status) */
+.banner{ margin:8px 0; padding:10px 12px; border-radius:10px; border:1px solid #86efac; background:#ecfdf5; color:#065f46; }
+.banner.warn{ border-color:#fcd34d; background:#fffbeb; color:#92400e; }
+.hidden{ display:none; }
+
+/* Rodapé do card (links) */
+.card-foot{
+  display:flex; justify-content:flex-end; gap:8px; margin-top:12px; flex-wrap: wrap;
+}
+
+/* Responsividade */
+@media (max-width: 900px){
+  .kpis{ grid-template-columns: repeat(2, 1fr); }
+}
+@media (max-width: 520px){
+  .kpis{ grid-template-columns: 1fr; }
+}
+
+
+
+/* ajustes pequenos sobre o tema base */
+#costDialog {
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 0;
+  width: min(560px, 96vw);
+}
+#costDialog .form { padding: 16px; }
+#costDialog h3 { margin: 0 0 12px; }
+#costDialog .grid {
+  display: grid; gap: 10px;
+  grid-template-columns: repeat(2, 1fr);
+}
+#costDialog label { display: grid; gap: 6px; }
+#costDialog label.inline { grid-template-columns: auto 1fr; align-items: center; }
+#costDialog input, #costDialog select {
+  padding:10px 12px; border:1px solid var(--border); border-radius:10px;
+}
+#costDialog menu { display:flex; justify-content:flex-end; gap:8px; margin-top:12px; }

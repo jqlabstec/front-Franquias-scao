@@ -1,0 +1,111 @@
+<!doctype html>
+<html lang="pt-BR">
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Receitas · Ficha Técnica</title>
+
+  <link rel="stylesheet" href="../../../saidbar/saidebar.css" />
+  <link rel="stylesheet" href="../../../../styles/base.css" />
+  <link rel="stylesheet" href="./index.css" />
+
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.all.min.js" defer></script>
+
+  <script>window.SIDEBAR_ACTIVE = 'recipes-list';</script>
+  <script src="../../../saidbar/saidebar.js" defer></script>
+  <script src="./index.js" defer></script>
+</head>
+
+<body>
+  <div class="app-layout">
+    <aside id="sidebar-root"></aside>
+    <div class="app-content">
+      <main class="shell">
+        <section class="card">
+          <div class="card-head">
+            <h1 id="recipeName">Ficha técnica</h1>
+            <div class="card-actions">
+              <a class="link-ghost" href="../index/index.html">Voltar</a>
+              <a id="btn-pricing" class="btn-primary" href="#">Precificação</a>
+              <a id="btnEdit" class="btn-primary" href="#">Editar</a>
+            </div>
+          </div>
+
+          <div class="header-grid">
+            <div class="media">
+              <img id="recipeImg" alt="Imagem da receita" />
+            </div>
+            <div class="props">
+              <div class="row">
+                <div>
+                  <div class="muted">Categoria</div>
+                  <div id="recipeCategory" class="strong">—</div>
+                </div>
+                <div>
+                  <div class="muted">Rendimento</div>
+                  <div id="recipeYield" class="strong">—</div>
+                </div>
+                <div>
+                  <div class="muted">Tempo de preparo</div>
+                  <div id="recipePrepTime" class="strong">—</div>
+                </div>
+                <div>
+                  <div class="muted">Validade (dias)</div>
+                  <div id="recipeShelfLife" class="strong">—</div>
+                </div>
+              </div>
+              <div class="row small">
+                <div>
+                  <div class="muted">Custo dos ingredientes</div>
+                  <div id="recipeCost" class="strong">—</div>
+                </div>
+                <div>
+                  <div class="muted">Custo por porção</div>
+                  <div id="recipeCostPerPortion" class="strong">—</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section class="card">
+          <div class="section-title">Composição (ingredientes)</div>
+          <div class="table-wrap">
+            <table class="tbl">
+              <thead>
+                <tr>
+                  <th>Tipo</th>
+                  <th>Ingrediente</th>
+                  <th>Unidade</th>
+                  <th>Qtde</th>
+                  <th>Custo Unit.</th>
+                  <th>Subtotal</th>
+                </tr>
+              </thead>
+              <tbody id="tbodyIngredients">
+                <tr>
+                  <td colspan="6" class="muted">Sem itens</td>
+                </tr>
+              </tbody>
+              <tfoot>
+                <tr>
+                  <td colspan="5" style="text-align:right;">Total</td>
+                  <td id="tfootTotal">0,00</td>
+                </tr>
+              </tfoot>
+            </table>
+          </div>
+        </section>
+
+        <section class="card">
+          <div class="section-title">Modo de preparo</div>
+          <div id="recipeInstructions" class="instructions"></div>
+        </section>
+      </main>
+    </div>
+  </div>
+</body>
+
+</html>

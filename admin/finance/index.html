@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Financeiro · Monitoramento</title>
+
+  <link rel="stylesheet" href="../../../saidbar/saidebar.css" />
+  <link rel="stylesheet" href="./finance.css" />
+  <link rel="stylesheet" href="../franchises/index/style.css" />
+
+  <script>window.SIDEBAR_ACTIVE='finance-dashboard';</script>
+  <script src="../../../saidbar/saidebar.js" defer></script>
+  <script type="module" src="../vendor/helpers.js"></script>
+  <script type="module" src="./finance.js" defer></script>
+  
+</head>
+<body>
+  <div class="app-layout">
+    <aside id="sidebar-root"></aside>
+
+    <div class="app-content">
+      <main class="shell">
+        <section class="card">
+          <div class="card-head">
+            <h1>Financeiro · Monitoramento</h1>
+            <div class="filters">
+              <input id="from" type="date" />
+              <span class="sep">→</span>
+              <input id="to" type="date" />
+              <button id="applyBtn" class="btn-primary">Aplicar</button>
+            </div>
+          </div>
+
+          <div class="kpis">
+            <div class="kpi">
+              <div class="kpi-title">Receita Total</div>
+              <div class="kpi-value" id="kpi-revenue">—</div>
+            </div>
+            <div class="kpi">
+              <div class="kpi-title">Fees (Canais)</div>
+              <div class="kpi-value" id="kpi-fees">—</div>
+            </div>
+            <div class="kpi">
+              <div class="kpi-title">CMV Total</div>
+              <div class="kpi-value" id="kpi-cmv">—</div>
+            </div>
+            <div class="kpi">
+              <div class="kpi-title">Lucro Operacional</div>
+              <div class="kpi-value" id="kpi-op-profit">—</div>
+            </div>
+          </div>
+
+          <div class="table-wrap">
+            <table class="tbl" id="tbl-channels">
+              <thead>
+                <tr>
+                  <th>Canal</th>
+                  <th class="num">Faturamento</th>
+                  <th class="num">Vendas</th>
+                  <th class="num">Ticket médio</th>
+                  <th class="num">Fees (R$)</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr><td colspan="5" class="muted">Carregando…</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="card-foot">
+            <a class="btn-ghost" href="#">Em breve: detalhar canais</a>
+            <a class="btn-ghost" href="#">Em breve: gastos operacionais</a>
+          </div>
+        </section>
+      </main>
+    </div>
+  </div>
+</body>
+</html>

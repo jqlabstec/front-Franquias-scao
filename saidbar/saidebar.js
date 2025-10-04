@@ -27,6 +27,10 @@
   }
 function linkMap(){
   return {
+
+
+    'sales-import': new URL('admin/sales/import/index.html', ROOT_DIR).href,
+
     'welcome': new URL('welcome/bemVindo.html', ROOT_DIR).href,
 
     // Pessoas / Franquias
@@ -34,10 +38,17 @@ function linkMap(){
     'users-list': new URL('admin/users/index/index.html', ROOT_DIR).href,
     'franchise-create': new URL('admin/franchises/create/index.html', ROOT_DIR).href,
     'franchises-list': new URL('admin/franchises/index/index.html', ROOT_DIR).href,
+    'finance-dashboard': new URL('admin/finance/index.html', ROOT_DIR).href,
+
+    'finance-dashboard': new URL('public/pages/dashboard.html', ROOT_DIR).href,
+    'finance-opex':      new URL('admin/finance/opex.html', ROOT_DIR).href,
+    'finance-revenue':   new URL('admin/finance/revenue.html', ROOT_DIR).href,
 
     // Produtos
     'products-create': new URL('admin/inventory/products/create/index.html', ROOT_DIR).href,
-    'products-list':   new URL('admin/inventory/products/index/index.html', ROOT_DIR).href,
+    'products-list':   new URL('admin/inventory/index/index.html', ROOT_DIR).href,
+    'products-discovered': new URL('admin/inventory/discovered/index.html', ROOT_DIR).href,
+    
 
     // Estoque
     'inventory-balances': new URL('admin/inventory/index/index.html', ROOT_DIR).href,
@@ -46,15 +57,28 @@ function linkMap(){
     // Compras
     'purchases-create': new URL('admin/purchases/create/index.html', ROOT_DIR).href,
     'purchases-list':   new URL('admin/purchases/index/index.html', ROOT_DIR).href,
+
+    // receitas
+    'recipes-list':      new URL('recipes/index/index.html', ROOT_DIR).href,
+    'recipes-create':    new URL('recipes/create/index.html', ROOT_DIR).href,
+
   };
 }
 
 function detectActive(){
   const p = location.pathname;
 
+
+  if (p.includes('/admin/sales/import')) return 'sales-import';
+
+  // Receitas
+  if (p.includes('/recipes/create')) return 'recipes-create';
+  if (p.includes('/recipes/index'))  return 'recipes-list';
+
   // Produtos
   if (p.includes('/admin/inventory/products/create')) return 'products-create';
   if (p.includes('/admin/inventory/products/index'))  return 'products-list';
+  if (p.includes('/admin/inventory/discovered')) return 'products-discovered';
 
   // Estoque
   if (p.includes('/admin/inventory/adjust')) return 'inventory-adjust';
@@ -69,6 +93,11 @@ function detectActive(){
   if (p.includes('/admin/users/index'))       return 'users-list';
   if (p.includes('/admin/franchises/create')) return 'franchise-create';
   if (p.includes('/admin/franchises/index'))  return 'franchises-list';
+  if (p.includes('/admin/finance/index')) return 'finance-dashboard';
+
+  if (p.includes('/public/pages/dashboard')) return 'finance-dashboard';
+  if (p.includes('/admin/finance/opex'))   return 'finance-opex';
+  if (p.includes('/admin/finance/revenue'))return 'finance-revenue';
 
   return 'welcome';
 }

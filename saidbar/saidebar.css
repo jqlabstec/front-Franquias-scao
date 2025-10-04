@@ -3,36 +3,121 @@
   --ok:#22c55e; --warn:#f59e0b; --danger:#ef4444; --shadow:0 12px 30px rgba(2,6,23,.08);
 }
 
-body { background: var(--bg); color: var(--text); }
+/* Base */
+body{ background:var(--bg); color:var(--text); }
 
 /* Layout geral com sidebar */
 .app-layout{
   min-height:100vh;
   display:grid;
-  grid-template-columns: 260px 1fr;
+  grid-template-columns:260px 1fr;
 }
 .app-content{ min-width:0; }
 
-/* Sidebar */
-#sidebar-root{ background:var(--card); border-right:1px solid var(--border); }
-.sb{ position:sticky; top:0; height:100dvh; display:flex; flex-direction:column; }
-.sb-head{ padding:16px; border-bottom:1px solid var(--border); }
+/* Sidebar container (coluna esquerda) */
+#sidebar-root{
+  background:var(--card);
+  border-right:1px solid var(--border);
+}
+
+/* Nav lateral rolável */
+.sb{
+  position:sticky; top:0;
+  height:100dvh;
+  display:flex; flex-direction:column;
+  overflow-y:auto;                    /* rolagem na sidebar */
+  overscroll-behavior:contain;
+  scrollbar-gutter:stable;            /* evita “pulo” quando a barra aparece */
+  padding-right:4px;                  /* respiro para a área do thumb */
+}
+
+/* Cabeçalho fixo no topo da sidebar */
+.sb-head{
+  padding:16px 12px;
+  border-bottom:1px solid var(--border);
+  background:var(--card);
+  position:sticky; top:0; z-index:1;
+}
 .sb-logo{ font-weight:800; color:#065f46; }
 
+/* Seções e itens */
 .sb-section{ padding:12px 8px; }
-.sb-title{ font-size:12px; color:var(--muted); text-transform:uppercase; letter-spacing:.06em; padding:6px 8px; }
+.sb-title{
+  font-size:12px; color:var(--muted);
+  text-transform:uppercase; letter-spacing:.06em;
+  padding:6px 8px;
+}
 .sb-item{
-  display:block; padding:10px 12px; margin:4px 0; border-radius:10px; color:#0f172a;
-  text-decoration:none; cursor:pointer;
+  display:block;
+  padding:10px 12px;
+  margin:4px 0;
+  border-radius:10px;
+  color:#0f172a;
+  text-decoration:none;
+  cursor:pointer;
+  transition:background .15s ease, color .15s ease, box-shadow .15s ease;
 }
 .sb-item:hover{ background:#f1f5f9; }
-.sb-item.active{ background:#e7f8ee; color:#065f46; font-weight:700; }
+.sb-item.active{
+  background:#e7f8ee;
+  color:#065f46;
+  font-weight:700;
+  box-shadow:0 2px 8px rgba(6,95,70,.08);
+}
 
-.sb-bottom{ margin-top:auto; padding:12px; display:flex; gap:8px; border-top:1px solid var(--border); }
-.sb-ghost{ border:1px solid var(--border); background:var(--card); border-radius:10px; padding:8px 12px; cursor:pointer; }
-.sb-danger{ border:1px solid #fecaca; color:#991b1b; background:var(--card); border-radius:10px; padding:8px 12px; cursor:pointer; width: 300px; }
+/* Rodapé fixo no fim da sidebar */
+.sb-bottom{
+  margin-top:auto;
+  padding:12px;
+  display:flex; gap:8px;
+  border-top:1px solid var(--border);
+  background:var(--card);
+  position:sticky; bottom:0; z-index:1; /* permanece visível ao rolar */
+}
+.sb-ghost{
+  border:1px solid var(--border);
+  background:var(--card);
+  border-radius:10px;
+  padding:8px 12px;
+  cursor:pointer;
+}
+.sb-danger{
+  border:1px solid #fecaca;
+  color:#991b1b;
+  background:var(--card);
+  border-radius:10px;
+  padding:8px 12px;
+  cursor:pointer;
+  width:100%;
+}
 
+/* Ocultação por regra de permissão */
 .sb-hidden{ display:none !important; }
 
+/* Scrollbar discreta (WebKit/Chromium/Edge/Safari) */
+.sb::-webkit-scrollbar{
+  width:10px;
+}
+.sb::-webkit-scrollbar-track{
+  background:transparent;
+}
+.sb::-webkit-scrollbar-thumb{
+  background:linear-gradient(180deg,#e5e7eb,#d1d5db);
+  border-radius:12px;
+  border:3px solid transparent;      /* deixa o thumb “fino” visualmente */
+  background-clip:padding-box;
+}
+.sb::-webkit-scrollbar-thumb:hover{
+  background:linear-gradient(180deg,#d1d5db,#cbd5e1);
+}
+
+/* Scrollbar discreta (Firefox) */
+.sb{
+  scrollbar-width:thin;
+  scrollbar-color:#cbd5e1 transparent;
+}
+
 /* Wrapper opcional caso a página não tenha preparado o grid */
-.has-sidebar:not(.app-layout){ display:grid; grid-template-columns:260px 1fr; }
+.has-sidebar:not(.app-layout){
+  display:grid; grid-template-columns:260px 1fr;
+}

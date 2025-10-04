@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Importar Vendas · XML</title>
+
+  <link rel="stylesheet" href="../../../saidbar/saidebar.css" />
+  <link rel="stylesheet" href="../../franchises/index/style.css" />
+  <link rel="stylesheet" href="./style.css" />
+
+  <script>window.SIDEBAR_ACTIVE='sales-import';</script>
+  <script src="../../../saidbar/saidebar.js" defer></script>
+  <script type="module" src="script.js" defer></script>
+</head>
+<body>
+  <div class="app-layout">
+    <aside id="sidebar-root"></aside>
+
+    <div class="app-content">
+      <main class="shell">
+        <!-- Cabeçalho -->
+        <section class="card">
+          <div class="card-head">
+            <h1>Importar Vendas (XML)</h1>
+            <p class="muted">Faça upload de arquivos XML (NFe/CFe) para importar vendas automaticamente</p>
+          </div>
+        </section>
+
+        <!-- Upload de XML -->
+        <section class="card">
+          <div class="card-head">
+            <h2>Upload de XML</h2>
+          </div>
+
+          <div class="upload-area" id="uploadArea">
+            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+              <polyline points="17 8 12 3 7 8"></polyline>
+              <line x1="12" y1="3" x2="12" y2="15"></line>
+            </svg>
+            <p class="upload-text">Arraste arquivos XML aqui ou clique para selecionar</p>
+            <p class="upload-hint">Suporta NFe e CFe (arquivos .xml)</p>
+            <input type="file" id="fileInput" accept=".xml" multiple hidden />
+          </div>
+
+          <div id="fileList" class="file-list"></div>
+
+          <div class="card-actions">
+            <button id="importBtn" class="btn-primary" disabled>
+              Importar Vendas
+            </button>
+            <button id="clearBtn" class="btn-secondary" disabled>
+              Limpar Lista
+            </button>
+          </div>
+        </section>
+
+        <!-- Resultado da Importação -->
+        <section class="card" id="resultSection" style="display: none;">
+          <div class="card-head">
+            <h2>Resultado da Importação</h2>
+          </div>
+
+          <div class="result-summary" id="resultSummary"></div>
+
+          <div class="table-wrap" id="resultTableWrap" style="display: none;">
+            <table class="tbl">
+              <thead>
+                <tr>
+                  <th>Arquivo</th>
+                  <th>Status</th>
+                  <th>Vendas</th>
+                  <th>Itens</th>
+                  <th>Produtos Descobertos</th>
+                  <th>Erros</th>
+                </tr>
+              </thead>
+              <tbody id="resultTable"></tbody>
+            </table>
+          </div>
+        </section>
+      </main>
+    </div>
+  </div>
+</body>
+</html>

@@ -1,0 +1,189 @@
+<!doctype html>
+<html lang="pt-BR">
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Receitas · Precificação</title>
+
+  <link rel="stylesheet" href="../../../saidbar/saidebar.css" />
+  <link rel="stylesheet" href="../../../../styles/base.css" />
+  <link rel="stylesheet" href="./pricing.css" />
+
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.all.min.js" defer></script>
+
+  <script>window.SIDEBAR_ACTIVE = 'recipes-list';</script>
+  <script src="../../../saidbar/saidebar.js" defer></script>
+  <script src="./recipe.pricing.js" defer></script>
+</head>
+
+<body>
+  <div class="app-layout">
+    <aside id="sidebar-root"></aside>
+    <div class="app-content">
+      <main class="shell">
+
+        <section class="card">
+          <div class="card-head">
+            <h1>Precificação</h1>
+            <div class="card-actions">
+              <a class="link-ghost" id="btnBack" href="../detail/index.html">Voltar</a>
+            </div>
+          </div>
+
+          <div class="summary">
+            <div class="summary-item">
+              <div class="muted">ID da Receita</div>
+              <div class="strong" id="sumRecipeId">—</div>
+            </div>
+            <div class="summary-item">
+              <div class="muted">Custo por porção</div>
+              <div class="strong" id="sumCostPerPortion">—</div>
+            </div>
+            <div class="summary-item">
+              <div class="muted">Preço sugerido (padrão)</div>
+              <div class="strong" id="sumSuggested">—</div>
+            </div>
+          </div>
+        </section>
+
+        <section class="card">
+          <div class="section-title">Parâmetros padrão</div>
+
+          <div class="grid">
+            <div class="field">
+              <label class="lbl">Modo</label>
+              <select id="mode" class="inp">
+                <option value="MARGIN">Margem (%)</option>
+                <option value="MARKUP">Markup (x)</option>
+              </select>
+            </div>
+
+            <div class="field" id="field-margin">
+              <label class="lbl">Margem desejada (%)</label>
+              <input id="targetMarginPct" class="inp" type="number" step="0.01" placeholder="ex.: 50" />
+            </div>
+
+            <div class="field" id="field-markup" style="display:none">
+              <label class="lbl">Markup (x)</label>
+              <input id="targetMarkup" class="inp" type="number" step="0.01" placeholder="ex.: 2.5" />
+            </div>
+
+            <div class="field">
+              <label class="lbl">Taxa do pagamento (%)</label>
+              <input id="paymentFeePct" class="inp" type="number" step="0.01" placeholder="ex.: 2" />
+            </div>
+
+            <div class="field">
+              <label class="lbl">Taxa do canal (%)</label>
+              <input id="channelFeePct" class="inp" type="number" step="0.01" placeholder="ex.: 12" />
+            </div>
+
+            <div class="field">
+              <label class="lbl">Embalagem (R$)</label>
+              <input id="packagingCost" class="inp" type="number" step="0.01" placeholder="ex.: 0,50" />
+            </div>
+
+            <div class="field">
+              <label class="lbl">Rateio fixos por porção (R$)</label>
+              <input id="fixedOverheadPerPortion" class="inp" type="number" step="0.01" placeholder="ex.: 0,40" />
+            </div>
+          </div>
+
+          <div class="row-actions">
+            <button id="btnCalcDefault" class="btn">Calculadora</button>
+            <button id="btnSaveDefault" class="btn-primary">Salvar padrão</button>
+          </div>
+
+          <div id="resDefault" class="result muted">Sem cálculo</div>
+        </section>
+
+        <section class="card">
+          <div class="section-title">Por canal</div>
+
+          <div class="grid grid-3">
+            <div class="field">
+              <label class="lbl">Canal</label>
+              <select id="channel" class="inp">
+                <option value="COUNTER">Balcão</option>
+                <option value="DELIVERY_APP">App de Delivery</option>
+                <option value="OWN_APP">App Próprio</option>
+                <option value="WHOLESALE">Atacado</option>
+                <option value="OTHER">Outro</option>
+              </select>
+            </div>
+
+            <div class="field">
+              <label class="lbl">Override: Modo</label>
+              <select id="c_mode" class="inp">
+                <option value="">Herdar</option>
+                <option value="MARGIN">Margem (%)</option>
+                <option value="MARKUP">Markup (x)</option>
+              </select>
+            </div>
+
+            <div class="field">
+              <label class="lbl">Override: Margem (%)</label>
+              <input id="c_targetMarginPct" class="inp" type="number" step="0.01" placeholder="Herdar" />
+            </div>
+
+            <div class="field">
+              <label class="lbl">Override: Markup (x)</label>
+              <input id="c_targetMarkup" class="inp" type="number" step="0.01" placeholder="Herdar" />
+            </div>
+
+            <div class="field">
+              <label class="lbl">Override: Taxa pagamento (%)</label>
+              <input id="c_paymentFeePct" class="inp" type="number" step="0.01" placeholder="Herdar" />
+            </div>
+
+            <div class="field">
+              <label class="lbl">Override: Taxa canal (%)</label>
+              <input id="c_channelFeePct" class="inp" type="number" step="0.01" placeholder="Herdar" />
+            </div>
+
+            <div class="field">
+              <label class="lbl">Override: Embalagem (R$)</label>
+              <input id="c_packagingCost" class="inp" type="number" step="0.01" placeholder="Herdar" />
+            </div>
+
+            <div class="field">
+              <label class="lbl">Override: Fixos (R$)</label>
+              <input id="c_fixedOverheadPerPortion" class="inp" type="number" step="0.01" placeholder="Herdar" />
+            </div>
+          </div>
+
+          <div class="row-actions">
+            <button id="btnCalcChannel" class="btn">Calcular canal</button>
+            <button id="btnSaveChannel" class="btn-primary">Salvar canal</button>
+            <button id="btnDeactivateChannel" class="btn ghost danger">Desativar canal</button>
+          </div>
+
+          <div id="resChannel" class="result muted">Sem cálculo</div>
+
+          <div class="table-wrap">
+            <table class="tbl">
+              <thead>
+                <tr>
+                  <th>Canal</th>
+                  <th>Modo</th>
+                  <th>Taxas (%)</th>
+                  <th>Embalagem</th>
+                  <th>Fixos</th>
+                  <th>Preço sugerido</th>
+                </tr>
+              </thead>
+              <tbody id="tbodyChannels">
+                <tr><td colspan="6" class="muted">Nenhum canal ativo</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+      </main>
+    </div>
+  </div>
+</body>
+
+</html>

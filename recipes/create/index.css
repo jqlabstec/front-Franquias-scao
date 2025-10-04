@@ -1,0 +1,35 @@
+:root{ --bg:#f8fafc; --text:#0f172a; --muted:#64748b; --border:#e5e7eb; --shadow:0 12px 30px rgba(2,6,23,.08);
+  --ok:#22c55e; --danger:#ef4444;
+}
+*{ box-sizing:border-box; }
+body{ margin:0; background:var(--bg); color:var(--text); font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu; }
+
+.shell{ display:grid; align-content:start; row-gap:20px; padding:110px 24px 24px; min-height:100vh; }
+.card{ width:min(100%,1100px); background:#fff; border:1px solid var(--border); border-radius:18px; box-shadow:var(--shadow); padding:18px; margin:0 auto; }
+.card-head{ display:flex; justify-content:space-between; align-items:center; gap:12px; }
+
+.form .field{ margin-bottom:12px; }
+.form label{ display:block; font-size:.9rem; color:#475569; margin-bottom:6px; }
+.form input,.form textarea,.form select{ width:100%; padding:10px 12px; border:1px solid var(--border); border-radius:10px; }
+.help{ font-size:.8rem; color:var(--muted); margin-top:4px; }
+
+.grid-2{ display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+.grid-3{ display:grid; grid-template-columns:1fr 1fr 1fr; gap:12px; }
+.inline{ display:flex; gap:8px; }
+.btn-primary{ padding:10px 12px; border:none; border-radius:10px; background:linear-gradient(180deg,#22c55e,#16a34a); color:#fff; font-weight:700; cursor:pointer; }
+.btn-ghost{ padding:10px 12px; border:1px solid var(--border); border-radius:10px; background:#fff; cursor:pointer; }
+
+.section-title{ margin:16px 0 6px; font-size:12px; letter-spacing:.06em; color:var(--muted); text-transform:uppercase; }
+.legend{ color:var(--muted); font-size:.9rem; margin-bottom:8px; }
+
+.ing-row{ display:grid; grid-template-columns: 140px 1fr 110px 110px 120px 110px 46px; gap:8px; margin-bottom:8px; align-items:center; }
+.ing-row .remove{ width:46px; height:42px; border-radius:10px; border:1px solid var(--border); background:#fff; cursor:pointer; }
+.remove:hover{ border-color:#fecaca; color:#ef4444; }
+
+.prod-cell{ position:relative; }
+.hints{ position:absolute; top:100%; left:0; right:0; z-index:10; background:#fff; border:1px solid var(--border); border-radius:10px; padding:6px; box-shadow:var(--shadow); max-height:200px; overflow:auto; }
+.hints div{ padding:6px 8px; cursor:pointer; }
+.hints div:hover{ background:#f8fafc; }
+
+.totals{ display:flex; gap:20px; align-items:center; margin-top:10px; }
+.muted{ color:var(--muted); }

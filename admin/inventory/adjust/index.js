@@ -46,20 +46,33 @@ function toastError(title = 'Falha na operação') {
   });
 }
 
-function confirmAdjust(title = 'Confirmar ajuste?', text = 'Deseja continuar?', danger=false) {
+function confirmAdjust(title = 'Confirmar ajuste?', text = 'Deseja continuar?', danger = false) {
+  const btnPrimaryGreen = 'padding:10px 12px;border:none;border-radius:10px;background:linear-gradient(180deg,#22c55e,#16a34a);color:#fff;font-weight:700;cursor:pointer;text-decoration:none;box-shadow:0 8px 16px rgba(22,163,74,.20);';
+  const btnPrimaryRed   = 'padding:10px 12px;border:none;border-radius:10px;background:linear-gradient(180deg,#ef4444,#dc2626);color:#fff;font-weight:700;cursor:pointer;text-decoration:none;box-shadow:0 8px 16px rgba(239,68,68,.20);';
+  const btnGhost        = 'padding:10px 12px;border:1px solid #e5e7eb;border-radius:10px;background:#fff;color:#0f172a;font-weight:600;cursor:pointer;';
+
   return Swal.fire({
     customClass: {
       popup: 'vita',
-      confirmButton: danger ? 'vita-danger' : 'vita-ok',
-      cancelButton: 'vita-warn'
+      confirmButton: '',   // aplicamos estilo inline no didRender
+      cancelButton: '',
     },
     icon: danger ? 'warning' : 'question',
-    title, text,
+    title,
+    html: `<div style="color:var(--muted)">${String(text).replace(/\n/g,'<br>')}</div>`,
     showCancelButton: true,
     confirmButtonText: 'Confirmar',
     cancelButtonText: 'Cancelar',
     buttonsStyling: false,
-    reverseButtons: true
+    reverseButtons: true,
+    didRender: () => {
+      const confirmEl = Swal.getConfirmButton();
+      const cancelEl  = Swal.getCancelButton();
+      if (confirmEl) confirmEl.setAttribute('style', danger ? btnPrimaryRed : btnPrimaryGreen);
+      if (cancelEl)  cancelEl.setAttribute('style', btnGhost);
+      const actions = Swal.getActions();
+      if (actions) actions.style.gap = '8px';
+    },
   });
 }
 

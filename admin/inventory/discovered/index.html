@@ -1,0 +1,126 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Produtos Descobertos · VitaGestor</title>
+
+  <link rel="stylesheet" href="../../../saidbar/saidebar.css" />
+  <link rel="stylesheet" href="./discovered.css" />
+
+  <script>window.SIDEBAR_ACTIVE='products-discovered';</script>
+  <script src="../../../saidbar/saidebar.js" defer></script>
+  <script type="module" src="./discovered.js" defer></script>
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+</head>
+<body>
+  <div class="app-layout">
+    <aside id="sidebar-root"></aside>
+
+    <div class="app-content">
+      <main class="shell">
+        <section class="card">
+          <div class="card-head">
+            <h1>Produtos Descobertos</h1>
+            <div class="filters">
+              <input id="q" placeholder="Buscar produto" />
+              <select id="statusFilter">
+                <option value="">Status: todos</option>
+                <option value="pending">Pendentes</option>
+                <option value="imported">Importados</option>
+              </select>
+              <button id="applyBtn" class="btn-primary">Aplicar</button>
+              <button id="uploadXmlBtn" class="btn-ghost">📤 Upload XML</button>
+            </div>
+          </div>
+
+          <div class="banner hidden" id="status"></div>
+
+          <!-- KPIs -->
+          <div class="kpis">
+            <div class="kpi">
+              <div class="kpi-title">Total Descobertos</div>
+              <div class="kpi-value" id="kpi-total">0</div>
+            </div>
+            <div class="kpi">
+              <div class="kpi-title">Pendentes</div>
+              <div class="kpi-value" id="kpi-pending">0</div>
+            </div>
+            <div class="kpi">
+              <div class="kpi-title">Importados</div>
+              <div class="kpi-value" id="kpi-imported">0</div>
+            </div>
+            <div class="kpi">
+              <div class="kpi-title">Preço Médio</div>
+              <div class="kpi-value" id="kpi-avg">R$ 0,00</div>
+            </div>
+          </div>
+
+          <div class="table-wrap">
+            <table class="tbl" id="tbl">
+              <thead>
+                <tr>
+                  <th>Código</th>
+                  <th>Nome</th>
+                  <th>Categoria</th>
+                  <th class="num">Preço Médio</th>
+                  <th class="num">Vezes Visto</th>
+                  <th>Primeira Vez</th>
+                  <th>Status</th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody id="tbody">
+                <tr><td colspan="8" class="muted">Carregando...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+      </main>
+    </div>
+  </div>
+
+  <!-- Modal Upload XML -->
+  <dialog id="uploadDialog">
+    <form method="dialog" class="form">
+      <h3>Upload de XML (NFe/CFe)</h3>
+      <div class="grid">
+        <label>Arquivo XML
+          <input id="f-xml-file" type="file" accept=".xml" />
+        </label>
+        <div class="info-box">
+          <p>📋 Formatos aceitos: NFe, CFe</p>
+          <p>✅ O sistema irá extrair automaticamente os produtos</p>
+        </div>
+      </div>
+      <menu>
+        <button id="dlgCancelUpload" class="btn-ghost">Cancelar</button>
+        <button id="dlgUpload" class="btn-primary">Processar</button>
+      </menu>
+    </form>
+  </dialog>
+
+  <!-- Modal Importar como Receita -->
+  <dialog id="importDialog">
+    <form method="dialog" class="form">
+      <h3>Importar como Receita</h3>
+      <input type="hidden" id="import-id" />
+      <div class="grid">
+        <label>Nome da Receita
+          <input id="f-name" required />
+        </label>
+        <label>Categoria
+          <input id="f-category" placeholder="Ex: Sucos, Açaí..." />
+        </label>
+        <label style="grid-column: 1 / -1;">Descrição
+          <textarea id="f-description" rows="3"></textarea>
+        </label>
+      </div>
+      <menu>
+        <button id="dlgCancelImport" class="btn-ghost">Cancelar</button>
+        <button id="dlgSaveImport" class="btn-primary">Importar</button>
+      </menu>
+    </form>
+  </dialog>
+</body>
+</html>

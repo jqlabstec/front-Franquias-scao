@@ -1,0 +1,78 @@
+:root{
+  --bg:#f8fafc; --text:#0f172a; --muted:#64748b; --border:#e5e7eb; --shadow:0 12px 30px rgba(2,6,23,.08);
+  --card:#ffffff; --field-bg:#fff; --field-border:#e5e7eb; --field-radius:10px;
+  --primary:#16a34a;        /* verde */
+  --primary-hover:#15803d;  /* verde mais escuro */
+  --danger:#dc2626; --danger-bg:#fff; --danger-border:#fee2e2;
+}
+
+*{ box-sizing:border-box; }
+html,body{ height:100%; }
+body{ margin:0; color:var(--text); background:var(--bg);
+  font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Cantarell,"Helvetica Neue",Arial,"Noto Sans";
+}
+
+.shell{ display:grid; align-content:start; justify-items:stretch; row-gap:20px; padding:110px 24px 24px; min-height:100vh; }
+.card{ width:min(100%,1100px); background:var(--card); border:1px solid var(--border); border-radius:18px; box-shadow:var(--shadow); padding:18px; margin:0 auto; }
+.card-head{ display:flex; justify-content:space-between; align-items:center; gap:12px; }
+.card-actions{ display:flex; gap:10px; align-items:center; }
+
+.section-title{ font-size:12px; text-transform:uppercase; letter-spacing:.06em; color:var(--muted); margin:16px 0 8px; }
+.strong{ font-weight:700; }
+.muted{ color:var(--muted); }
+
+.grid2{ display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+.grid3{ display:grid; grid-template-columns:1fr 1fr 1fr; gap:12px; }
+@media (max-width: 900px){
+  .grid2{ grid-template-columns:1fr; }
+  .grid3{ grid-template-columns:1fr; }
+}
+
+.fld label{ display:block; font-size:.9rem; color:#475569; margin:6px 0 6px; }
+.fld input,.fld textarea,.fld select{
+  width:100%; padding:10px 12px; border:1px solid var(--field-border); border-radius:var(--field-radius);
+  background:var(--field-bg); color:var(--text); outline:none;
+}
+.fld input:focus,.fld textarea:focus,.fld select:focus{
+  border-color:#cbd5e1; box-shadow:0 0 0 3px rgba(22,163,74,.12);
+}
+
+#formRecipe{ display:grid; gap:12px; }
+
+/* Ingredientes (removido o campo de ID do produto) */
+.ing-row{
+  display:grid;
+  grid-template-columns: 140px 1fr 110px 130px 130px 150px 40px;
+  gap:10px; align-items:end; margin-bottom:8px;
+}
+.ing-row .small{ font-size:.8rem; color:var(--muted); margin-top:4px; }
+@media (max-width: 1100px){
+  .ing-row{ grid-template-columns: 1fr 1fr; }
+  .ing-row > .fld:nth-child(2){ grid-column: span 2; } /* Produto / Nome livre ocupa 2 colunas no mobile */
+}
+
+.remove{
+  width:40px; height:40px; border:1px solid var(--danger-border); background:var(--danger-bg);
+  color:var(--danger); border-radius:10px; cursor:pointer; align-self:end;
+}
+.remove:hover{ background:#fef2f2; }
+
+.totals{ display:flex; gap:16px; margin-top:8px; flex-wrap:wrap; }
+.totals .muted{ margin-right:6px; }
+
+/* Botões verdes */
+.btn-primary{
+  display:inline-flex; align-items:center; gap:8px;
+  background:var(--primary); color:#fff; border:none;
+  padding:10px 14px; border-radius:10px; cursor:pointer; text-decoration:none; font-weight:600;
+  box-shadow:0 8px 16px rgba(22,163,74,.20);
+  transition:transform .06s ease, box-shadow .2s ease, background .2s ease;
+}
+.btn-primary:hover{ background:var(--primary-hover); box-shadow:0 10px 20px rgba(22,163,74,.28); }
+.btn-primary:active{ transform:translateY(1px); }
+
+.btn-ghost{
+  background:#fff; color:var(--text); border:1px solid var(--border);
+  padding:10px 14px; border-radius:10px; cursor:pointer; text-decoration:none;
+}
+.btn-ghost:hover{ background:#f8fafc; }

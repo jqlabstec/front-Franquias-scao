@@ -43,7 +43,11 @@ h1{ margin:0; font-weight:800; }
 .filters input{ padding:10px 12px; border:1px solid var(--border); border-radius:10px; }
 .sep{ align-self:center; color:var(--muted); }
 .btn-primary{
-  padding:10px 12px; border:none; border-radius:10px; background:linear-gradient(180deg,#22c55e,#16a34a); color:#fff; font-weight:700; cursor:pointer; text-decoration:none; display:inline-block;
+  padding:10px 12px; border:none; border-radius:10px; background:linear-gradient(1180deg,#22c55e,#16a34a); color:#fff; font-weight:700; cursor:pointer; text-decoration:none; display:inline-block;
+}
+
+.btn-secondary{
+  padding:10px 12px; border:none; border-radius:10px; background:linear-gradient(180deg,#989898,#989898); color:#040404; font-weight:700; cursor:pointer; text-decoration:none; display:inline-block;
 }
 .btn-ghost{
   padding:10px 12px; border:1px solid var(--border); border-radius:10px; background:#fff; cursor:pointer;
