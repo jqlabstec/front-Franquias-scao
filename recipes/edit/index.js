@@ -22,7 +22,6 @@ async function updateRecipe(id, body, token){
 }
 
 function ingRowTemplate(ing){
-  // ing pode ter productId ou nome livre
   const row = document.createElement('div');
   row.className = 'ing-row';
 
@@ -39,7 +38,6 @@ function ingRowTemplate(ing){
       <label>Produto / Nome livre</label>
       <input data-field="name" type="text" placeholder="Ex.: Morango congelado">
       <input data-field="productId" type="hidden" placeholder="ID do produto (opcional)"/>
-    
     </div>
     <div class="fld">
       <label>Unidade</label>
@@ -60,7 +58,6 @@ function ingRowTemplate(ing){
     <button class="remove" type="button" title="Remover">✕</button>
   `;
 
-  // preencher valores
   row.querySelector('[data-field="type"]').value = ing?.type || 'INGREDIENT';
   row.querySelector('[data-field="name"]').value = ing?.product?.name || ing?.name || '';
   row.querySelector('[data-field="productId"]').value = ing?.productId || '';
@@ -74,7 +71,6 @@ function ingRowTemplate(ing){
     recalcTotals();
   });
 
-  // Recalcular quando mudar algo
   row.querySelectorAll('input,select').forEach(inp => {
     inp.addEventListener('input', recalcTotals);
   });
@@ -98,8 +94,8 @@ function readIngredients(){
       productId: productIdRaw ? Number(productIdRaw) : null,
       name: productIdRaw ? null : (name || null),
       unitOfMeasure,
-      quantity, // já convertido: ex. 0.4 se quiser 400g quando produto é kg
-      conversionFactor: null, // não vamos usar agora
+      quantity,
+      conversionFactor: null,
       wastageFactor: Math.max(0, Math.min(1, wastagePercent/100)),
       unitCost: unitCostRaw ? Number(unitCostRaw) : null,
       notes: null,
@@ -109,8 +105,6 @@ function readIngredients(){
 
 function recalcTotals(){
   const ings = readIngredients();
-  // Como não temos o custo do produto no front, só conseguimos estimar se unitCost foi preenchido.
-  // Caso unitCost esteja vazio, subtotal estimado será 0 aqui — o back calculará corretamente.
   let total = 0;
   ings.forEach(i => {
     const unitCost = Number(i.unitCost || 0);
@@ -122,7 +116,85 @@ function recalcTotals(){
   document.getElementById('costPerPortion').textContent = (total && yq) ? `R$ ${fmtMoney(total / yq)}` : '—';
 }
 
-function fillForm(recipe){
+// ✅ Corrigido: Recebe id e auth como parâmetros
+function renderImagePreview(imageUrl, recipeId, authToken) {
+  const preview = document.getElementById('imagePreview');
+  if (!preview) return;
+  
+  if (imageUrl) {
+    preview.innerHTML = `
+      <img src="${imageUrl}" alt="Preview" style="max-width: 300px; border-radius: 8px;">
+      <button type="button" id="btnRemoveImage" class="btn-secondary" style="margin-top: 10px;">
+        Remover Imagem
+      </button>
+    `;
+    
+    document.getElementById('btnRemoveImage')?.addEventListener('click', async () => {
+      if (!confirm('Deseja remover a imagem?')) return;
+      
+      try {
+        const r = await fetch(`${API}/recipes/${recipeId}/image`, {
+          method: 'DELETE',
+          headers: { Authorization: `Bearer ${authToken}` },
+        });
+        
+        if (!r.ok) {
+          const data = await r.json().catch(() => ({}));
+          throw new Error(data.message || 'Erro ao remover imagem');
+        }
+        
+        renderImagePreview(null, recipeId, authToken);
+        await Swal.fire({ icon: 'success', title: 'Imagem removida!' });
+      } catch (err) {
+        await Swal.fire({ icon: 'error', title: 'Erro', text: err.message });
+      }
+    });
+  } else {
+    preview.innerHTML = `
+      <input type="file" id="imageInput" accept="image/*" style="display: none;">
+      <button type="button" id="btnSelectImage" class="btn-secondary">
+        Selecionar Imagem
+      </button>
+    `;
+    
+    document.getElementById('btnSelectImage')?.addEventListener('click', () => {
+      document.getElementById('imageInput')?.click();
+    });
+    
+    document.getElementById('imageInput')?.addEventListener('change', async (e) => {
+      const file = e.target.files[0];
+      if (!file) return;
+      
+      // Validar tamanho (5MB)
+      if (file.size > 5 * 1024 * 1024) {
+        await Swal.fire({ icon: 'error', title: 'Erro', text: 'Imagem muito grande! Máximo 5MB.' });
+        return;
+      }
+      
+      const formData = new FormData();
+      formData.append('image', file);
+      
+      try {
+        const r = await fetch(`${API}/recipes/${recipeId}/image`, {
+          method: 'POST',
+          headers: { Authorization: `Bearer ${authToken}` },
+          body: formData,
+        });
+        
+        const data = await r.json();
+        if (!r.ok) throw new Error(data.message || 'Erro ao enviar imagem');
+        
+        renderImagePreview(data.imageUrl, recipeId, authToken);
+        await Swal.fire({ icon: 'success', title: 'Imagem enviada!' });
+      } catch (err) {
+        await Swal.fire({ icon: 'error', title: 'Erro', text: err.message });
+      }
+    });
+  }
+}
+
+// ✅ Corrigido: Passa id e auth para renderImagePreview
+function fillForm(recipe, recipeId, authToken){
   document.getElementById('name').value = recipe.name || '';
   document.getElementById('category').value = recipe.category || '';
   document.getElementById('yieldQuantity').value = recipe.yieldQuantity != null ? Number(recipe.yieldQuantity) : '';
@@ -138,16 +210,28 @@ function fillForm(recipe){
   });
 
   recalcTotals();
+
+  // ✅ Passa os parâmetros necessários
+  renderImagePreview(recipe.imageUrl, recipeId, authToken);
 }
 
 document.addEventListener('DOMContentLoaded', async ()=>{
-  const auth = getAuth(); if(!auth?.token){ location.href='../../../login/index.html'; return; }
-  const id = qs('id'); if(!id){ location.href='../index/index.html'; return; }
+  const auth = getAuth(); 
+  if(!auth?.token){ 
+    location.href='../../../login/index.html'; 
+    return; 
+  }
+  
+  const id = qs('id'); 
+  if(!id){ 
+    location.href='../index/index.html'; 
+    return; 
+  }
 
   // Carregar receita
   try{
     const recipe = await fetchRecipe(id, auth.token);
-    fillForm(recipe);
+    fillForm(recipe, id, auth.token); // ✅ Passa id e token
   }catch(err){
     await Swal.fire({ icon:'error', title:'Erro', text: err.message || 'Falha ao carregar', confirmButtonText:'Ok' });
     location.href = '../index/index.html';
@@ -188,8 +272,8 @@ document.addEventListener('DOMContentLoaded', async ()=>{
   });
 
   // Recalcular custos ao alterar campos que afetam custo por porção
-  ['yieldQuantity'].forEach(id => {
-    const el = document.getElementById(id);
+  ['yieldQuantity'].forEach(fieldId => {
+    const el = document.getElementById(fieldId);
     if (el) el.addEventListener('input', recalcTotals);
   });
 });

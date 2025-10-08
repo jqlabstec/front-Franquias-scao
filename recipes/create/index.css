@@ -33,3 +33,32 @@ body{ margin:0; background:var(--bg); color:var(--text); font-family:system-ui,-
 
 .totals{ display:flex; gap:20px; align-items:center; margin-top:10px; }
 .muted{ color:var(--muted); }
+
+
+/* Container para o input de arquivo */
+.field input[type="file"] {
+  display: block;
+  width: 100%;
+  padding: 8px 12px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background-color: #fff;
+  font-family: inherit;
+  font-size: 1rem;
+  color: var(--text);
+  cursor: pointer;
+  transition: border-color 0.2s ease;
+}
+
+.field input[type="file"]:hover {
+  border-color: var(--ok);
+}
+
+.field input[type="file"]:focus {
+  outline: none;
+  border-color: var(--ok);
+  box-shadow: 0 0 0 3px rgba(34, 197, 94, 0.3);
+}
+
+/* Para esconder o texto padrão do input e usar um botão customizado (opcional) */
+/* Se quiser um botão customizado, me avise para eu ajudar a montar */
