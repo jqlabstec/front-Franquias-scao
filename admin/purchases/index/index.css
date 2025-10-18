@@ -92,3 +92,83 @@ body {
 .card + .card {
   margin-top: 20px;
 }
+
+/* ✅ Paginação */
+.pagination {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 1.5rem;
+  padding: 1rem;
+  background: var(--card-bg);
+  border-radius: 12px;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.pagination-info {
+  color: var(--muted);
+  font-size: 0.9rem;
+  font-weight: 500;
+}
+
+.pagination-controls {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.pagination-controls button {
+  min-width: 40px;
+  height: 40px;
+  padding: 0.5rem;
+  border-radius: 8px;
+  font-weight: 600;
+  transition: all 0.2s;
+}
+
+.pagination-controls button:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.pagination-controls .btn-primary {
+  background: linear-gradient(180deg, #22c55e, #16a34a);
+  color: white;
+  border: none;
+}
+
+.pagination-controls .btn-ghost {
+  background: white;
+  color: var(--text);
+  border: 1px solid var(--border);
+}
+
+.pagination-controls .btn-ghost:hover:not(:disabled) {
+  background: var(--hover-bg);
+  border-color: var(--primary);
+}
+
+/* ✅ Pill para método de pagamento */
+.pill {
+  display: inline-block;
+  padding: 0.25rem 0.75rem;
+  border-radius: 12px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  background: var(--hover-bg);
+  color: var(--text);
+  border: 1px solid var(--border);
+}
+
+.pill.ok {
+  background: #dcfce7;
+  color: #16a34a;
+  border-color: #86efac;
+}
+
+.pill.no {
+  background: #fee2e2;
+  color: #dc2626;
+  border-color: #fca5a5;
+}

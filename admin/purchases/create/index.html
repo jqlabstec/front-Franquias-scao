@@ -1,22 +1,24 @@
 <!doctype html>
 <html lang="pt-BR">
+
 <head>
-  <meta charset="utf-8"/>
-  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Compras · Nova</title>
 
-  <link rel="stylesheet" href="../../../saidbar/saidebar.css"/>
-  <link rel="stylesheet" href="../../../../styles/base.css"/>
-  <link rel="stylesheet" href="./index.css"/>
+  <link rel="stylesheet" href="../../../saidbar/saidebar.css" />
+  <link rel="stylesheet" href="../../../../styles/base.css" />
+  <link rel="stylesheet" href="./index.css" />
 
   <!-- SweetAlert2 -->
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.all.min.js" defer></script>
 
-  <script>window.SIDEBAR_ACTIVE='purchases-create';</script>
+  <script>window.SIDEBAR_ACTIVE = 'purchases-create';</script>
   <script src="../../../saidbar/saidebar.js" defer></script>
   <script src="./index.js" defer></script>
 </head>
+
 <body>
   <div class="app-layout">
     <aside id="sidebar-root"></aside>
@@ -33,29 +35,53 @@
               <a class="btn-ghost" href="../index/index.html">Listar compras</a>
             </div>
           </div>
-          <input type="file" id="xmlFile" accept=".xml,text/xml" style="display:none"/>
-          <form id="formHeader" class="filters" style="display:grid;grid-template-columns:repeat(2,minmax(220px,1fr));gap:8px;">
+          <input type="file" id="xmlFile" accept=".xml,text/xml" style="display:none" />
+          <form id="formHeader" class="filters"
+            style="display:grid;grid-template-columns:repeat(2,minmax(220px,1fr));gap:8px;">
             <div class="field">
               <label>Número da nota (opcional)</label>
-              <input id="invoiceNumber" type="text" maxlength="60" placeholder="Ex.: 3523"/>
+              <input id="invoiceNumber" type="text" maxlength="60" placeholder="Ex.: 3523" />
             </div>
             <div class="field">
               <label>Data da compra</label>
-              <input id="purchaseDate" type="datetime-local"/>
+              <input id="purchaseDate" type="datetime-local" />
             </div>
             <div class="field" style="grid-column: span 2;">
               <label>Fornecedor</label>
-              <input id="supplierName" type="text" required placeholder="Ex.: Distribuidora XPTO"/>
+              <input id="supplierName" type="text" required placeholder="Ex.: Distribuidora XPTO" />
             </div>
             <div class="field">
               <label>Vencimento (opcional)</label>
-              <input id="paymentDueDate" type="date"/>
+              <input id="paymentDueDate" type="date" />
             </div>
             <div class="field">
               <label>Pago?</label>
               <select id="isPaid">
                 <option value="false" selected>Não</option>
                 <option value="true">Sim</option>
+              </select>
+            </div>
+            <div class="field" style="grid-column: span 2;">
+              <label>Tipo de compra</label>
+              <select id="purchaseType">
+                <option value="INGREDIENT" selected>Ingrediente</option>
+                <option value="PACKAGING">Embalagem</option>
+                <option value="ADMINISTRATIVE">Material administrativo</option>
+                <option value="EQUIPMENT">Equipamento</option>
+                <option value="MAINTENANCE">Manutenção</option>
+                <option value="OTHER">Outro</option>
+              </select>
+            </div>
+            <div class="field" style="grid-column: span 2;">
+              <label>Método de pagamento</label>
+              <select id="paymentMethod">
+                <option value="BILLED" selected>Faturado (a prazo)</option>
+                <option value="PIX">PIX</option>
+                <option value="DEBIT">Débito</option>
+                <option value="CREDIT">Crédito</option>
+                <option value="CASH">Dinheiro</option>
+                <option value="TRANSFER">Transferência bancária</option>
+                <option value="OTHER">Outro</option>
               </select>
             </div>
           </form>
@@ -70,22 +96,23 @@
           </div>
 
           <!-- Linha para adicionar item -->
-          <div class="filters" id="addItemRow" style="display:grid;grid-template-columns:120px 1fr 140px 160px 120px;gap:8px;">
+          <div class="filters" id="addItemRow"
+            style="display:grid;grid-template-columns:120px 1fr 140px 160px 120px;gap:8px;">
             <div class="field">
               <label>Código (SKU)</label>
-              <input id="itCode" type="text" placeholder="Ex.: FAR-001"/>
+              <input id="itCode" type="text" placeholder="Ex.: FAR-001" />
             </div>
             <div class="field">
               <label>Produto</label>
-              <input id="itName" type="text" placeholder="Nome do produto (opcional)"/>
+              <input id="itName" type="text" placeholder="Nome do produto (opcional)" />
             </div>
             <div class="field">
               <label>Qtd</label>
-              <input id="itQty" type="number" step="0.0001" min="0.0001" placeholder="Ex.: 10"/>
+              <input id="itQty" type="number" step="0.0001" min="0.0001" placeholder="Ex.: 10" />
             </div>
             <div class="field">
               <label>Custo unit.</label>
-              <input id="itUnitCost" type="number" step="0.0001" min="0" placeholder="Ex.: 5.50"/>
+              <input id="itUnitCost" type="number" step="0.0001" min="0" placeholder="Ex.: 5.50" />
             </div>
             <div class="actions" style="display:flex;align-items:end">
               <button class="btn-primary" id="btnAddItem" type="button">Adicionar</button>
@@ -97,18 +124,26 @@
             <table class="tbl">
               <thead>
                 <tr>
-                  <th>#</th><th>Código</th><th>Nome</th><th>Qtd</th><th>Unit.</th><th>Total</th><th></th>
+                  <th>#</th>
+                  <th>Código</th>
+                  <th>Nome</th>
+                  <th>Qtd</th>
+                  <th>Unit.</th>
+                  <th>Total</th>
+                  <th></th>
                 </tr>
               </thead>
               <tbody id="tbodyItems">
-                <tr><td colspan="7" class="muted">Nenhum item</td></tr>
+                <tr>
+                  <td colspan="7" class="muted">Nenhum item</td>
+                </tr>
               </tbody>
             </table>
           </div>
 
           <div style="display:flex;justify-content:flex-end;gap:12px;margin-top:12px;">
-              <div class="banner"><strong>Total:</strong> <span id="totalSpan">0,00</span></div>
-              <button class="btn-primary-save" id="btnSave">Salvar compra</button>
+            <div class="banner"><strong>Total:</strong> <span id="totalSpan">0,00</span></div>
+            <button class="btn-primary-save" id="btnSave">Salvar compra</button>
           </div>
         </section>
 
@@ -116,4 +151,5 @@
     </div>
   </div>
 </body>
+
 </html>

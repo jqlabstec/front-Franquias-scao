@@ -186,3 +186,97 @@ body{ margin:0; color:var(--text); background:var(--bg);
   font-size:.9rem;
 }
 .btn-secondary:hover{ background:#fef2f2; }
+
+
+/* ✅ Container do produto com position relative */
+.prod-cell {
+  position: relative;
+  flex: 1;
+  min-width: 200px;
+}
+
+/* ✅ Dropdown flutuante */
+.hints {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  background: white;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  max-height: 200px;
+  overflow-y: auto;
+  z-index: 1000;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  display: none;
+}
+
+/* ✅ Itens do dropdown */
+.hint-item {
+  cursor: pointer;
+  padding: 8px 12px;
+  border-bottom: 1px solid #eee;
+  transition: background-color 0.2s;
+}
+
+.hint-item:last-child {
+  border-bottom: none;
+}
+
+.hint-item:hover {
+  background-color: #f0f0f0;
+}
+
+/* ✅ Mensagem de erro */
+.error-msg {
+  display: block;
+  font-size: 0.85em;
+  margin-top: 4px;
+}
+
+/* ✅ Linha de ingrediente */
+.ing-row {
+  display: flex;
+  gap: 8px;
+  align-items: flex-start;
+  margin-bottom: 12px;
+  flex-wrap: wrap;
+}
+
+.ing-row select,
+.ing-row input {
+  padding: 8px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 14px;
+}
+
+.ing-row .type {
+  flex: 0 0 140px;
+}
+
+.ing-row .unitOfMeasure {
+  flex: 0 0 80px;
+}
+
+.ing-row .quantity,
+.ing-row .wastageFactor,
+.ing-row .unitCost {
+  flex: 0 0 100px;
+}
+
+.ing-row .remove {
+  flex: 0 0 40px;
+  background: #dc3545;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 18px;
+  padding: 8px;
+  transition: background-color 0.2s;
+}
+
+.ing-row .remove:hover {
+  background: #c82333;
+}

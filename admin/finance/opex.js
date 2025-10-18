@@ -16,10 +16,32 @@ function params(){
   return {
     q: qs('#q').value.trim(),
     category: qs('#category').value || undefined,
+    costType: qs('#costType').value || undefined, // ✅ NOVO
     from: qs('#from').value ? `${qs('#from').value}T00:00:00.000Z` : undefined,
     to: qs('#to').value ? `${qs('#to').value}T23:59:59.999Z` : undefined,
   };
 }
+
+// ✅ NOVO: Mapeamento de labels para costType
+const COST_TYPE_LABELS = {
+  RENT: 'Aluguel',
+  SALARY: 'Salários',
+  UTILITIES: 'Água/Luz/Gás',
+  INSURANCE: 'Seguros',
+  DEPRECIATION: 'Depreciação',
+  MAINTENANCE: 'Manutenção',
+  CLEANING: 'Limpeza',
+  SECURITY: 'Segurança',
+  MARKETING: 'Marketing',
+  COMMISSION: 'Comissões',
+  FREIGHT: 'Frete',
+  ADMINISTRATIVE: 'Administrativo',
+  IT_SOFTWARE: 'Software/TI',
+  PROFESSIONAL_SERVICE: 'Serv. Profissionais',
+  BANK_FEE: 'Tarifas bancárias',
+  TAX: 'Impostos',
+  OTHER: 'Outros',
+};
 
 function confirmAction(title = 'Confirmar ação?', text = 'Deseja continuar?', danger = false) {
   const btnPrimaryGreen = 'padding:10px 12px;border:none;border-radius:10px;background:linear-gradient(180deg,#22c55e,#16a34a);color:#fff;font-weight:700;cursor:pointer;text-decoration:none;box-shadow:0 8px 16px rgba(22,163,74,.20);';
@@ -96,6 +118,7 @@ async function listCosts() {
   const p = params();
   if (p.q) url.searchParams.set('q', p.q);
   if (p.category) url.searchParams.set('category', p.category);
+  if (p.costType) url.searchParams.set('costType', p.costType); // ✅ NOVO
   if (p.from) url.searchParams.set('from', p.from);
   if (p.to) url.searchParams.set('to', p.to);
 
@@ -133,7 +156,7 @@ async function deleteCost(id) {
 function renderRows(items){
   const tbody = qs('#tbody');
   if (!items.length) {
-    tbody.innerHTML = `<tr><td colspan="7" class="muted">Sem resultados</td></tr>`;
+    tbody.innerHTML = `<tr><td colspan="8" class="muted">Sem resultados</td></tr>`; // ✅ colspan 8
     qs('#tfoot-total').textContent = '—';
     return;
   }
@@ -141,10 +164,12 @@ function renderRows(items){
   tbody.innerHTML = items.map(c=>{
     const d = new Date(c.costDate);
     total += Number(c.amount || 0);
+    const typeLabel = COST_TYPE_LABELS[c.costType] || c.costType || '—'; // ✅ NOVO
     return `
       <tr data-id="${c.id}">
         <td>${d.toLocaleDateString('pt-BR')}</td>
         <td>${c.description}</td>
+        <td>${typeLabel}</td> <!-- ✅ NOVO: Mostrar tipo -->
         <td>${c.category}</td>
         <td>${c.recognitionBasis}</td>
         <td>${c.isRecurring ? '<span class="pill ok">Sim</span>' : '<span class="pill no">Não</span>'}</td>
@@ -197,6 +222,7 @@ function openDialog(item){
   qs('#dlgTitle').textContent = item ? 'Editar custo' : 'Novo custo';
   qs('#f-description').value = item?.description || '';
   qs('#f-amount').value = item ? Number(item.amount) : '';
+  qs('#f-costType').value = item?.costType || 'OTHER'; // ✅ NOVO
   qs('#f-category').value = item?.category || 'FIXED';
   qs('#f-basis').value = item?.recognitionBasis || 'ACCRUAL';
   qs('#f-rec').checked = !!item?.isRecurring;
@@ -225,6 +251,7 @@ function openDialog(item){
     const payload = {
       description: desc,
       amount: amt,
+      costType: qs('#f-costType').value, // ✅ NOVO
       category: qs('#f-category').value,
       costDate: new Date(qs('#f-date').value + 'T12:00:00').toISOString(),
       recognitionBasis: qs('#f-basis').value,
@@ -271,6 +298,13 @@ document.addEventListener('DOMContentLoaded', ()=>{
   if (categorySelect) {
     categorySelect.setAttribute('style', 'padding:8px 12px; border:1px solid var(--border); border-radius:8px; background:#fff; font-size:14px; cursor:pointer;');
   }
+  
+  // ✅ NOVO: Aplicar estilo no costType também
+  const costTypeSelect = qs('#costType');
+  if (costTypeSelect) {
+    costTypeSelect.setAttribute('style', 'padding:8px 12px; border:1px solid var(--border); border-radius:8px; background:#fff; font-size:14px; cursor:pointer;');
+  }
+  
   qs('#applyBtn').addEventListener('click', (e)=>{ e.preventDefault(); load(); });
   qs('#newBtn').addEventListener('click', ()=> openDialog(null));
   load();

@@ -43,6 +43,7 @@ function linkMap(){
     'finance-dashboard': new URL('public/pages/dashboard.html', ROOT_DIR).href,
     'finance-opex':      new URL('admin/finance/opex.html', ROOT_DIR).href,
     'finance-revenue':   new URL('admin/finance/revenue.html', ROOT_DIR).href,
+    'finance-cash-register': new URL('cash/index.html', ROOT_DIR).href,
 
     // Produtos
     'products-create': new URL('admin/inventory/products/create/index.html', ROOT_DIR).href,
@@ -98,6 +99,7 @@ function detectActive(){
   if (p.includes('/public/pages/dashboard')) return 'finance-dashboard';
   if (p.includes('/admin/finance/opex'))   return 'finance-opex';
   if (p.includes('/admin/finance/revenue'))return 'finance-revenue';
+  if (p.includes('/Cash')) return 'finance-cash-register';
 
   return 'welcome';
 }

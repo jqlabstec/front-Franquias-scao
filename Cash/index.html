@@ -1,0 +1,149 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>Financeiro · Registro de Caixa</title>
+
+  <link rel="stylesheet" href="../../../saidbar/saidebar.css"/>
+  <link rel="stylesheet" href="./index.css"/>
+
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css"/>
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.all.min.js" defer></script>
+
+  <script>window.SIDEBAR_ACTIVE='finance-dashboard';</script>
+  <script src="../../../saidbar/saidebar.js" defer></script>
+  <script src="./index.js" defer></script>
+</head>
+<body>
+  <div class="app-layout">
+    <aside id="sidebar-root"></aside>
+    <div class="app-content">
+      <main class="shell">
+        <section class="card">
+          <div class="card-head">
+            <h1>Registro de Caixa</h1>
+          </div>
+
+          <form id="cashRegisterForm" class="form" autocomplete="off">
+            <div class="grid-2">
+              <div class="field">
+                <label>Valor de Abertura (R$)</label>
+                <input id="openingAmount" type="number" min="0" step="0.01" required placeholder="Ex.: 123.00"/>
+              </div>
+              <div class="field">
+                <label>Troco (R$)</label>
+                <input id="changeAmount" type="number" min="0" step="0.01" placeholder="Ex.: 50.00" value="0"/>
+              </div>
+            </div>
+
+            <div class="grid-2">
+              <div class="field">
+                <label>Despesas (R$)</label>
+                <input id="expenseAmount" type="number" min="0" step="0.01" placeholder="Ex.: 20.00" value="0"/>
+              </div>
+              <div class="field">
+                <label>Sangria (R$)</label>
+                <input id="sangriaAmount" type="number" min="0" step="0.01" placeholder="Ex.: 0.00" value="0"/>
+              </div>
+            </div>
+
+            <div class="field">
+              <label>Observação</label>
+              <textarea id="observation" rows="3" placeholder="Observações adicionais (opcional)"></textarea>
+            </div>
+
+            <div style="display:flex; gap:10px; margin-top:18px;">
+              <button class="btn-primary" type="submit">Registrar Abertura</button>
+              <button id="btnCloseCash" class="btn-ghost" type="button">Fechar Caixa</button>
+            </div>
+          </form>
+        </section>
+
+        <section class="card" style="margin-top: 30px;">
+          <div class="card-head">
+            <h2>Caixas Registrados</h2>
+          </div>
+
+          <form id="filterForm" class="form" autocomplete="off" style="margin-bottom: 12px;">
+            <div class="grid-3">
+              <div class="field">
+                <label>Data Início</label>
+                <input type="date" id="filterStartDate"/>
+              </div>
+              <div class="field">
+                <label>Data Fim</label>
+                <input type="date" id="filterEndDate"/>
+              </div>
+              <div class="field">
+                <label>Fechado por</label>
+                <input type="text" id="filterClosedBy" placeholder="Nome do usuário"/>
+              </div>
+            </div>
+            <button type="submit" class="btn-primary" style="margin-top: 8px;">Filtrar</button>
+          </form>
+
+          <div class="table-container">
+            <table>
+              <thead>
+                <tr>
+                  <th>Abertura</th>
+                  <th>Fechamento</th>
+                  <th>Aberto por</th>
+                  <th>Fechado por</th>
+                  <th>Valor Abertura</th>
+                  <th>Valor Fechamento</th>
+                  <th>Sangria</th>
+                  <th>Observação</th>
+                  <th>Ações</th>
+                </tr>
+              </thead>
+              <tbody id="cashRegisterList">
+                <!-- Linhas serão inseridas via JS -->
+              </tbody>
+            </table>
+          </div>
+
+          <div style="margin-top: 12px; display: flex; justify-content: space-between; align-items: center;">
+            <button id="prevPage" class="btn-ghost">Anterior</button>
+            <span id="pageInfo"></span>
+            <button id="nextPage" class="btn-ghost">Próximo</button>
+          </div>
+        </section>
+      </main>
+    </div>
+  </div>
+
+  <div id="closeRegisterModalOverlay" class="modal-overlay hidden">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>Fechar Caixa</h2>
+        <button id="modalCloseButton" class="close-button">&times;</button>
+      </div>
+      <div class="modal-body">
+        <form id="modalCloseForm" class="form" autocomplete="off">
+          <input type="hidden" id="modalCashRegisterId" />
+
+          <div class="field">
+            <label>Valor de Fechamento (R$)</label>
+            <input id="modalClosingAmount" type="number" min="0" step="0.01" required placeholder="Ex.: 300.00" />
+          </div>
+          <div class="field">
+            <label>Sangria (R$)</label>
+            <input id="modalSangriaAmount" type="number" min="0" step="0.01" value="0" placeholder="Ex.: 0.00" />
+          </div>
+          <div class="field">
+            <label>Observação</label>
+            <textarea id="modalObservation" rows="3" placeholder="Observações adicionais (opcional)"></textarea>
+          </div>
+          
+          <div class="modal-footer">
+            <button id="modalCancelButton" type="button" class="btn-ghost">Cancelar</button>
+            <button type="submit" class="btn-primary">Confirmar Fechamento</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

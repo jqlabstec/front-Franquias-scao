@@ -1,0 +1,264 @@
+:root{ --bg:#f8fafc; --text:#0f172a; --muted:#64748b; --border:#e5e7eb; --shadow:0 12px 30px rgba(2,6,23,.08);
+  --ok:#22c55e; --danger:#ef4444;
+}
+*{ box-sizing:border-box; }
+body{ margin:0; background:var(--bg); color:var(--text); font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu; }
+
+.shell{ display:grid; align-content:start; row-gap:20px; padding:110px 24px 24px; min-height:100vh; }
+.card{ width:min(100%,1100px); background:#fff; border:1px solid var(--border); border-radius:18px; box-shadow:var(--shadow); padding:18px; margin:0 auto; }
+.card-head{ display:flex; justify-content:space-between; align-items:center; gap:12px; }
+
+.form .field{ margin-bottom:12px; }
+.form label{ display:block; font-size:.9rem; color:#475569; margin-bottom:6px; }
+.form input,.form textarea,.form select{ width:100%; padding:10px 12px; border:1px solid var(--border); border-radius:10px; }
+.help{ font-size:.8rem; color:var(--muted); margin-top:4px; }
+
+.grid-2{ display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+.grid-3{ display:grid; grid-template-columns:1fr 1fr 1fr; gap:12px; }
+.inline{ display:flex; gap:8px; }
+.btn-primary{ padding:10px 12px; border:none; border-radius:10px; background:linear-gradient(180deg,#22c55e,#16a34a); color:#fff; font-weight:700; cursor:pointer; }
+.btn-ghost{ padding:10px 12px; border:1px solid var(--border); border-radius:10px; background:#fff; cursor:pointer; }
+
+.section-title{ margin:16px 0 6px; font-size:12px; letter-spacing:.06em; color:var(--muted); text-transform:uppercase; }
+.legend{ color:var(--muted); font-size:.9rem; margin-bottom:8px; }
+
+.ing-row{ display:grid; grid-template-columns: 140px 1fr 110px 110px 120px 110px 46px; gap:8px; margin-bottom:8px; align-items:center; }
+.ing-row .remove{ width:46px; height:42px; border-radius:10px; border:1px solid var(--border); background:#fff; cursor:pointer; }
+.remove:hover{ border-color:#fecaca; color:#ef4444; }
+
+.prod-cell{ position:relative; }
+.hints{ position:absolute; top:100%; left:0; right:0; z-index:10; background:#fff; border:1px solid var(--border); border-radius:10px; padding:6px; box-shadow:var(--shadow); max-height:200px; overflow:auto; }
+.hints div{ padding:6px 8px; cursor:pointer; }
+.hints div:hover{ background:#f8fafc; }
+
+.totals{ display:flex; gap:20px; align-items:center; margin-top:10px; }
+.muted{ color:var(--muted); }
+
+/* Container para o input de arquivo */
+.field input[type="file"] {
+  display: block;
+  width: 100%;
+  padding: 8px 12px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background-color: #fff;
+  font-family: inherit;
+  font-size: 1rem;
+  color: var(--text);
+  cursor: pointer;
+  transition: border-color 0.2s ease;
+}
+
+.field input[type="file"]:hover {
+  border-color: var(--ok);
+}
+
+.field input[type="file"]:focus {
+  outline: none;
+  border-color: var(--ok);
+  box-shadow: 0 0 0 3px rgba(34, 197, 94, 0.3);
+}
+
+.form textarea {
+  resize: vertical;
+}
+
+/* Estilos para Tabela */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  border-radius: 10px;
+  overflow: hidden;
+  border: 1px solid var(--border);
+  margin-top: 16px;
+}
+
+table thead {
+  background: linear-gradient(180deg, #f8fafc, #f1f5f9);
+}
+
+table thead th {
+  padding: 12px 14px;
+  text-align: left;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #475569;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  border-bottom: 2px solid var(--border);
+  white-space: nowrap;
+}
+
+table tbody td {
+  padding: 12px 14px;
+  border-bottom: 1px solid var(--border);
+  font-size: 0.9rem;
+  color: var(--text);
+  vertical-align: middle;
+  white-space: nowrap;
+}
+
+table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+table tbody tr:nth-child(even) {
+  background-color: #fafbfc;
+}
+
+table tbody tr:hover {
+  background-color: #f0fdf4;
+  transition: background-color 0.15s ease;
+}
+
+/* Alinhamento para colunas de valores */
+table tbody td:nth-child(5),
+table tbody td:nth-child(6),
+table tbody td:nth-child(7) {
+  text-align: right;
+  font-weight: 500;
+}
+
+table thead th:nth-child(5),
+table thead th:nth-child(6),
+table thead th:nth-child(7) {
+  text-align: right;
+}
+
+/* Coluna de ações */
+table tbody td:last-child {
+  text-align: center;
+}
+
+table thead th:last-child {
+  text-align: center;
+}
+
+/* Botão dentro da tabela */
+table .btn-close {
+  padding: 6px 12px;
+  font-size: 0.85rem;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: #fff;
+  color: var(--text);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+table .btn-close:hover {
+  background: linear-gradient(180deg, #fef2f2, #fee2e2);
+  border-color: #fca5a5;
+  color: var(--danger);
+}
+
+/* CSS para o Modal */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.6);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  opacity: 1;
+  transition: opacity 0.2s ease-in-out;
+}
+
+.modal-overlay.hidden {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.modal-content {
+  background-color: #fff;
+  padding: 24px;
+  border-radius: 12px;
+  width: 100%;
+  max-width: 500px;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.12);
+  transform: scale(1);
+  transition: transform 0.2s ease-in-out;
+}
+
+.modal-overlay.hidden .modal-content {
+  transform: scale(0.95);
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--border);
+}
+
+.modal-header h2 {
+  margin: 0;
+  font-size: 1.25rem;
+  color: var(--text);
+}
+
+.close-button {
+  background: none;
+  border: none;
+  font-size: 1.75rem;
+  line-height: 1;
+  cursor: pointer;
+  color: #888;
+  padding: 0;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 6px;
+  transition: all 0.2s ease;
+}
+
+.close-button:hover {
+  background-color: #fee2e2;
+  color: var(--danger);
+}
+
+.modal-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 24px;
+}
+
+/* Ajusta a tabela para não forçar expansão */
+.table-container table {
+  margin-top: 0;
+  min-width: 100%;
+}
+
+/* Sombra para indicar scroll */
+.table-container {
+  background: 
+    linear-gradient(to right, white 30%, rgba(255,255,255,0)),
+    linear-gradient(to right, rgba(255,255,255,0), white 70%) 0 100%,
+    radial-gradient(farthest-side at 0% 50%, rgba(0,0,0,.1), rgba(0,0,0,0)),
+    radial-gradient(farthest-side at 100% 50%, rgba(0,0,0,.1), rgba(0,0,0,0)) 0 100%;
+  background-repeat: no-repeat;
+  background-color: white;
+  background-size: 40px 100%, 40px 100%, 14px 100%, 14px 100%;
+  background-attachment: local, local, scroll, scroll;
+}
+
+
+.table-container {
+  width: 100%;
+  overflow-x: auto;
+  margin-top: 16px;
+}
+
+.table-container table {
+  margin-top: 0;
+  min-width: 100%;
+}

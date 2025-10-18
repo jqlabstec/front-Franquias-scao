@@ -31,6 +31,35 @@
                 <option value="FIXED">Fixos</option>
                 <option value="VARIABLE">Variáveis</option>
               </select>
+              <!-- ✅ NOVO: Filtro por tipo de custo -->
+              <select id="costType">
+                <option value="">Tipo: todos</option>
+                <optgroup label="💼 Fixas">
+                  <option value="RENT">Aluguel</option>
+                  <option value="SALARY">Salários</option>
+                  <option value="UTILITIES">Água/Luz/Gás</option>
+                  <option value="INSURANCE">Seguros</option>
+                  <option value="DEPRECIATION">Depreciação</option>
+                  <option value="MAINTENANCE">Manutenção</option>
+                  <option value="CLEANING">Limpeza</option>
+                  <option value="SECURITY">Segurança</option>
+                </optgroup>
+                <optgroup label="📊 Variáveis">
+                  <option value="MARKETING">Marketing</option>
+                  <option value="COMMISSION">Comissões</option>
+                  <option value="FREIGHT">Frete</option>
+                </optgroup>
+                <optgroup label="🏢 Administrativo">
+                  <option value="ADMINISTRATIVE">Material escritório</option>
+                  <option value="IT_SOFTWARE">Software/TI</option>
+                  <option value="PROFESSIONAL_SERVICE">Serviços profissionais</option>
+                  <option value="BANK_FEE">Tarifas bancárias</option>
+                </optgroup>
+                <optgroup label="🚨 Outros">
+                  <option value="TAX">Impostos</option>
+                  <option value="OTHER">Outros</option>
+                </optgroup>
+              </select>
               <input id="from" type="date" />
               <span class="sep">→</span>
               <input id="to" type="date" />
@@ -47,19 +76,20 @@
                 <tr>
                   <th>Data</th>
                   <th>Descrição</th>
-                  <th>Categoria</th>
+                  <th>Tipo</th> <!-- ✅ MUDANÇA: "Categoria" vira "Tipo" -->
+                  <th>Cat.</th> <!-- ✅ NOVO: Categoria FIXED/VARIABLE -->
                   <th>Base</th>
-                  <th>Recorrente</th>
+                  <th>Rec.</th> <!-- ✅ ENCURTADO -->
                   <th class="num">Valor</th>
                   <th></th>
                 </tr>
               </thead>
               <tbody id="tbody">
-                <tr><td colspan="7" class="muted">Sem resultados</td></tr>
+                <tr><td colspan="8" class="muted">Sem resultados</td></tr> <!-- ✅ colspan 8 -->
               </tbody>
               <tfoot>
                 <tr>
-                  <th colspan="5" class="num">Total</th>
+                  <th colspan="6" class="num">Total</th> <!-- ✅ colspan 6 -->
                   <th class="num" id="tfoot-total">—</th>
                   <th></th>
                 </tr>
@@ -79,6 +109,38 @@
               <label>Valor (R$)
                 <input id="f-amount" type="number" step="0.01" min="0.01" required />
               </label>
+              
+              <!-- ✅ NOVO: Tipo de custo -->
+              <label>Tipo de custo
+                <select id="f-costType" required>
+                  <optgroup label="Despesas Fixas">
+                    <option value="RENT">Aluguel</option>
+                    <option value="SALARY">Salários e encargos</option>
+                    <option value="UTILITIES">Água, luz, gás</option>
+                    <option value="INSURANCE">Seguros</option>
+                    <option value="DEPRECIATION">Depreciação</option>
+                    <option value="MAINTENANCE">Manutenção de equipamentos</option>
+                    <option value="CLEANING">Limpeza</option>
+                    <option value="SECURITY">Segurança</option>
+                  </optgroup>
+                  <optgroup label="Despesas Variáveis">
+                    <option value="MARKETING">Marketing e propaganda</option>
+                    <option value="COMMISSION">Comissões</option>
+                    <option value="FREIGHT">Frete</option>
+                  </optgroup>
+                  <optgroup label="Administrativo">
+                    <option value="ADMINISTRATIVE">Material de escritório</option>
+                    <option value="IT_SOFTWARE">Software/TI</option>
+                    <option value="PROFESSIONAL_SERVICE">Contabilidade, advocacia</option>
+                    <option value="BANK_FEE">Tarifas bancárias</option>
+                  </optgroup>
+                  <optgroup label="Outros">
+                    <option value="TAX">Impostos (não sobre vendas)</option>
+                    <option value="OTHER" selected>Outros custos</option>
+                  </optgroup>
+                </select>
+              </label>
+              
               <label>Categoria
                 <select id="f-category" required>
                   <option value="FIXED">FIXED</option>
