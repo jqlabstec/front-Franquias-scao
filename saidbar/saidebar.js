@@ -44,6 +44,7 @@ function linkMap(){
     'finance-opex':      new URL('admin/finance/opex.html', ROOT_DIR).href,
     'finance-revenue':   new URL('admin/finance/revenue.html', ROOT_DIR).href,
     'finance-cash-register': new URL('cash/index.html', ROOT_DIR).href,
+    'finance-dre': new URL('admin/dre/index.html', ROOT_DIR).href,
 
     // Produtos
     'products-create': new URL('admin/inventory/products/create/index.html', ROOT_DIR).href,
@@ -100,6 +101,7 @@ function detectActive(){
   if (p.includes('/admin/finance/opex'))   return 'finance-opex';
   if (p.includes('/admin/finance/revenue'))return 'finance-revenue';
   if (p.includes('/Cash')) return 'finance-cash-register';
+  if (p.includes('/admin/dre/index')) return 'finance-dre';
 
   return 'welcome';
 }

@@ -1,0 +1,101 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>DRE - Demonstrativo de Resultados</title>
+
+  <!-- Sidebar e estilos -->
+  <link rel="stylesheet" href="../../../saidbar/saidebar.css" />
+  <link rel="stylesheet" href="./style.css" />
+  <script>window.SIDEBAR_ACTIVE='dre';</script>
+  <script src="../../../saidbar/saidebar.js" defer></script>
+
+  <!-- Script da página -->
+  <script src="./script.js" defer></script>
+</head>
+<body>
+  <div class="app-layout">
+    <aside id="sidebar-root"></aside>
+
+    <div class="app-content">
+      <main class="shell">
+        <section class="card">
+          <div class="dre-header">
+            <div>
+              <h1>📊 DRE - Demonstrativo de Resultados</h1>
+              <p class="muted">Análise financeira detalhada do período</p>
+            </div>
+            
+            <div class="dre-filters">
+              <div class="mom-toggle">
+                <label>
+                  <input type="checkbox" id="momMode" /> Comparar meses (MoM)
+                </label>
+              </div>
+
+              <div id="singleMonthFilters" class="filter-group">
+                <select id="yearSelect"></select>
+                <select id="monthSelect">
+                  <option value="1">Janeiro</option>
+                  <option value="2">Fevereiro</option>
+                  <option value="3">Março</option>
+                  <option value="4">Abril</option>
+                  <option value="5">Maio</option>
+                  <option value="6">Junho</option>
+                  <option value="7">Julho</option>
+                  <option value="8">Agosto</option>
+                  <option value="9">Setembro</option>
+                  <option value="10">Outubro</option>
+                  <option value="11">Novembro</option>
+                  <option value="12">Dezembro</option>
+                </select>
+              </div>
+
+              <div id="momFilters" class="filter-group hidden">
+                <select id="startYearSelect"></select>
+                <select id="startMonthSelect">
+                  <option value="1">Jan</option>
+                  <option value="2">Fev</option>
+                  <option value="3">Mar</option>
+                  <option value="4">Abr</option>
+                  <option value="5">Mai</option>
+                  <option value="6">Jun</option>
+                  <option value="7">Jul</option>
+                  <option value="8">Ago</option>
+                  <option value="9">Set</option>
+                  <option value="10">Out</option>
+                  <option value="11">Nov</option>
+                  <option value="12">Dez</option>
+                </select>
+                <span class="separator">até</span>
+                <select id="endYearSelect"></select>
+                <select id="endMonthSelect">
+                  <option value="1">Jan</option>
+                  <option value="2">Fev</option>
+                  <option value="3">Mar</option>
+                  <option value="4">Abr</option>
+                  <option value="5">Mai</option>
+                  <option value="6">Jun</option>
+                  <option value="7">Jul</option>
+                  <option value="8">Ago</option>
+                  <option value="9">Set</option>
+                  <option value="10">Out</option>
+                  <option value="11">Nov</option>
+                  <option value="12">Dez</option>
+                </select>
+              </div>
+
+              <button id="loadBtn" class="btn-load">Carregar</button>
+            </div>
+          </div>
+
+          <div id="dreContent" class="dre-content">
+            <div class="loading">Selecione o período e clique em "Carregar"</div>
+          </div>
+        </section>
+      </main>
+    </div>
+  </div>
+</body>
+</html>
