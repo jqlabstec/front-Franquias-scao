@@ -201,53 +201,51 @@ select:focus {
 .dre-table td {
   padding: 12px 16px;
   border-bottom: 1px solid #f1f5f9;
+  color: var(--text); /* ✅ Cor neutra */
 }
 
 .dre-table td.number {
   text-align: right;
   font-family: 'Courier New', Courier, monospace;
-  font-weight: 500;
+  
+  color: var(--text); /* ✅ Cor neutra */
 }
 
-/* ========== ROW STYLES ========== */
+/* ========== ROW STYLES - CORES NEUTRAS ========== */
 .dre-table tr.section-header {
-  background: #e0f2fe;
+  background: #f1f5f9; /* ✅ Cinza neutro */
   font-weight: 700;
 }
 
 .dre-table tr.section-header td {
   padding: 14px 16px;
   font-size: 15px;
-  color: #0c4a6e;
+  color: var(--text); /* ✅ Cor neutra */
 }
 
 .dre-table tr.section-total {
-  background: #fef3c7;
+  background: #f8fafc; /* ✅ Cinza claro neutro */
   font-weight: 700;
 }
 
 .dre-table tr.section-total td {
   padding: 14px 16px;
   font-size: 15px;
+  color: var(--text); /* ✅ Cor neutra */
 }
 
 .dre-table tr.final-result {
-  background: #d1fae5;
+  background: #e2e8f0; /* ✅ Cinza azulado neutro */
   font-weight: 800;
   font-size: 16px;
 }
 
 .dre-table tr.final-result td {
   padding: 16px;
+  color: var(--text); /* ✅ Cor neutra */
 }
 
-.dre-table tr.negative td {
-  color: #dc2626;
-}
-
-.dre-table tr.positive td {
-  color: #16a34a;
-}
+/* ✅ REMOVIDO: classes .negative e .positive */
 
 .dre-table td.indent-1 {
   padding-left: 32px;
@@ -313,7 +311,7 @@ select:focus {
   display: none !important;
 }
 
-/* Tabela MoM com scroll horizontal */
+/* ========== MoM TABLE - CORES NEUTRAS ========== */
 .mom-table {
   overflow-x: auto;
   max-width: 100%;
@@ -327,8 +325,10 @@ select:focus {
 .mom-table td {
   white-space: nowrap;
   padding: 10px 15px;
+  color: var(--text); /* ✅ Cor neutra */
 }
 
+/* ✅ Primeira coluna fixa com cor neutra */
 .mom-table th:first-child,
 .mom-table td:first-child {
   position: sticky;
@@ -338,30 +338,99 @@ select:focus {
   box-shadow: 2px 0 5px rgba(0,0,0,0.05);
 }
 
+/* ✅ Header neutro */
 .mom-table thead th:first-child {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: #f8fafc;
   z-index: 15;
 }
 
+/* ✅ Section header neutro */
 .mom-table .section-header td {
   position: sticky;
   left: 0;
+  background: #f1f5f9; /* ✅ Cinza neutro */
   z-index: 5;
+  font-weight: 700;
+}
+
+/* ✅ Subsection neutra */
+.mom-table .subsection td {
+  background: #f8fafc; /* ✅ Cinza claro neutro */
+  font-weight: 700;
 }
 
 .mom-table .subsection td:first-child {
-  background: #e8ebf9;
+  background: #f8fafc;
+}
+
+/* ✅ Highlight neutro */
+.mom-table .highlight td {
+  background: #f1f5f9; /* ✅ Cinza neutro */
+  font-weight: 700;
 }
 
 .mom-table .highlight td:first-child {
-  background: #fff3cd;
+  background: #f1f5f9;
+}
+
+/* ✅ Final neutro */
+.mom-table .highlight.final td {
+  background: #e2e8f0; /* ✅ Cinza azulado neutro */
+  font-weight: 800;
 }
 
 .mom-table .highlight.final td:first-child {
-  background: #d4edda;
+  background: #e2e8f0;
 }
 
 /* Melhorar legibilidade */
 .mom-table tbody tr:hover td:first-child {
   background: #f0f0f0;
+}
+
+/* ✅ Tax details neutro - SEM ITÁLICO */
+.mom-table .tax-details td {
+  background-color: #fafafa !important;
+  font-size: 0.9em;
+  color: #64748b;
+  /* ✅ REMOVIDO: font-style: italic; */
+}
+
+.mom-table .tax-details span {
+  line-height: 1.8;
+  color: #64748b;
+}
+
+/* ✅ Estilos gerais para MoM - CORES NEUTRAS */
+.mom-table .section-header {
+  background: #f1f5f9; /* ✅ Cinza neutro */
+}
+
+.mom-table .subsection {
+  background: #f8fafc; /* ✅ Cinza claro neutro */
+}
+
+.mom-table .value {
+  text-align: right;
+  
+  color: var(--text); /* ✅ Cor neutra */
+}
+
+/* ✅ REMOVIDO: .value.negative com cor vermelha */
+
+.mom-table .indent {
+  padding-left: 32px !important;
+  font-size: 13px;
+  color: var(--muted);
+}
+
+/* ✅ Tax details adicionais - SEM ITÁLICO */
+.tax-details td {
+  background-color: #fafafa !important;
+  /* ✅ REMOVIDO: font-style: italic; */
+}
+
+.tax-details span {
+  line-height: 1.8;
+  color: #64748b;
 }

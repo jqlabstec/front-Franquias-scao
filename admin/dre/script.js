@@ -48,7 +48,7 @@ async function loadDre() {
   container.innerHTML = '<div class="loading">Carregando...</div>';
 
   try {
-    const response = await fetch(`${API_BASE}/dre?year=${year}&month=${month}`, {
+    const response = await fetch(`${API_BASE}/dashboard?year=${year}&month=${month}`, {
       headers: { Authorization: `Bearer ${auth.token}` },
     });
 
@@ -86,7 +86,7 @@ async function loadDreMoM() {
 
   try {
     const response = await fetch(
-      `${API_BASE}/dre/mom?startYear=${startYear}&startMonth=${startMonth}&endYear=${endYear}&endMonth=${endMonth}`,
+      `${API_BASE}/dashboard/mom?startYear=${startYear}&startMonth=${startMonth}&endYear=${endYear}&endMonth=${endMonth}`,
       { headers: { Authorization: `Bearer ${auth.token}` } }
     );
 
@@ -112,6 +112,23 @@ function renderDre(dre, month, year) {
   if (!container) {
     console.error('Container dreContent não encontrado!');
     return;
+  }
+
+  // ✅ CRIAR HTML DO DETALHAMENTO DE IMPOSTOS
+  let taxBreakdownHtml = '';
+  if (dre.taxBreakdown && dre.taxBreakdown.length > 0) {
+    taxBreakdownHtml = `
+      <tr class="tax-details">
+        <td colspan="2" style="padding-left: 30px; font-size: 0.9em; color: #666;">
+          <strong>Detalhamento de Impostos:</strong><br/>
+          ${dre.taxBreakdown.map(tax => 
+            `<span style="display: block; margin-left: 15px; line-height: 1.8;">
+              ${tax.type}: ${formatCurrency(tax.amount)} (${formatPercent(tax.percentage)})
+            </span>`
+          ).join('')}
+        </td>
+      </tr>
+    `;
   }
 
   container.innerHTML = `
@@ -148,6 +165,7 @@ function renderDre(dre, month, year) {
             <td>% Impostos</td>
             <td class="value">${formatPercent(dre.taxPct)}</td>
           </tr>
+          ${taxBreakdownHtml}
           <tr>
             <td>Impostos (-)</td>
             <td class="value negative">${formatCurrency(-dre.taxes)}</td>
@@ -201,11 +219,11 @@ function renderDre(dre, month, year) {
           </tr>
           <tr>
             <td>Ifood</td>
-            <td class="value">${formatCurrency(dre.ifoodFees)}</td>
+            <td class="value">${formatCurrency(dre.deliveryFees || 0)}</td>
           </tr>
           <tr>
             <td>Adquirência</td>
-            <td class="value">${formatCurrency(dre.acquirerFees)}</td>
+            <td class="value">${formatCurrency(dre.acquirerFees || 0)}</td>
           </tr>
 
           <!-- Despesas Franquia -->
@@ -308,6 +326,10 @@ function renderDre(dre, month, year) {
             <td class="indent">Ar condicionado</td>
             <td class="value negative">${formatCurrency(-dre.occupationDetails.ac)}</td>
           </tr>
+          <tr>
+            <td class="indent">Gás</td>
+            <td class="value negative">${formatCurrency(-dre.occupationDetails.gas)}</td>
+          </tr>
 
           <!-- Consumos e Utilidades -->
           <tr class="subsection">
@@ -345,6 +367,10 @@ function renderDre(dre, month, year) {
             <td class="indent">Aluguel Equipamentos</td>
             <td class="value">${formatCurrency(dre.utilitiesDetails.equipmentRental)}</td>
           </tr>
+          <tr>
+            <td class="indent">Telefone</td>
+            <td class="value negative">${formatCurrency(-dre.utilitiesDetails.phone)}</td>
+          </tr>
 
           <!-- Gastos Administrativos -->
           <tr class="subsection">
@@ -367,12 +393,16 @@ function renderDre(dre, month, year) {
             <td class="value negative">${formatCurrency(-dre.adminDetails.accounting)}</td>
           </tr>
           <tr>
-            <td class="indent">Telefone / Internet</td>
-            <td class="value">${formatCurrency(dre.adminDetails.phoneInternet)}</td>
-          </tr>
-          <tr>
             <td class="indent">Seguro do imóvel</td>
             <td class="value negative">${formatCurrency(-dre.adminDetails.insurance)}</td>
+          </tr>
+          <tr>
+            <td class="indent">Assessoria Jurídica</td>
+            <td class="value negative">${formatCurrency(-dre.adminDetails.legal)}</td>
+          </tr>
+          <tr>
+            <td class="indent">Tarifas Bancárias</td>
+            <td class="value negative">${formatCurrency(-dre.adminDetails.bankFee)}</td>
           </tr>
           <tr>
             <td class="indent">Gastos Adm. - Outros</td>
@@ -392,33 +422,20 @@ function renderDre(dre, month, year) {
             <td class="value">${formatPercent(dre.hrPct)}</td>
           </tr>
           <tr>
-            <td class="indent">Mão de Obra Total</td>
-            <td class="value negative">${formatCurrency(-dre.hrDetails.totalLabor)}</td>
+            <td class="indent">Salários</td>
+            <td class="value negative">${formatCurrency(-dre.hrDetails.salary)}</td>
           </tr>
           <tr>
-            <td class="indent">Qtde. Recursos</td>
-            <td class="value">${dre.hrDetails.employeeCount}</td>
+            <td class="indent">Encargos Trabalhistas</td>
+            <td class="value negative">${formatCurrency(-dre.hrDetails.laborCharges)}</td>
           </tr>
           <tr>
-            <td class="indent">Custo Médio/Recurso</td>
-            <td class="value negative">${formatCurrency(-dre.hrDetails.avgCostPerEmployee)}</td>
-          </tr>
-
-          <!-- Outros Gastos com Pessoal -->
-          <tr class="subsection">
-            <td colspan="2"><strong>Outros Gastos com Pessoal</strong></td>
+            <td class="indent">Benefícios</td>
+            <td class="value negative">${formatCurrency(-dre.hrDetails.benefits)}</td>
           </tr>
           <tr>
-            <td>Outros Gastos com Pessoal (-)</td>
-            <td class="value negative">${formatCurrency(-dre.otherPersonnelCosts)}</td>
-          </tr>
-          <tr>
-            <td>% Outros Gastos com Pessoal (-)/ROL</td>
-            <td class="value">${formatPercent(dre.otherPersonnelPct)}</td>
-          </tr>
-          <tr>
-            <td class="indent">Outros Gastos</td>
-            <td class="value negative">${formatCurrency(-dre.otherPersonnelCosts)}</td>
+            <td class="indent">Treinamento</td>
+            <td class="value negative">${formatCurrency(-dre.hrDetails.training)}</td>
           </tr>
 
           <!-- Marketing -->
@@ -427,7 +444,7 @@ function renderDre(dre, month, year) {
           </tr>
           <tr>
             <td>Marketing (-)</td>
-            <td class="value">${formatCurrency(dre.marketingCosts)}</td>
+            <td class="value negative">${formatCurrency(-dre.marketingCosts)}</td>
           </tr>
           <tr>
             <td>% Marketing (-)/ROL</td>
@@ -435,7 +452,11 @@ function renderDre(dre, month, year) {
           </tr>
           <tr>
             <td class="indent">Marketing</td>
-            <td class="value">${formatCurrency(dre.marketingCosts)}</td>
+            <td class="value negative">${formatCurrency(-dre.marketingDetails.marketing)}</td>
+          </tr>
+          <tr>
+            <td class="indent">Publicidade</td>
+            <td class="value negative">${formatCurrency(-dre.marketingDetails.advertising)}</td>
           </tr>
 
           <!-- ========== RESULTADO ========== -->
@@ -452,7 +473,7 @@ function renderDre(dre, month, year) {
           </tr>
           <tr>
             <td>Taxa de Transferência (-)</td>
-            <td class="value negative">${formatCurrency(dre.transferFee)}</td>
+            <td class="value negative">${formatCurrency(-dre.transferFee)}</td>
           </tr>
           <tr class="highlight">
             <td><strong>Lucro Geral</strong></td>
@@ -464,7 +485,7 @@ function renderDre(dre, month, year) {
           </tr>
           <tr>
             <td>PLR (-)</td>
-            <td class="value negative">${formatCurrency(dre.plr)}</td>
+            <td class="value negative">${formatCurrency(-dre.plr)}</td>
           </tr>
           <tr class="highlight final">
             <td><strong>Lucro Final</strong></td>
@@ -480,7 +501,7 @@ function renderDre(dre, month, year) {
   `;
 }
 
-// ========== RENDERIZAR DRE MoM (COMPARAÇÃO) ==========
+// ========== RENDERIZAR DRE MoM (COMPARAÇÃO COMPLETA) ==========
 // ========== RENDERIZAR DRE MoM (COMPARAÇÃO COMPLETA) ==========
 function renderDreMoM(data) {
   const container = document.getElementById('dreContent');
@@ -547,6 +568,32 @@ function renderDreMoM(data) {
     return row;
   }
 
+  // ✅ FUNÇÃO PARA CRIAR DETALHAMENTO DE IMPOSTOS
+  function createTaxBreakdownRow() {
+    let row = '<tr class="tax-details">';
+    row += '<td style="padding-left: 30px; font-size: 0.9em; color: #666;"><strong>Detalhamento:</strong></td>';
+    
+    data.forEach(item => {
+      const taxBreakdown = item.data.taxBreakdown;
+      let content = '';
+      
+      if (taxBreakdown && Array.isArray(taxBreakdown) && taxBreakdown.length > 0) {
+        content = taxBreakdown.map(tax => 
+          `<span style="display: block; font-size: 0.85em; line-height: 1.6;">
+            ${tax.type}: ${formatCurrency(tax.amount)}<br/>(${formatPercent(tax.percentage)})
+          </span>`
+        ).join('');
+      } else {
+        content = '<span style="font-size: 0.85em; color: #999;">-</span>';
+      }
+      
+      row += `<td class="value" style="font-size: 0.9em; color: #666;">${content}</td>`;
+    });
+    
+    row += '</tr>';
+    return row;
+  }
+
   // Construir todas as linhas do DRE
   let tableRows = '';
 
@@ -557,6 +604,7 @@ function renderDreMoM(data) {
   tableRows += createRow('% Descontos', 'discountPct', { type: 'percent' });
   tableRows += createRow('Receita Bruta (+) s/Descontos', 'grossRevenueNoDiscount', { highlight: true });
   tableRows += createRow('% Impostos', 'taxPct', { type: 'percent' });
+  tableRows += createTaxBreakdownRow(); // ✅ DETALHAMENTO ADICIONADO
   tableRows += createRow('Impostos (-)', 'taxes', { negative: true });
   tableRows += createRow('Taxas Transações', 'transactionFees', { negative: true });
   tableRows += createRow('Receita Líquida (+)', 'netRevenue', { highlight: true });
@@ -575,7 +623,7 @@ function renderDreMoM(data) {
 
   // Taxas Cartão e iFood
   tableRows += createRow('Taxas Cartão e Ifood', '', { subsection: true });
-  tableRows += createRow('Ifood', 'ifoodFees');
+  tableRows += createRow('Ifood', 'deliveryFees');
   tableRows += createRow('Adquirência', 'acquirerFees');
 
   // Despesas Franquia
@@ -609,6 +657,7 @@ function renderDreMoM(data) {
   tableRows += createRow('Água', 'occupationDetails.water', { negative: true, indent: true });
   tableRows += createRow('Energia', 'occupationDetails.electricity', { negative: true, indent: true });
   tableRows += createRow('Ar condicionado', 'occupationDetails.ac', { negative: true, indent: true });
+  tableRows += createRow('Gás', 'occupationDetails.gas', { negative: true, indent: true });
 
   // Consumos e Utilidades
   tableRows += createRow('Consumos e Utilidades', '', { subsection: true });
@@ -620,6 +669,7 @@ function renderDreMoM(data) {
   tableRows += createRow('Materiais de escritório', 'utilitiesDetails.officeSupplies', { negative: true, indent: true });
   tableRows += createRow('Equipamentos e utensílios', 'utilitiesDetails.equipmentUtensils', { indent: true });
   tableRows += createRow('Aluguel Equipamentos', 'utilitiesDetails.equipmentRental', { indent: true });
+  tableRows += createRow('Telefone', 'utilitiesDetails.phone', { negative: true, indent: true });
 
   // Gastos Administrativos
   tableRows += createRow('Gastos Administrativos', '', { subsection: true });
@@ -627,29 +677,26 @@ function renderDreMoM(data) {
   tableRows += createRow('% Gastos Administrativos (-)/ROL', 'adminPct', { type: 'percent' });
   tableRows += createRow('Software', 'adminDetails.software', { negative: true, indent: true });
   tableRows += createRow('Contador', 'adminDetails.accounting', { negative: true, indent: true });
-  tableRows += createRow('Telefone / Internet', 'adminDetails.phoneInternet', { indent: true });
   tableRows += createRow('Seguro do imóvel', 'adminDetails.insurance', { negative: true, indent: true });
+  tableRows += createRow('Assessoria Jurídica', 'adminDetails.legal', { negative: true, indent: true });
+  tableRows += createRow('Tarifas Bancárias', 'adminDetails.bankFee', { negative: true, indent: true });
   tableRows += createRow('Gastos Adm. - Outros', 'adminDetails.other', { negative: true, indent: true });
 
   // Recursos Humanos
   tableRows += createRow('Recursos Humanos', '', { subsection: true });
   tableRows += createRow('Recursos Humanos (-)', 'hrCosts', { negative: true });
   tableRows += createRow('% Recursos Humanos (-)/ROL', 'hrPct', { type: 'percent' });
-  tableRows += createRow('Mão de Obra Total', 'hrDetails.totalLabor', { negative: true, indent: true });
-  tableRows += createRow('Qtde. Recursos', 'hrDetails.employeeCount', { type: 'number', indent: true });
-  tableRows += createRow('Custo Médio/Recurso', 'hrDetails.avgCostPerEmployee', { negative: true, indent: true });
-
-  // Outros Gastos com Pessoal
-  tableRows += createRow('Outros Gastos com Pessoal', '', { subsection: true });
-  tableRows += createRow('Outros Gastos com Pessoal (-)', 'otherPersonnelCosts', { negative: true });
-  tableRows += createRow('% Outros Gastos com Pessoal (-)/ROL', 'otherPersonnelPct', { type: 'percent' });
-  tableRows += createRow('Outros Gastos', 'otherPersonnelCosts', { negative: true, indent: true });
+  tableRows += createRow('Salários', 'hrDetails.salary', { negative: true, indent: true });
+  tableRows += createRow('Encargos Trabalhistas', 'hrDetails.laborCharges', { negative: true, indent: true });
+  tableRows += createRow('Benefícios', 'hrDetails.benefits', { negative: true, indent: true });
+  tableRows += createRow('Treinamento', 'hrDetails.training', { negative: true, indent: true });
 
   // Marketing
   tableRows += createRow('Marketing', '', { subsection: true });
-  tableRows += createRow('Marketing (-)', 'marketingCosts');
+  tableRows += createRow('Marketing (-)', 'marketingCosts', { negative: true });
   tableRows += createRow('% Marketing (-)/ROL', 'marketingPct', { type: 'percent' });
-  tableRows += createRow('Marketing', 'marketingCosts', { indent: true });
+  tableRows += createRow('Marketing', 'marketingDetails.marketing', { negative: true, indent: true });
+  tableRows += createRow('Publicidade', 'marketingDetails.advertising', { negative: true, indent: true });
 
   // ========== RESULTADO ==========
   tableRows += createRow('RESULTADO', '', { section: true });
@@ -679,7 +726,6 @@ function renderDreMoM(data) {
     </div>
   `;
 }
-
 // ========== INICIALIZAÇÃO ==========
 document.addEventListener('DOMContentLoaded', () => {
   const yearSelect = document.getElementById('yearSelect');
@@ -750,4 +796,4 @@ document.addEventListener('DOMContentLoaded', () => {
       loadDre();
     }
   });
-}); 
+});

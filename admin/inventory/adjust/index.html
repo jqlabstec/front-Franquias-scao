@@ -30,11 +30,18 @@
       max-height: 220px;
       overflow: auto;
       box-shadow: 0 6px 20px rgba(0, 0, 0, .08);
+      border-radius: 0 0 8px 8px;
     }
 
     .autocomplete-item {
-      padding: 8px 10px;
+      padding: 10px 12px;
       cursor: pointer;
+      transition: background 0.15s;
+      border-bottom: 1px solid #f0f0f0;
+    }
+
+    .autocomplete-item:last-child {
+      border-bottom: none;
     }
 
     .autocomplete-item:hover {
@@ -50,6 +57,51 @@
     .tbl .btn-link {
       color: #6b21a8;
       font-weight: 600;
+      background: none;
+      border: none;
+      cursor: pointer;
+      text-decoration: underline;
+      padding: 4px 8px;
+    }
+
+    .tbl .btn-link:hover {
+      color: #581c87;
+    }
+
+    /* ✅ Estilos da paginação */
+    .pager {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-top: 16px;
+      padding: 12px 0;
+      border-top: 1px solid #e5e7eb;
+    }
+
+    .pager button {
+      padding: 8px 16px;
+      border: 1px solid #e5e7eb;
+      border-radius: 8px;
+      background: #fff;
+      color: #0f172a;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .pager button:hover:not(:disabled) {
+      background: #f8fafc;
+      border-color: #cbd5e1;
+    }
+
+    .pager button:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+    }
+
+    .pager .page-info {
+      font-size: 14px;
+      color: #64748b;
     }
   </style>
 </head>
@@ -113,10 +165,10 @@
 
           <div id="status" class="banner hidden"></div>
 
-          <h2 style="margin:16px 0 8px;">Últimas movimentações</h2>
-          <div class="filters">
-            <input id="txQuery" type="text" placeholder="Filtrar por nome ou código" />
-            <select id="txType">
+          <h2 style="margin:24px 0 12px;">Últimas movimentações</h2>
+          <div class="filters" style="display:flex;gap:8px;margin-bottom:16px;">
+            <input id="txQuery" type="text" placeholder="Filtrar por nome ou código" style="flex:1;" />
+            <select id="txType" style="min-width:180px;">
               <option value="">Tipo: Todos</option>
               <option value="ADJUST_IN">ADJUST_IN</option>
               <option value="ADJUST_OUT">ADJUST_OUT</option>
@@ -127,6 +179,7 @@
               <option value="RETURN">RETURN</option>
             </select>
             <button id="txSearch" class="btn-primary" type="button">Buscar</button>
+            <button id="txClear" class="btn-ghost" type="button">Limpar</button>
           </div>
 
           <div class="table-wrap">
@@ -145,10 +198,17 @@
               </thead>
               <tbody id="txBody">
                 <tr>
-                  <td colspan="8" class="muted">Sem resultados</td>
+                  <td colspan="8" class="muted">Carregando...</td>
                 </tr>
               </tbody>
             </table>
+          </div>
+
+          <!-- ✅ PAGINAÇÃO ADICIONADA -->
+          <div class="pager">
+            <button id="txPrevBtn" class="btn-ghost">&laquo; Anterior</button>
+            <span id="txPageInfo" class="page-info">-</span>
+            <button id="txNextBtn" class="btn-ghost">Próxima &raquo;</button>
           </div>
         </section>
       </main>

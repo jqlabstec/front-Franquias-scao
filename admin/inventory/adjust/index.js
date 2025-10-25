@@ -1,4 +1,5 @@
 const API = window.API_BASE_URL || 'http://localhost:3000/api/v1';
+const PAGE_SIZE = 15;
 
 /* ===== SweetAlert helpers (cores do tema) ===== */
 function showSuccess(title = 'Sucesso', text = '') {
@@ -54,7 +55,7 @@ function confirmAdjust(title = 'Confirmar ajuste?', text = 'Deseja continuar?', 
   return Swal.fire({
     customClass: {
       popup: 'vita',
-      confirmButton: '',   // aplicamos estilo inline no didRender
+      confirmButton: '',
       cancelButton: '',
     },
     icon: danger ? 'warning' : 'question',
@@ -97,10 +98,13 @@ async function postAdjust(body, token){
 }
 
 async function fetchTxns(q, token){
-  const p = new URLSearchParams({ page:'1', pageSize:'10' });
+  const p = new URLSearchParams({ 
+    page: String(q.page || 1), 
+    pageSize: String(PAGE_SIZE) 
+  });
   if (q.productId) p.set('productId', String(q.productId));
   if (q.type) p.set('type', q.type);
-  if (q.query) p.set('query', q.query); // backend opcional
+  if (q.query) p.set('query', q.query);
   const r = await fetch(`${API}/inventory/txns?${p.toString()}`, {
     headers:{ Authorization:`Bearer ${token}` }
   });
@@ -110,8 +114,11 @@ async function fetchTxns(q, token){
 }
 
 async function fetchProducts(term, token){
-  const p = new URLSearchParams({ query: term, page:'1', pageSize:'10' });
-  // Ajuste para o endpoint real da sua API
+  const p = new URLSearchParams({ 
+    query: term, 
+    page: '1', 
+    pageSize: '50'
+  });
   const url = `${API}/products?${p.toString()}`;
   const r = await fetch(url, { headers:{ Authorization:`Bearer ${token}` } });
   const data = await r.json().catch(()=> ({}));
@@ -127,14 +134,11 @@ async function fetchStock(productId, token){
 }
 
 /* ===== Render ===== */
-function renderTxns(items, qText){
+function renderTxns(items){
   const tb = document.getElementById('txBody');
   tb.innerHTML = '';
   let list = Array.isArray(items) ? items : [];
-  if (qText && qText.trim()) {
-    const t = qText.trim().toLowerCase();
-    list = list.filter(it => (it.product?.name || '').toLowerCase().includes(t) || String(it.productId).includes(t));
-  }
+  
   if(list.length===0){
     const tr = document.createElement('tr'); const td = document.createElement('td');
     td.colSpan = 8; td.className='muted'; td.textContent='Sem resultados';
@@ -173,14 +177,29 @@ document.addEventListener('DOMContentLoaded', async ()=>{
   const notes = document.getElementById('notes');
   const btnClear = document.getElementById('btnClear');
 
-  let lastProducts = [];
+  // ✅ Elementos de paginação
+  const txPrevBtn = document.getElementById('txPrevBtn');
+  const txNextBtn = document.getElementById('txNextBtn');
+  const txPageInfo = document.getElementById('txPageInfo');
+  const txClear = document.getElementById('txClear');
 
-  async function loadTxns(params={}){
+  let lastProducts = [];
+  let txState = { page: 1, query: '', type: '' }; // ✅ Estado da paginação
+
+  async function loadTxns(){
     try{
-      const data = await fetchTxns(params, auth.token);
-      renderTxns(data.items, params.query);
+      const data = await fetchTxns(txState, auth.token);
+      renderTxns(data.items);
+      
+      // ✅ Atualizar paginação
+      const pi = data.pageInfo || {};
+      txPageInfo.textContent = `Página ${pi.page || 1} de ${pi.totalPages || 1} — ${pi.totalItems || 0} transações`;
+      txPrevBtn.disabled = !pi.hasPrev;
+      txNextBtn.disabled = !pi.hasNext;
     }catch(e){
-      renderTxns([], params.query);
+      renderTxns([]);
+      txPageInfo.textContent = '-';
+      txPrevBtn.disabled = txNextBtn.disabled = true;
     }
   }
 
@@ -198,7 +217,11 @@ document.addEventListener('DOMContentLoaded', async ()=>{
       try{
         lastProducts = await fetchProducts(term, auth.token);
         productList.innerHTML = '';
-        if (!lastProducts.length) { productList.style.display='none'; return; }
+        if (!lastProducts.length) { 
+          productList.innerHTML = '<div class="autocomplete-item" style="color:#999;cursor:default;">Nenhum produto encontrado</div>';
+          productList.style.display='block';
+          return;
+        }
         for(const p of lastProducts){
           const el = document.createElement('div');
           el.className = 'autocomplete-item';
@@ -207,12 +230,16 @@ document.addEventListener('DOMContentLoaded', async ()=>{
           productList.appendChild(el);
         }
         productList.style.display = 'block';
-      }catch(e){ productList.style.display='none'; }
+      }catch(e){ 
+        productList.innerHTML = '<div class="autocomplete-item" style="color:#dc2626;cursor:default;">Erro ao buscar produtos</div>';
+        productList.style.display='block';
+      }
     }, 180);
   });
 
   productList.addEventListener('click', async (e)=>{
-    const item = e.target.closest('.autocomplete-item'); if(!item) return;
+    const item = e.target.closest('.autocomplete-item'); 
+    if(!item || !item.dataset.id) return;
     const id = Number(item.dataset.id);
     const p = lastProducts.find(x => x.id === id);
     if (!p) return;
@@ -258,7 +285,6 @@ document.addEventListener('DOMContentLoaded', async ()=>{
     const needsCost = ['PURCHASE','RETURN','PRODUCTION_YIELD','ADJUST_IN'].includes(type.value);
     if (needsCost && unitCost.value) body.unitCost = Number(unitCost.value);
 
-    // Confirmação para saídas
     const isOutbound = ['ADJUST_OUT','SALE','PRODUCTION_CONSUME'].includes(type.value);
     if (isOutbound) {
       const prodLabel = productSearch.value || `#${productId.value}`;
@@ -269,7 +295,8 @@ document.addEventListener('DOMContentLoaded', async ()=>{
     try{
       await postAdjust(body, auth.token);
       qty.value=''; unitCost.value=''; notes.value='';
-      await loadTxns({});
+      txState.page = 1; // ✅ Voltar para página 1 após novo ajuste
+      await loadTxns();
       toastSuccess('Movimentação registrada!');
       const stock = await fetchStock(Number(productId.value), auth.token).catch(()=>null);
       if (stock && stock.currentQty != null) stockHint.textContent = `Saldo atual: ${fmt(stock.currentQty, 3)}`;
@@ -286,7 +313,7 @@ document.addEventListener('DOMContentLoaded', async ()=>{
     stockHint.textContent=''; costHint.textContent='';
   });
 
-  // Ações na tabela: Ajustar
+  // ✅ Ações na tabela: Ajustar
   document.getElementById('txBody').addEventListener('click', async (e)=>{
     const btn = e.target.closest('button[data-action="adjust"]');
     if (!btn) return;
@@ -302,17 +329,34 @@ document.addEventListener('DOMContentLoaded', async ()=>{
     toastSuccess('Formulário preenchido. Ajuste e confirme.');
   });
 
-  // Busca transações
+  // ✅ Busca transações
   document.getElementById('txSearch').addEventListener('click', async ()=>{
-    const qText = document.getElementById('txQuery').value;
-    const qType = document.getElementById('txType').value;
-    try{
-      const data = await fetchTxns({ query: qText || undefined, type: qType || undefined }, auth.token);
-      renderTxns(data.items, qText);
-    }catch(e){
-      renderTxns([], qText);
+    txState.query = document.getElementById('txQuery').value.trim();
+    txState.type = document.getElementById('txType').value;
+    txState.page = 1;
+    await loadTxns();
+  });
+
+  // ✅ Limpar filtros
+  txClear.addEventListener('click', async ()=>{
+    document.getElementById('txQuery').value = '';
+    document.getElementById('txType').value = '';
+    txState = { page: 1, query: '', type: '' };
+    await loadTxns();
+  });
+
+  // ✅ Paginação
+  txPrevBtn.addEventListener('click', async ()=>{
+    if (txState.page > 1) {
+      txState.page--;
+      await loadTxns();
     }
   });
 
-  await loadTxns({});
+  txNextBtn.addEventListener('click', async ()=>{
+    txState.page++;
+    await loadTxns();
+  });
+
+  await loadTxns();
 });

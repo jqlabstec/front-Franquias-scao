@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
-  <title>Estoque · Saldos</title>
+  <title>Produtos · Listagem</title>
   <link rel="stylesheet" href="../../../saidbar/saidebar.css"/>
   <link rel="stylesheet" href="../../../../styles/base.css"/>
   <link rel="stylesheet" href="./index.css"/>
@@ -18,16 +18,12 @@
       <main class="shell">
         <section class="card">
           <div class="card-head">
-            <h1>Estoque • Saldos</h1>
-            <a class="btn-primary" href="../adjust/index.html">Ajuste rápido</a>
+            <h1>Produtos • Listagem</h1>
+            <a class="btn-primary" href="../create/index.html">+ Novo Produto</a>
           </div>
 
           <form id="filterForm" class="filters">
-            <input id="q" placeholder="Buscar por nome ou NCM"/>
-            <label style="display:flex;align-items:center;gap:8px;">
-              <input id="belowMin" type="checkbox"/>
-              <span>Apenas abaixo do mínimo</span>
-            </label>
+            <input id="q" placeholder="Buscar por nome, código ou NCM"/>
             <button class="btn-primary" type="submit">Buscar</button>
             <button class="btn-ghost" type="button" id="clearBtn">Limpar</button>
           </form>
@@ -38,16 +34,16 @@
             <table class="tbl">
               <thead>
                 <tr>
-                  <th>Produto</th>
-                  <th>Unid.</th>
-                  <th>Qtd</th>
-                  <th>Custo Médio</th>
-                  <th>Mín.</th>
+                  <th>Nome</th>
+                  <th>Código</th>
+                  <th>Unidade</th>
+                  <th>Custo Unitário</th>
+                  <th>NCM</th>
                   <th>Atualizado</th>
                 </tr>
               </thead>
               <tbody id="tbody">
-                <tr><td colspan="6" class="muted">Sem resultados</td></tr>
+                <tr><td colspan="6" class="muted">Carregando...</td></tr>
               </tbody>
             </table>
           </div>

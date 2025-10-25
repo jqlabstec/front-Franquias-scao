@@ -14,6 +14,124 @@
   <script type="module" src="../vendor/helpers.js"></script>
   <script type="module" src="./opex.js" defer></script>
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  
+  <style>
+    /* ✅ Estilos para o modal funcionar */
+    dialog {
+      border: none;
+      border-radius: 12px;
+      padding: 0;
+      max-width: 600px;
+      width: 90%;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+    }
+    
+    dialog::backdrop {
+      background: rgba(0, 0, 0, 0.5);
+      backdrop-filter: blur(4px);
+    }
+    
+    .form {
+      padding: 24px;
+    }
+    
+    .form h3 {
+      margin: 0 0 20px 0;
+      font-size: 20px;
+      color: #0f172a;
+    }
+    
+    .form .grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+    
+    .form label {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      font-size: 14px;
+      font-weight: 600;
+      color: #334155;
+    }
+    
+    .form label.inline {
+      flex-direction: row;
+      align-items: center;
+      grid-column: 1 / -1;
+    }
+    
+    .form input[type="text"],
+    .form input[type="number"],
+    .form input[type="date"],
+    .form select {
+      padding: 10px 12px;
+      border: 1px solid #e2e8f0;
+      border-radius: 8px;
+      font-size: 14px;
+      font-family: inherit;
+    }
+    
+    .form input[type="checkbox"] {
+      width: 18px;
+      height: 18px;
+      cursor: pointer;
+    }
+    
+    .form menu {
+      display: flex;
+      gap: 12px;
+      justify-content: flex-end;
+      margin: 0;
+      padding: 0;
+    }
+    
+    /* ✅ Campos de cálculo automático */
+    #autoCalcFields {
+      grid-column: 1 / -1;
+      display: none;
+      background: #f8f9fa;
+      padding: 16px;
+      border-radius: 8px;
+      gap: 12px;
+    }
+    
+    #autoCalcFields label {
+      margin-bottom: 8px;
+    }
+    
+    #autoCalcFields small {
+      color: #6b7280;
+      font-size: 12px;
+      font-weight: 400;
+    }
+    
+    #calculatedValue {
+      font-size: 18px;
+      font-weight: 700;
+      color: #22c55e;
+    }
+    
+    .pill {
+      display: inline-block;
+      padding: 4px 8px;
+      border-radius: 12px;
+      font-size: 12px;
+      font-weight: 600;
+    }
+    
+    .pill.ok {
+      background: #d1fae5;
+      color: #065f46;
+    }
+    
+    .pill.no {
+      background: #fee2e2;
+      color: #991b1b;
+    }
+  </style>
 </head>
 <body>
   <div class="app-layout">
@@ -23,7 +141,7 @@
       <main class="shell">
         <section class="card">
           <div class="card-head">
-            <h1>Custos operacionais</h1>
+            <h1>💰 Custos Operacionais</h1>
             <div class="filters">
               <input id="q" placeholder="Buscar descrição" />
               <select id="category">
@@ -31,35 +149,87 @@
                 <option value="FIXED">Fixos</option>
                 <option value="VARIABLE">Variáveis</option>
               </select>
-              <!-- ✅ NOVO: Filtro por tipo de custo -->
+              
+              <!-- ✅ FILTRO COMPLETO COM IMPOSTOS -->
               <select id="costType">
                 <option value="">Tipo: todos</option>
-                <optgroup label="💼 Fixas">
-                  <option value="RENT">Aluguel</option>
-                  <option value="SALARY">Salários</option>
-                  <option value="UTILITIES">Água/Luz/Gás</option>
-                  <option value="INSURANCE">Seguros</option>
-                  <option value="DEPRECIATION">Depreciação</option>
-                  <option value="MAINTENANCE">Manutenção</option>
-                  <option value="CLEANING">Limpeza</option>
-                  <option value="SECURITY">Segurança</option>
+                
+                <optgroup label="💰 Impostos sobre Vendas">
+                  <option value="SIMPLES_NACIONAL">Simples Nacional</option>
+                  <option value="ICMS">ICMS</option>
+                  <option value="PIS">PIS</option>
+                  <option value="COFINS">COFINS</option>
+                  <option value="ISS">ISS</option>
+                  <option value="TAX_OTHER">Outros Impostos</option>
                 </optgroup>
-                <optgroup label="📊 Variáveis">
+                
+                <optgroup label="🏠 Ocupação">
+                  <option value="RENT">Aluguel</option>
+                  <option value="CONDO_FEE">Condomínio</option>
+                  <option value="SHOPPING_PROMO_FUND">Fundo Shopping</option>
+                  <option value="PROPERTY_TAX">IPTU</option>
+                  <option value="WATER">Água</option>
+                  <option value="ELECTRICITY">Energia</option>
+                  <option value="AC_MAINTENANCE">Ar Condicionado</option>
+                  <option value="GAS">Gás</option>
+                </optgroup>
+                
+                <optgroup label="👥 Recursos Humanos">
+                  <option value="SALARY">Salários</option>
+                  <option value="LABOR_CHARGES">Encargos</option>
+                  <option value="BENEFITS">Benefícios</option>
+                  <option value="TRAINING">Treinamentos</option>
+                </optgroup>
+                
+                <optgroup label="🔧 Consumos">
+                  <option value="INTERNET">Internet</option>
+                  <option value="CLEANING">Limpeza</option>
+                  <option value="MAINTENANCE">Manutenção</option>
+                  <option value="OFFICE_SUPPLIES">Material Escritório</option>
+                  <option value="EQUIPMENT_RENTAL">Aluguel Equipamentos</option>
+                  <option value="EQUIPMENT_UTENSILS">Equipamentos</option>
+                  <option value="PHONE">Telefone</option>
+                </optgroup>
+                
+                <optgroup label="📋 Administrativo">
+                  <option value="IT_SOFTWARE">Software/TI</option>
+                  <option value="ACCOUNTING">Contador</option>
+                  <option value="INSURANCE">Seguros</option>
+                  <option value="PROFESSIONAL_SERVICE">Serv. Profissionais</option>
+                  <option value="BANK_FEE">Tarifas Bancárias</option>
+                  <option value="ADMINISTRATIVE">Administrativo</option>
+                  <option value="LEGAL">Advocacia</option>
+                </optgroup>
+                
+                <optgroup label="🏢 Franquia">
+                  <option value="ROYALTY">Royalties</option>
+                  <option value="MARKETING_FUND">Fundo Marketing</option>
+                </optgroup>
+                
+                <optgroup label="📢 Marketing">
                   <option value="MARKETING">Marketing</option>
+                  <option value="ADVERTISING">Publicidade</option>
+                </optgroup>
+                
+                <optgroup label="🛵 Delivery">
+                  <option value="DELIVERY_FEE">Taxas Delivery</option>
+                  <option value="ACQUIRER_FEE">Adquirência</option>
+                  <option value="TRANSACTION_FEE">Taxas Transação</option>
+                </optgroup>
+                
+                <optgroup label="🔹 Outros">
+                  <option value="TRANSFER_FEE">Taxa Transferência</option>
+                  <option value="PLR">PLR</option>
+                  <option value="DEPRECIATION">Depreciação</option>
                   <option value="COMMISSION">Comissões</option>
                   <option value="FREIGHT">Frete</option>
-                </optgroup>
-                <optgroup label="🏢 Administrativo">
-                  <option value="ADMINISTRATIVE">Material escritório</option>
-                  <option value="IT_SOFTWARE">Software/TI</option>
-                  <option value="PROFESSIONAL_SERVICE">Serviços profissionais</option>
-                  <option value="BANK_FEE">Tarifas bancárias</option>
-                </optgroup>
-                <optgroup label="🚨 Outros">
-                  <option value="TAX">Impostos</option>
+                  <option value="SECURITY">Segurança</option>
+                  <option value="TAX">Impostos (Antigo)</option>
+                  <option value="UTILITIES">Utilidades</option>
                   <option value="OTHER">Outros</option>
                 </optgroup>
               </select>
+              
               <input id="from" type="date" />
               <span class="sep">→</span>
               <input id="to" type="date" />
@@ -76,20 +246,20 @@
                 <tr>
                   <th>Data</th>
                   <th>Descrição</th>
-                  <th>Tipo</th> <!-- ✅ MUDANÇA: "Categoria" vira "Tipo" -->
-                  <th>Cat.</th> <!-- ✅ NOVO: Categoria FIXED/VARIABLE -->
+                  <th>Tipo</th>
+                  <th>Cat.</th>
                   <th>Base</th>
-                  <th>Rec.</th> <!-- ✅ ENCURTADO -->
+                  <th>Rec.</th>
                   <th class="num">Valor</th>
                   <th></th>
                 </tr>
               </thead>
               <tbody id="tbody">
-                <tr><td colspan="8" class="muted">Sem resultados</td></tr> <!-- ✅ colspan 8 -->
+                <tr><td colspan="8" class="muted">Sem resultados</td></tr>
               </tbody>
               <tfoot>
                 <tr>
-                  <th colspan="6" class="num">Total</th> <!-- ✅ colspan 6 -->
+                  <th colspan="6" class="num">Total</th>
                   <th class="num" id="tfoot-total">—</th>
                   <th></th>
                 </tr>
@@ -98,71 +268,149 @@
           </div>
         </section>
 
-        <!-- Modal simples -->
+        <!-- ✅ MODAL COMPLETO COM IMPOSTOS -->
         <dialog id="costDialog">
           <form method="dialog" class="form">
             <h3 id="dlgTitle">Novo custo</h3>
+            
             <div class="grid">
-              <label>Descrição
-                <input id="f-description" required />
-              </label>
-              <label>Valor (R$)
-                <input id="f-amount" type="number" step="0.01" min="0.01" required />
+              <label style="grid-column: 1 / -1;">Descrição
+                <input id="f-description" type="text" required placeholder="Ex: Simples Nacional Setembro - 6% sobre faturamento" />
               </label>
               
-              <!-- ✅ NOVO: Tipo de custo -->
-              <label>Tipo de custo
+              <!-- ✅ TIPO DE CUSTO COMPLETO COM IMPOSTOS -->
+              <label style="grid-column: 1 / -1;">Tipo de custo
                 <select id="f-costType" required>
-                  <optgroup label="Despesas Fixas">
-                    <option value="RENT">Aluguel</option>
-                    <option value="SALARY">Salários e encargos</option>
-                    <option value="UTILITIES">Água, luz, gás</option>
-                    <option value="INSURANCE">Seguros</option>
-                    <option value="DEPRECIATION">Depreciação</option>
-                    <option value="MAINTENANCE">Manutenção de equipamentos</option>
-                    <option value="CLEANING">Limpeza</option>
-                    <option value="SECURITY">Segurança</option>
+                  <optgroup label="💰 Impostos sobre Vendas">
+                    <option value="SIMPLES_NACIONAL">Simples Nacional</option>
+                    <option value="ICMS">ICMS</option>
+                    <option value="PIS">PIS</option>
+                    <option value="COFINS">COFINS</option>
+                    <option value="ISS">ISS</option>
+                    <option value="TAX_OTHER">Outros Impostos</option>
                   </optgroup>
-                  <optgroup label="Despesas Variáveis">
-                    <option value="MARKETING">Marketing e propaganda</option>
+                  
+                  <optgroup label="🏠 Ocupação">
+                    <option value="RENT">Aluguel</option>
+                    <option value="CONDO_FEE">Condomínio</option>
+                    <option value="SHOPPING_PROMO_FUND">Fundo Promoção Shopping</option>
+                    <option value="PROPERTY_TAX">IPTU</option>
+                    <option value="WATER">Água</option>
+                    <option value="ELECTRICITY">Energia Elétrica</option>
+                    <option value="AC_MAINTENANCE">Ar Condicionado</option>
+                    <option value="GAS">Gás</option>
+                  </optgroup>
+                  
+                  <optgroup label="👥 Recursos Humanos">
+                    <option value="SALARY">Salários</option>
+                    <option value="LABOR_CHARGES">Encargos Trabalhistas</option>
+                    <option value="BENEFITS">Benefícios (VT, VA, VR)</option>
+                    <option value="TRAINING">Treinamentos</option>
+                  </optgroup>
+                  
+                  <optgroup label="🔧 Consumos e Utilidades">
+                    <option value="INTERNET">Internet</option>
+                    <option value="CLEANING">Limpeza e Conservação</option>
+                    <option value="MAINTENANCE">Manutenção</option>
+                    <option value="OFFICE_SUPPLIES">Material de Escritório</option>
+                    <option value="EQUIPMENT_UTENSILS">Equipamentos e Utensílios</option>
+                    <option value="EQUIPMENT_RENTAL">Aluguel de Equipamentos</option>
+                    <option value="PHONE">Telefone</option>
+                  </optgroup>
+                  
+                  <optgroup label="📋 Administrativo">
+                    <option value="IT_SOFTWARE">Software/ERP/SaaS</option>
+                    <option value="ACCOUNTING">Contador</option>
+                    <option value="INSURANCE">Seguros</option>
+                    <option value="PROFESSIONAL_SERVICE">Serviços Profissionais</option>
+                    <option value="BANK_FEE">Tarifas Bancárias</option>
+                    <option value="ADMINISTRATIVE">Outros Administrativos</option>
+                    <option value="LEGAL">Advocacia</option>
+                  </optgroup>
+                  
+                  <optgroup label="🏢 Franquia">
+                    <option value="ROYALTY">Royalties</option>
+                    <option value="MARKETING_FUND">Fundo de Marketing/Propaganda</option>
+                  </optgroup>
+                  
+                  <optgroup label="📢 Marketing">
+                    <option value="MARKETING">Marketing Local</option>
+                    <option value="ADVERTISING">Publicidade</option>
+                  </optgroup>
+                  
+                  <optgroup label="🛵 Delivery e Marketplace">
+                    <option value="DELIVERY_FEE">Taxas Delivery (iFood, Rappi, Uber Eats)</option>
+                    <option value="ACQUIRER_FEE">Adquirência (Stone, Cielo, Rede)</option>
+                    <option value="TRANSACTION_FEE">Taxas de Transação</option>
+                  </optgroup>
+                  
+                  <optgroup label="🔹 Outros">
+                    <option value="TRANSFER_FEE">Taxa de Transferência</option>
+                    <option value="PLR">Participação nos Lucros</option>
+                    <option value="DEPRECIATION">Depreciação</option>
                     <option value="COMMISSION">Comissões</option>
                     <option value="FREIGHT">Frete</option>
-                  </optgroup>
-                  <optgroup label="Administrativo">
-                    <option value="ADMINISTRATIVE">Material de escritório</option>
-                    <option value="IT_SOFTWARE">Software/TI</option>
-                    <option value="PROFESSIONAL_SERVICE">Contabilidade, advocacia</option>
-                    <option value="BANK_FEE">Tarifas bancárias</option>
-                  </optgroup>
-                  <optgroup label="Outros">
-                    <option value="TAX">Impostos (não sobre vendas)</option>
-                    <option value="OTHER" selected>Outros custos</option>
+                    <option value="SECURITY">Segurança</option>
+                    <option value="TAX">Impostos (Antigo)</option>
+                    <option value="UTILITIES">Utilidades (Água/Luz/Gás)</option>
+                    <option value="OTHER" selected>Outros</option>
                   </optgroup>
                 </select>
               </label>
               
               <label>Categoria
                 <select id="f-category" required>
-                  <option value="FIXED">FIXED</option>
-                  <option value="VARIABLE">VARIABLE</option>
+                  <option value="FIXED">Fixo</option>
+                  <option value="VARIABLE">Variável</option>
                 </select>
               </label>
+              
               <label>Data
                 <input id="f-date" type="date" required />
               </label>
-              <label>Base
+              
+              <!-- ✅ NOVO: Modo de cálculo -->
+              <label style="grid-column: 1 / -1;" class="inline">
+                <input id="f-autoCalc" type="checkbox" /> Calcular automaticamente baseado em percentual
+              </label>
+              
+              <!-- ✅ Campos de cálculo automático -->
+              <div id="autoCalcFields">
+                <label>Valor Base (R$)
+                  <input id="f-baseValue" type="number" step="0.01" min="0" placeholder="Ex: 25000.00" />
+                  <small>Faturamento ou valor de referência</small>
+                </label>
+                
+                <label>Percentual (%)
+                  <input id="f-percentage" type="number" step="0.01" min="0" max="100" placeholder="Ex: 6.0" />
+                  <small>Ex: 6.0 para 6%</small>
+                </label>
+                
+                <div style="padding: 12px; background: #fff; border-radius: 6px; border: 2px solid #22c55e; grid-column: 1 / -1;">
+                  <strong>Valor Calculado:</strong> <span id="calculatedValue">R$ 0,00</span>
+                </div>
+              </div>
+              
+              <!-- ✅ Campo de valor manual -->
+              <label id="manualValueField" style="grid-column: 1 / -1;">Valor (R$)
+                <input id="f-amount" type="number" step="0.01" min="0.01" required />
+              </label>
+              
+              <label>Base de Reconhecimento
                 <select id="f-basis" required>
-                  <option value="ACCRUAL">ACCRUAL</option>
-                  <option value="CASH">CASH</option>
+                  <option value="ACCRUAL">Competência</option>
+                  <option value="CASH">Caixa</option>
                 </select>
               </label>
+              
               <label class="inline">
                 <input id="f-rec" type="checkbox" /> Recorrente
               </label>
             </div>
+            
             <menu>
-              <button id="dlgCancel" class="btn-ghost">Cancelar</button>
-              <button id="dlgSave" class="btn-primary">Salvar</button>
+              <button type="button" id="dlgCancel" class="btn-ghost">Cancelar</button>
+              <button type="button" id="dlgSave" class="btn-primary">Salvar</button>
             </menu>
           </form>
         </dialog>

@@ -16,31 +16,81 @@ function params(){
   return {
     q: qs('#q').value.trim(),
     category: qs('#category').value || undefined,
-    costType: qs('#costType').value || undefined, // ✅ NOVO
+    costType: qs('#costType').value || undefined,
     from: qs('#from').value ? `${qs('#from').value}T00:00:00.000Z` : undefined,
     to: qs('#to').value ? `${qs('#to').value}T23:59:59.999Z` : undefined,
   };
 }
 
-// ✅ NOVO: Mapeamento de labels para costType
+// ✅ MAPEAMENTO ATUALIZADO (compatível com seu CostType)
 const COST_TYPE_LABELS = {
+  // 💰 IMPOSTOS SOBRE VENDAS (NOVO)
+  SIMPLES_NACIONAL: 'Simples Nacional',
+  ICMS: 'ICMS',
+  PIS: 'PIS',
+  COFINS: 'COFINS',
+  ISS: 'ISS',
+  TAX_OTHER: 'Outros Impostos',
+  
+  // Ocupação
   RENT: 'Aluguel',
+  CONDO_FEE: 'Condomínio',
+  SHOPPING_PROMO_FUND: 'Fundo Shopping',
+  PROPERTY_TAX: 'IPTU',
+  WATER: 'Água',
+  ELECTRICITY: 'Energia',
+  AC_MAINTENANCE: 'Ar Condicionado',
+  GAS: 'Gás',
+  
+  // Recursos Humanos
   SALARY: 'Salários',
-  UTILITIES: 'Água/Luz/Gás',
-  INSURANCE: 'Seguros',
-  DEPRECIATION: 'Depreciação',
-  MAINTENANCE: 'Manutenção',
+  LABOR_CHARGES: 'Encargos',
+  BENEFITS: 'Benefícios',
+  TRAINING: 'Treinamentos',
+  
+  // Consumos e Utilidades
+  INTERNET: 'Internet',
   CLEANING: 'Limpeza',
-  SECURITY: 'Segurança',
+  MAINTENANCE: 'Manutenção',
+  OFFICE_SUPPLIES: 'Material Escritório',
+  EQUIPMENT_RENTAL: 'Aluguel Equipamentos',
+  EQUIPMENT_UTENSILS: 'Equipamentos',
+  PHONE: 'Telefone',
+  
+  // Administrativo
+  IT_SOFTWARE: 'Software/TI',
+  ACCOUNTING: 'Contador',
+  INSURANCE: 'Seguros',
+  PROFESSIONAL_SERVICE: 'Serv. Profissionais',
+  BANK_FEE: 'Tarifas Bancárias',
+  ADMINISTRATIVE: 'Administrativo',
+  LEGAL: 'Advocacia',
+  
+  // Franquia
+  ROYALTY: 'Royalties',
+  MARKETING_FUND: 'Fundo Marketing',
+  
+  // Marketing
   MARKETING: 'Marketing',
+  ADVERTISING: 'Publicidade',
+  
+  // Delivery e Marketplace
+  DELIVERY_FEE: 'Taxas Delivery',
+  ACQUIRER_FEE: 'Adquirência',
+  TRANSACTION_FEE: 'Taxas Transação',
+  
+  // Outros
+  TRANSFER_FEE: 'Taxa Transferência',
+  PLR: 'PLR',
+  OTHER: 'Outros',
+  
+  // Deprecados
+  UTILITIES: 'Utilidades',
+  DEPRECIATION: 'Depreciação',
   COMMISSION: 'Comissões',
   FREIGHT: 'Frete',
-  ADMINISTRATIVE: 'Administrativo',
-  IT_SOFTWARE: 'Software/TI',
-  PROFESSIONAL_SERVICE: 'Serv. Profissionais',
-  BANK_FEE: 'Tarifas bancárias',
-  TAX: 'Impostos',
-  OTHER: 'Outros',
+  SECURITY: 'Segurança',
+  TAX: 'Impostos (Antigo)',
 };
 
 function confirmAction(title = 'Confirmar ação?', text = 'Deseja continuar?', danger = false) {
@@ -118,7 +168,7 @@ async function listCosts() {
   const p = params();
   if (p.q) url.searchParams.set('q', p.q);
   if (p.category) url.searchParams.set('category', p.category);
-  if (p.costType) url.searchParams.set('costType', p.costType); // ✅ NOVO
+  if (p.costType) url.searchParams.set('costType', p.costType);
   if (p.from) url.searchParams.set('from', p.from);
   if (p.to) url.searchParams.set('to', p.to);
 
@@ -156,24 +206,35 @@ async function deleteCost(id) {
 function renderRows(items){
   const tbody = qs('#tbody');
   if (!items.length) {
-    tbody.innerHTML = `<tr><td colspan="8" class="muted">Sem resultados</td></tr>`; // ✅ colspan 8
+    tbody.innerHTML = `<tr><td colspan="8" class="muted">Sem resultados</td></tr>`;
     qs('#tfoot-total').textContent = '—';
     return;
   }
+  
   let total = 0;
   tbody.innerHTML = items.map(c=>{
     const d = new Date(c.costDate);
-    total += Number(c.amount || 0);
-    const typeLabel = COST_TYPE_LABELS[c.costType] || c.costType || '—'; // ✅ NOVO
+    const amount = typeof c.amount === 'string' ? parseFloat(c.amount) : Number(c.amount);
+    total += amount;
+    
+    const typeLabel = COST_TYPE_LABELS[c.costType] || c.costType || '—';
+    
+    let descriptionHtml = c.description;
+    if (c.baseValue && c.percentage) {
+      const baseVal = typeof c.baseValue === 'string' ? parseFloat(c.baseValue) : Number(c.baseValue);
+      const pct = typeof c.percentage === 'string' ? parseFloat(c.percentage) : Number(c.percentage);
+      descriptionHtml += ` <span style="color:#6b7280;font-size:12px;">(${pct}% de ${formatMoney(baseVal)})</span>`;
+    }
+    
     return `
       <tr data-id="${c.id}">
         <td>${d.toLocaleDateString('pt-BR')}</td>
-        <td>${c.description}</td>
-        <td>${typeLabel}</td> <!-- ✅ NOVO: Mostrar tipo -->
+        <td>${descriptionHtml}</td>
+        <td>${typeLabel}</td>
         <td>${c.category}</td>
         <td>${c.recognitionBasis}</td>
         <td>${c.isRecurring ? '<span class="pill ok">Sim</span>' : '<span class="pill no">Não</span>'}</td>
-        <td class="num">${formatMoney(c.amount)}</td>
+        <td class="num">${formatMoney(amount)}</td>
         <td class="num">
           <button class="btn-ghost btn-edit">Editar</button>
           <button class="btn-ghost btn-del">Excluir</button>
@@ -191,6 +252,7 @@ function renderRows(items){
       openDialog(item);
     });
   });
+  
   tbody.querySelectorAll('.btn-del').forEach(btn=>{
     btn.addEventListener('click', async ()=>{
       const tr = btn.closest('tr');
@@ -217,62 +279,192 @@ function renderRows(items){
   });
 }
 
+// ✅ FUNÇÃO PARA CALCULAR VALOR AUTOMATICAMENTE
+function updateCalculatedValue() {
+  const baseValueEl = qs('#f-baseValue');
+  const percentageEl = qs('#f-percentage');
+  const calculatedValueEl = qs('#calculatedValue');
+  const amountEl = qs('#f-amount');
+  
+  if (!baseValueEl || !percentageEl || !calculatedValueEl || !amountEl) {
+    console.error('Elementos de cálculo não encontrados!');
+    return;
+  }
+  
+  const baseValue = parseFloat(baseValueEl.value) || 0;
+  const percentage = parseFloat(percentageEl.value) || 0;
+  const calculatedAmount = baseValue * (percentage / 100);
+  
+  calculatedValueEl.textContent = formatMoney(calculatedAmount);
+  amountEl.value = calculatedAmount.toFixed(2);
+}
+
 function openDialog(item){
+  console.log('🔵 openDialog chamado com:', item);
+  
   const dlg = qs('#costDialog');
-  qs('#dlgTitle').textContent = item ? 'Editar custo' : 'Novo custo';
-  qs('#f-description').value = item?.description || '';
-  qs('#f-amount').value = item ? Number(item.amount) : '';
-  qs('#f-costType').value = item?.costType || 'OTHER'; // ✅ NOVO
-  qs('#f-category').value = item?.category || 'FIXED';
-  qs('#f-basis').value = item?.recognitionBasis || 'ACCRUAL';
-  qs('#f-rec').checked = !!item?.isRecurring;
-  const dt = item?.costDate ? new Date(item.costDate) : new Date();
-  qs('#f-date').value = dt.toISOString().slice(0,10);
+  if (!dlg) {
+    console.error('❌ Modal #costDialog não encontrado!');
+    return;
+  }
+  
+  console.log('✅ Modal encontrado:', dlg);
+  
+  // Preencher título
+  const titleEl = qs('#dlgTitle');
+  if (titleEl) titleEl.textContent = item ? 'Editar custo' : 'Novo custo';
+  
+  // Preencher campos
+  const descEl = qs('#f-description');
+  const typeEl = qs('#f-costType');
+  const catEl = qs('#f-category');
+  const basisEl = qs('#f-basis');
+  const recEl = qs('#f-rec');
+  const dateEl = qs('#f-date');
+  const autoCalcEl = qs('#f-autoCalc');
+  const autoCalcFieldsEl = qs('#autoCalcFields');
+  const manualValueFieldEl = qs('#manualValueField');
+  const baseValueEl = qs('#f-baseValue');
+  const percentageEl = qs('#f-percentage');
+  const amountEl = qs('#f-amount');
+  
+  if (descEl) descEl.value = item?.description || '';
+  if (typeEl) typeEl.value = item?.costType || 'OTHER';
+  if (catEl) catEl.value = item?.category || 'FIXED';
+  if (basisEl) basisEl.value = item?.recognitionBasis || 'ACCRUAL';
+  if (recEl) recEl.checked = !!item?.isRecurring;
+  
+  if (dateEl) {
+    const dt = item?.costDate ? new Date(item.costDate) : new Date();
+    dateEl.value = dt.toISOString().slice(0,10);
+  }
+
+  // Preencher campos de cálculo automático
+  const hasAutoCalc = item?.baseValue && item?.percentage;
+  if (autoCalcEl) autoCalcEl.checked = hasAutoCalc;
+  
+  if (hasAutoCalc) {
+    if (autoCalcFieldsEl) autoCalcFieldsEl.style.display = 'grid';
+    if (manualValueFieldEl) manualValueFieldEl.style.display = 'none';
+    if (baseValueEl) baseValueEl.value = typeof item.baseValue === 'string' ? item.baseValue : String(item.baseValue);
+    if (percentageEl) percentageEl.value = typeof item.percentage === 'string' ? item.percentage : String(item.percentage);
+    updateCalculatedValue();
+  } else {
+    if (autoCalcFieldsEl) autoCalcFieldsEl.style.display = 'none';
+    if (manualValueFieldEl) manualValueFieldEl.style.display = 'block';
+    if (amountEl) {
+      const amount = typeof item?.amount === 'string' ? parseFloat(item.amount) : Number(item?.amount || 0);
+      amountEl.value = item ? amount : '';
+    }
+  }
 
   dlg.dataset.editingId = item?.id || '';
-  dlg.showModal();
-
-  qs('#dlgCancel').onclick = ()=> dlg.close();
-  qs('#dlgSave').onclick = async (e)=>{
-    e.preventDefault();
-    
-    const desc = qs('#f-description').value.trim();
-    const amt = Number(qs('#f-amount').value);
-    
-    if (!desc) {
-      notifyError('Campo obrigatório', 'Informe a descrição do custo.');
-      return;
-    }
-    if (!amt || amt <= 0) {
-      notifyError('Valor inválido', 'Informe um valor maior que zero.');
-      return;
-    }
-    
-    const payload = {
-      description: desc,
-      amount: amt,
-      costType: qs('#f-costType').value, // ✅ NOVO
-      category: qs('#f-category').value,
-      costDate: new Date(qs('#f-date').value + 'T12:00:00').toISOString(),
-      recognitionBasis: qs('#f-basis').value,
-      isRecurring: qs('#f-rec').checked,
-    };
-    
-    const editingId = dlg.dataset.editingId ? Number(dlg.dataset.editingId) : undefined;
-    
-    try {
-      await createOrUpdateCost(editingId, payload);
+  
+  // ✅ REGISTRAR EVENTOS (apenas uma vez)
+  const cancelBtn = qs('#dlgCancel');
+  const saveBtn = qs('#dlgSave');
+  
+  if (cancelBtn) {
+    cancelBtn.onclick = ()=> {
+      console.log('🔴 Cancelar clicado');
       dlg.close();
-      await notifySuccess(
-        editingId ? 'Custo atualizado!' : 'Custo criado!',
-        editingId ? 'As alterações foram salvas com sucesso.' : 'O custo foi registrado com sucesso.'
-      );
-      load();
-    } catch (e) {
-      console.error(e);
-      notifyError('Erro ao salvar', 'Não foi possível salvar o custo. Verifique os dados e tente novamente.');
-    }
-  };
+    };
+  }
+  
+  if (autoCalcEl) {
+    autoCalcEl.onchange = (e) => {
+      if (e.target.checked) {
+        if (autoCalcFieldsEl) autoCalcFieldsEl.style.display = 'grid';
+        if (manualValueFieldEl) manualValueFieldEl.style.display = 'none';
+        if (amountEl) amountEl.removeAttribute('required');
+        if (baseValueEl) baseValueEl.setAttribute('required', 'required');
+        if (percentageEl) percentageEl.setAttribute('required', 'required');
+      } else {
+        if (autoCalcFieldsEl) autoCalcFieldsEl.style.display = 'none';
+        if (manualValueFieldEl) manualValueFieldEl.style.display = 'block';
+        if (amountEl) amountEl.setAttribute('required', 'required');
+        if (baseValueEl) baseValueEl.removeAttribute('required');
+        if (percentageEl) percentageEl.removeAttribute('required');
+      }
+    };
+  }
+  
+  if (baseValueEl) baseValueEl.oninput = updateCalculatedValue;
+  if (percentageEl) percentageEl.oninput = updateCalculatedValue;
+  
+  if (saveBtn) {
+    saveBtn.onclick = async (e)=>{
+      e.preventDefault();
+      console.log('🟢 Salvar clicado');
+      
+      const desc = descEl?.value.trim() || '';
+      const isAutoCalc = autoCalcEl?.checked || false;
+      
+      if (!desc) {
+        notifyError('Campo obrigatório', 'Informe a descrição do custo.');
+        return;
+      }
+      
+      let amount, baseValue = null, percentage = null, calculationNote = null;
+      
+      if (isAutoCalc) {
+        baseValue = parseFloat(baseValueEl?.value || '0');
+        percentage = parseFloat(percentageEl?.value || '0');
+        
+        if (!baseValue || baseValue <= 0) {
+          notifyError('Valor base inválido', 'Informe um valor base maior que zero.');
+          return;
+        }
+        if (!percentage || percentage <= 0) {
+          notifyError('Percentual inválido', 'Informe um percentual maior que zero.');
+          return;
+        }
+        
+        amount = baseValue * (percentage / 100);
+        calculationNote = `${percentage}% sobre ${formatMoney(baseValue)}`;
+      } else {
+        amount = parseFloat(amountEl?.value || '0');
+        
+        if (!amount || amount <= 0) {
+          notifyError('Valor inválido', 'Informe um valor maior que zero.');
+          return;
+        }
+      }
+      
+      const payload = {
+        description: desc,
+        amount: amount,
+        costType: typeEl?.value || 'OTHER',
+        category: catEl?.value || 'FIXED',
+        costDate: new Date((dateEl?.value || '') + 'T12:00:00').toISOString(),
+        recognitionBasis: basisEl?.value || 'ACCRUAL',
+        isRecurring: recEl?.checked || false,
+        baseValue: baseValue,
+        percentage: percentage,
+        calculationNote: calculationNote,
+      };
+      
+      const editingId = dlg.dataset.editingId ? Number(dlg.dataset.editingId) : undefined;
+      
+      try {
+        await createOrUpdateCost(editingId, payload);
+        dlg.close();
+        await notifySuccess(
+          editingId ? 'Custo atualizado!' : 'Custo criado!',
+          editingId ? 'As alterações foram salvas com sucesso.' : 'O custo foi registrado com sucesso.'
+        );
+        load();
+      } catch (e) {
+        console.error(e);
+        notifyError('Erro ao salvar', 'Não foi possível salvar o custo. Verifique os dados e tente novamente.');
+      }
+    };
+  }
+  
+  // ✅ ABRIR O MODAL
+  console.log('🟢 Abrindo modal...');
+  dlg.showModal();
+  console.log('✅ Modal aberto!');
 }
 
 async function load(){
@@ -289,23 +481,47 @@ async function load(){
   }
 }
 
+// ✅ INICIALIZAÇÃO
 document.addEventListener('DOMContentLoaded', ()=>{
+  console.log('🟢 DOM carregado!');
+  
   const p = periodDefault();
-  qs('#from').value = p.from;
-  qs('#to').value = p.to;
+  const fromEl = qs('#from');
+  const toEl = qs('#to');
+  
+  if (fromEl) fromEl.value = p.from;
+  if (toEl) toEl.value = p.to;
 
   const categorySelect = qs('#category');
   if (categorySelect) {
     categorySelect.setAttribute('style', 'padding:8px 12px; border:1px solid var(--border); border-radius:8px; background:#fff; font-size:14px; cursor:pointer;');
   }
   
-  // ✅ NOVO: Aplicar estilo no costType também
   const costTypeSelect = qs('#costType');
   if (costTypeSelect) {
     costTypeSelect.setAttribute('style', 'padding:8px 12px; border:1px solid var(--border); border-radius:8px; background:#fff; font-size:14px; cursor:pointer;');
   }
   
-  qs('#applyBtn').addEventListener('click', (e)=>{ e.preventDefault(); load(); });
-  qs('#newBtn').addEventListener('click', ()=> openDialog(null));
+  const applyBtn = qs('#applyBtn');
+  if (applyBtn) {
+    applyBtn.addEventListener('click', (e)=>{ 
+      e.preventDefault(); 
+      console.log('🔵 Aplicar filtros');
+      load(); 
+    });
+  }
+  
+  const newBtn = qs('#newBtn');
+  if (newBtn) {
+    console.log('✅ Botão "Novo custo" encontrado:', newBtn);
+    newBtn.addEventListener('click', (e)=> {
+      e.preventDefault();
+      console.log('🟢 Botão "Novo custo" clicado!');
+      openDialog(null);
+    });
+  } else {
+    console.error('❌ Botão #newBtn não encontrado!');
+  }
+  
   load();
 });
