@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Importar Receitas</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+    }
+
+    .container {
+      background: white;
+      border-radius: 16px;
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+      padding: 40px;
+      max-width: 600px;
+      width: 100%;
+    }
+
+    h1 {
+      color: #333;
+      margin-bottom: 10px;
+      font-size: 28px;
+      text-align: center;
+    }
+
+    p {
+      color: #666;
+      margin-bottom: 30px;
+      line-height: 1.6;
+      text-align: center;
+    }
+
+    .upload-area {
+      border: 2px dashed #667eea;
+      border-radius: 12px;
+      padding: 40px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      margin-bottom: 20px;
+    }
+
+    .upload-area:hover {
+      background: #f0f4ff;
+      border-color: #764ba2;
+    }
+
+    .upload-area.dragover {
+      background: #f0f4ff;
+      border-color: #764ba2;
+      transform: scale(1.02);
+    }
+
+    #fileInput {
+      display: none;
+    }
+
+    .upload-icon {
+      font-size: 48px;
+      margin-bottom: 10px;
+    }
+
+    .btn {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      border: none;
+      padding: 14px 32px;
+      font-size: 16px;
+      font-weight: 600;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+      width: 100%;
+    }
+
+    .btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(102, 126, 234, 0.6);
+    }
+
+    .btn:disabled {
+      background: #ccc;
+      cursor: not-allowed;
+      box-shadow: none;
+      transform: none;
+    }
+
+    .info {
+      margin-top: 20px;
+      padding: 15px;
+      background: #f0f4ff;
+      border-left: 4px solid #667eea;
+      border-radius: 4px;
+      display: none;
+    }
+
+    .info.show {
+      display: block;
+    }
+
+    .info strong {
+      color: #667eea;
+    }
+
+    .error {
+      background: #ffe6e6;
+      border-left: 4px solid #e74c3c;
+      color: #c0392b;
+      margin-top: 15px;
+      padding: 15px;
+      border-radius: 4px;
+      display: none;
+    }
+
+    .error.show {
+      display: block;
+    }
+
+    .file-info {
+      background: #e8f5e9;
+      border-left: 4px solid #4caf50;
+      padding: 15px;
+      border-radius: 4px;
+      margin-bottom: 20px;
+      display: none;
+    }
+
+    .file-info.show {
+      display: block;
+    }
+
+    .progress {
+      width: 100%;
+      height: 8px;
+      background: #e0e0e0;
+      border-radius: 4px;
+      overflow: hidden;
+      margin-top: 15px;
+      display: none;
+    }
+
+    .progress.show {
+      display: block;
+    }
+
+    .progress-bar {
+      height: 100%;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      width: 0%;
+      transition: width 0.3s ease;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>📤 Importar Receitas</h1>
+    <p>Faça upload da planilha consolidada de receitas com os IDs dos produtos preenchidos.</p>
+    
+    <div class="upload-area" id="uploadArea">
+      <div class="upload-icon">📁</div>
+      <h3>Clique ou arraste o arquivo aqui</h3>
+      <p style="margin-top: 10px; color: #999;">Formato: .xlsx ou .xls</p>
+      <input type="file" id="fileInput" accept=".xlsx, .xls">
+    </div>
+
+    <div class="file-info" id="fileInfo">
+      <strong>Arquivo:</strong> <span id="fileName">-</span><br>
+      <strong>Total de linhas:</strong> <span id="totalRows">-</span>
+    </div>
+
+    <button id="btnImport" class="btn" disabled>📥 Importar Receitas</button>
+
+    <div class="progress" id="progress">
+      <div class="progress-bar" id="progressBar"></div>
+    </div>
+
+    <div class="info" id="info">
+      <strong>Criadas:</strong> <span id="created">0</span><br>
+      <strong>Atualizadas:</strong> <span id="updated">0</span><br>
+      <strong>Com erro:</strong> <span id="skipped">0</span>
+    </div>
+
+    <div class="error" id="error"></div>
+  </div>
+
+  <script>
+    const API_URL = 'http://localhost:3000/api/v1';
+    
+    const uploadArea = document.getElementById('uploadArea');
+    const fileInput = document.getElementById('fileInput');
+    const fileInfo = document.getElementById('fileInfo');
+    const fileName = document.getElementById('fileName');
+    const totalRows = document.getElementById('totalRows');
+    const btnImport = document.getElementById('btnImport');
+    const infoDiv = document.getElementById('info');
+    const errorDiv = document.getElementById('error');
+    const progress = document.getElementById('progress');
+    const progressBar = document.getElementById('progressBar');
+    const created = document.getElementById('created');
+    const updated = document.getElementById('updated');
+    const skipped = document.getElementById('skipped');
+
+    let parsedData = null;
+
+    // ✅ Função de autenticação
+    function getAuth() {
+      try {
+        return JSON.parse(localStorage.getItem('auth')) || JSON.parse(sessionStorage.getItem('auth'));
+      } catch {
+        return null;
+      }
+    }
+
+    // Verificar autenticação
+    function checkAuth() {
+      const auth = getAuth();
+      if (!auth || !auth.token) {
+        errorDiv.textContent = '❌ Você precisa estar logado. Redirecionando...';
+        errorDiv.classList.add('show');
+        setTimeout(() => {
+          window.location.href = '/login.html';
+        }, 2000);
+        return false;
+      }
+      return true;
+    }
+
+    // Upload area events
+    uploadArea.addEventListener('click', () => fileInput.click());
+    
+    uploadArea.addEventListener('dragover', (e) => {
+      e.preventDefault();
+      uploadArea.classList.add('dragover');
+    });
+
+    uploadArea.addEventListener('dragleave', () => {
+      uploadArea.classList.remove('dragover');
+    });
+
+    uploadArea.addEventListener('drop', (e) => {
+      e.preventDefault();
+      uploadArea.classList.remove('dragover');
+      
+      const files = e.dataTransfer.files;
+      if (files.length > 0) {
+        handleFile(files[0]);
+      }
+    });
+
+    fileInput.addEventListener('change', (e) => {
+      const files = e.target.files;
+      if (files.length > 0) {
+        handleFile(files[0]);
+      }
+    });
+
+    // Processar arquivo
+    function handleFile(file) {
+      if (!file.name.match(/\.(xlsx|xls)$/)) {
+        errorDiv.textContent = '❌ Por favor, selecione um arquivo Excel (.xlsx ou .xls)';
+        errorDiv.classList.add('show');
+        return;
+      }
+
+      errorDiv.classList.remove('show');
+      
+      const reader = new FileReader();
+      
+      reader.onload = (e) => {
+        try {
+          const data = new Uint8Array(e.target.result);
+          const workbook = XLSX.read(data, { type: 'array' });
+          const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
+          const jsonData = XLSX.utils.sheet_to_json(firstSheet);
+          
+          parsedData = jsonData;
+          
+          fileName.textContent = file.name;
+          totalRows.textContent = jsonData.length;
+          fileInfo.classList.add('show');
+          btnImport.disabled = false;
+          
+        } catch (error) {
+          errorDiv.textContent = '❌ Erro ao ler o arquivo: ' + error.message;
+          errorDiv.classList.add('show');
+        }
+      };
+      
+      reader.readAsArrayBuffer(file);
+    }
+
+    // Importar receitas
+    async function importRecipes() {
+      if (!parsedData) return;
+
+      try {
+        btnImport.disabled = true;
+        btnImport.textContent = '⏳ Importando...';
+        errorDiv.classList.remove('show');
+        infoDiv.classList.remove('show');
+        progress.classList.add('show');
+        progressBar.style.width = '0%';
+
+        const auth = getAuth();
+        if (!auth || !auth.token) {
+          throw new Error('Você precisa estar logado para importar receitas');
+        }
+
+        progressBar.style.width = '30%';
+
+        const response = await fetch(`${API_URL}/recipes/bulk-import`, {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${auth.token}`,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ recipes: parsedData }),
+        });
+
+        progressBar.style.width = '70%';
+
+        if (!response.ok) {
+          if (response.status === 401) {
+            throw new Error('Sessão expirada. Faça login novamente.');
+          }
+          const errorData = await response.json();
+          throw new Error(errorData.message || `Erro ao importar: ${response.statusText}`);
+        }
+
+        const result = await response.json();
+        
+        progressBar.style.width = '100%';
+
+        // Mostrar resultados
+        created.textContent = result.created;
+        updated.textContent = result.updated;
+        skipped.textContent = result.skipped;
+        infoDiv.classList.add('show');
+
+        if (result.errors && result.errors.length > 0) {
+          console.error('Erros durante a importação:', result.errors);
+          errorDiv.innerHTML = `<strong>⚠️ Alguns itens tiveram erro:</strong><br>${result.errors.slice(0, 5).map(e => `- ${e.recipe}: ${e.error}`).join('<br>')}`;
+          errorDiv.classList.add('show');
+        }
+
+        btnImport.textContent = '✅ Importação Concluída!';
+        
+        setTimeout(() => {
+          progress.classList.remove('show');
+          progressBar.style.width = '0%';
+        }, 2000);
+
+      } catch (error) {
+        console.error('Erro ao importar receitas:', error);
+        errorDiv.textContent = error.message;
+        errorDiv.classList.add('show');
+        btnImport.textContent = '📥 Importar Receitas';
+        btnImport.disabled = false;
+        progress.classList.remove('show');
+
+        if (error.message.includes('Sessão expirada') || error.message.includes('logado')) {
+          setTimeout(() => {
+            window.location.href = '/login.html';
+          }, 2000);
+        }
+      }
+    }
+
+    // Event listeners
+    btnImport.addEventListener('click', importRecipes);
+
+    // Verificar autenticação ao carregar
+    window.addEventListener('DOMContentLoaded', () => {
+      checkAuth();
+    });
+  </script>
+</body>
+</html>

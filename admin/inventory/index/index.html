@@ -1,13 +1,12 @@
 <!doctype html>
 <html lang="pt-BR">
 <head>
-  <meta charset="utf-8"/>
-  <meta name="viewport" content="width=device-width, initial-scale=1"/>
-  <title>Produtos · Listagem</title>
-  <link rel="stylesheet" href="../../../saidbar/saidebar.css"/>
-  <link rel="stylesheet" href="../../../../styles/base.css"/>
-  <link rel="stylesheet" href="./index.css"/>
-  <script>window.SIDEBAR_ACTIVE='products-list';</script>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Produtos</title>
+  <link rel="stylesheet" href="../../../saidbar/saidebar.css" />
+  <link rel="stylesheet" href="./index.css" />
+  <script>window.SIDEBAR_ACTIVE = 'products-list';</script>
   <script src="../../../saidbar/saidebar.js" defer></script>
   <script src="./index.js" defer></script>
 </head>
@@ -16,16 +15,17 @@
     <aside id="sidebar-root"></aside>
     <div class="app-content">
       <main class="shell">
+
         <section class="card">
           <div class="card-head">
-            <h1>Produtos • Listagem</h1>
-            <a class="btn-primary" href="../create/index.html">+ Novo Produto</a>
+            <h1>📦 Produtos</h1>
+            <a href="../products/create/index.html" class="btn-primary">+ Novo Produto</a>
           </div>
 
           <form id="filterForm" class="filters">
-            <input id="q" placeholder="Buscar por nome, código ou NCM"/>
-            <button class="btn-primary" type="submit">Buscar</button>
-            <button class="btn-ghost" type="button" id="clearBtn">Limpar</button>
+            <input type="text" id="q" placeholder="Buscar por nome, código ou NCM..." />
+            <button type="submit" class="btn-primary">🔍 Buscar</button>
+            <button type="button" id="clearBtn" class="btn-ghost">Limpar</button>
           </form>
 
           <div id="status" class="banner hidden"></div>
@@ -34,28 +34,92 @@
             <table class="tbl">
               <thead>
                 <tr>
-                  <th>Nome</th>
+                  <th class="text-left">Produto</th>
                   <th>Código</th>
                   <th>Unidade</th>
-                  <th>Custo Unitário</th>
+                  <th>Estoque Atual</th>
+                  <th>Estoque Mínimo</th>
+                  <th>Custo Unit.</th>
                   <th>NCM</th>
                   <th>Atualizado</th>
+                  <th>Ações</th>
                 </tr>
               </thead>
               <tbody id="tbody">
-                <tr><td colspan="6" class="muted">Carregando...</td></tr>
+                <tr><td colspan="9" class="muted">Carregando...</td></tr>
               </tbody>
             </table>
           </div>
 
-          <div class="pager">
-            <button id="prevBtn" class="btn-ghost">&laquo; Anterior</button>
-            <span id="pageInfo" class="muted">-</span>
-            <button id="nextBtn" class="btn-ghost">Próxima &raquo;</button>
+          <div class="pagination">
+            <button id="prevBtn" class="btn-ghost">← Anterior</button>
+            <span id="pageInfo">-</span>
+            <button id="nextBtn" class="btn-ghost">Próxima →</button>
           </div>
         </section>
+
       </main>
     </div>
   </div>
+
+  <!-- ✅ MODAL DE EDIÇÃO -->
+  <div id="editModal" class="modal hidden">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>✏️ Editar Produto</h2>
+        <button id="closeModalBtn" class="btn-close">×</button>
+      </div>
+
+      <div class="modal-body">
+        <input type="hidden" id="editProductId" />
+
+        <div class="field">
+          <label>Nome *</label>
+          <input type="text" id="editName" required />
+        </div>
+
+        <div class="field">
+          <label>Código *</label>
+          <input type="text" id="editCode" required />
+        </div>
+
+        <div class="field">
+          <label>Unidade de Medida *</label>
+          <input type="text" id="editUnitOfMeasure" required />
+        </div>
+
+        <div class="field">
+          <label>Custo Unitário *</label>
+          <input type="number" id="editCurrentCostPerUnit" step="0.0001" required />
+        </div>
+
+        <div class="field">
+          <label>NCM</label>
+          <input type="text" id="editNcm" />
+        </div>
+
+        <div class="field">
+          <label>Estoque Mínimo</label>
+          <input type="number" id="editMinQty" step="0.01" />
+        </div>
+
+        <div class="field">
+          <label>Lead Time (dias)</label>
+          <input type="number" id="editLeadTimeDays" />
+        </div>
+
+        <div class="field">
+          <label>Consumo Médio Diário</label>
+          <input type="number" id="editAvgDailyUse" step="0.01" />
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button id="cancelEditBtn" class="btn-ghost">Cancelar</button>
+        <button id="saveProductBtn" class="btn-primary">💾 Salvar</button>
+      </div>
+    </div>
+  </div>
+
 </body>
 </html>

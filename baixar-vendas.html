@@ -1,0 +1,950 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Conversor XML → Excel | SAT-CF-e + NFC-e (Múltiplas Pastas)</title>
+  
+  <!-- SheetJS (xlsx) via CDN -->
+  <script src="https://cdn.sheetjs.com/xlsx-0.20.1/package/dist/xlsx.full.min.js"></script>
+  
+  <style>
+    :root {
+      --bg: #f8fafc;
+      --card: #ffffff;
+      --text: #0f172a;
+      --muted: #64748b;
+      --border: #e5e7eb;
+      --primary: #22c55e;
+      --primary-dark: #16a34a;
+      --danger: #ef4444;
+      --warning: #f59e0b;
+      --shadow: 0 12px 30px rgba(2, 6, 23, 0.08);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: system-ui, -apple-system, 'Segoe UI', Roboto, Ubuntu, Cantarell, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      padding: 24px;
+      min-height: 100vh;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    h1 {
+      font-size: 32px;
+      font-weight: 700;
+      margin-bottom: 8px;
+      background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .subtitle {
+      color: var(--muted);
+      margin-bottom: 32px;
+      font-size: 16px;
+    }
+
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      padding: 24px;
+      margin-bottom: 24px;
+      box-shadow: var(--shadow);
+    }
+
+    .upload-zone {
+      border: 2px dashed var(--border);
+      border-radius: 12px;
+      padding: 48px 24px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.3s;
+      background: #f9fafb;
+    }
+
+    .upload-zone:hover {
+      border-color: var(--primary);
+      background: #f0fdf4;
+    }
+
+    .upload-zone.dragover {
+      border-color: var(--primary);
+      background: #dcfce7;
+      transform: scale(1.02);
+    }
+
+    .upload-icon {
+      font-size: 48px;
+      margin-bottom: 16px;
+    }
+
+    .upload-text {
+      font-size: 18px;
+      font-weight: 600;
+      margin-bottom: 8px;
+    }
+
+    .upload-hint {
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    input[type="file"] {
+      display: none;
+    }
+
+    .btn {
+      padding: 12px 24px;
+      border: none;
+      border-radius: 10px;
+      font-weight: 700;
+      cursor: pointer;
+      font-size: 14px;
+      transition: all 0.2s;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .btn-primary {
+      background: linear-gradient(180deg, var(--primary), var(--primary-dark));
+      color: white;
+      box-shadow: 0 8px 16px rgba(34, 197, 94, 0.2);
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 12px 24px rgba(34, 197, 94, 0.3);
+    }
+
+    .btn-primary:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 16px;
+      margin-top: 24px;
+    }
+
+    .stat-card {
+      background: linear-gradient(135deg, #f0fdf4, #dcfce7);
+      border: 1px solid #bbf7d0;
+      border-radius: 12px;
+      padding: 16px;
+    }
+
+    .stat-label {
+      font-size: 13px;
+      color: var(--muted);
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 8px;
+    }
+
+    .stat-value {
+      font-size: 28px;
+      font-weight: 700;
+      color: var(--primary-dark);
+    }
+
+    .table-wrap {
+      overflow-x: auto;
+      margin-top: 16px;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      max-height: 400px;
+      overflow-y: auto;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    th, td {
+      padding: 12px;
+      text-align: left;
+      border-bottom: 1px solid var(--border);
+      font-size: 14px;
+    }
+
+    th {
+      background: #f9fafb;
+      font-weight: 600;
+      position: sticky;
+      top: 0;
+      z-index: 1;
+    }
+
+    tbody tr:hover {
+      background: #f9fafb;
+    }
+
+    .text-right {
+      text-align: right;
+    }
+
+    .text-center {
+      text-align: center;
+    }
+
+    .badge {
+      display: inline-block;
+      padding: 4px 8px;
+      border-radius: 6px;
+      font-size: 12px;
+      font-weight: 600;
+    }
+
+    .badge-success {
+      background: #dcfce7;
+      color: #166534;
+    }
+
+    .badge-warning {
+      background: #fef3c7;
+      color: #92400e;
+    }
+
+    .badge-danger {
+      background: #fee2e2;
+      color: #991b1b;
+    }
+
+    .badge-info {
+      background: #dbeafe;
+      color: #1e40af;
+    }
+
+    .alert {
+      padding: 16px;
+      border-radius: 10px;
+      margin-bottom: 16px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .alert-info {
+      background: #dbeafe;
+      border: 1px solid #93c5fd;
+      color: #1e40af;
+    }
+
+    .alert-warning {
+      background: #fef3c7;
+      border: 1px solid #fcd34d;
+      color: #92400e;
+    }
+
+    .progress-bar {
+      width: 100%;
+      height: 8px;
+      background: #e5e7eb;
+      border-radius: 4px;
+      overflow: hidden;
+      margin-top: 16px;
+    }
+
+    .progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--primary), var(--primary-dark));
+      transition: width 0.3s;
+    }
+
+    .file-list {
+      margin-top: 16px;
+      max-height: 300px;
+      overflow-y: auto;
+    }
+
+    .folder-group {
+      margin-bottom: 16px;
+    }
+
+    .folder-header {
+      background: #f0fdf4;
+      border: 1px solid #bbf7d0;
+      border-radius: 8px;
+      padding: 12px;
+      font-weight: 700;
+      color: var(--primary-dark);
+      margin-bottom: 8px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .file-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 8px 12px;
+      background: #f9fafb;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      margin-bottom: 4px;
+      margin-left: 20px;
+      font-size: 13px;
+    }
+
+    .file-name {
+      font-weight: 600;
+      font-size: 13px;
+    }
+
+    .file-size {
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    @media (max-width: 768px) {
+      body {
+        padding: 16px;
+      }
+
+      h1 {
+        font-size: 24px;
+      }
+
+      .stats {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>📊 Conversor XML → Excel (SAT-CF-e + NFC-e)</h1>
+    <p class="subtitle">Análise consolidada de vendas de múltiplas pastas</p>
+
+    <div class="card">
+      <div class="upload-zone" id="uploadZone">
+        <div class="upload-icon">📁</div>
+        <div class="upload-text">Arraste pastas com XMLs aqui</div>
+        <div class="upload-hint">ou clique para selecionar (aceita múltiplas pastas e arquivos)</div>
+        <input type="file" id="fileInput" webkitdirectory directory multiple>
+      </div>
+
+      <div id="fileList" class="file-list" style="display: none;"></div>
+
+      <div id="progress" style="display: none;">
+        <div class="progress-bar">
+          <div class="progress-fill" id="progressFill" style="width: 0%"></div>
+        </div>
+        <p id="progressText" style="text-align: center; margin-top: 8px; color: var(--muted); font-size: 14px;"></p>
+      </div>
+    </div>
+
+    <div id="results" style="display: none;">
+      <div class="card">
+        <h2 style="margin-bottom: 16px;">📈 Resumo da Análise Consolidada</h2>
+        
+        <div class="stats">
+          <div class="stat-card">
+            <div class="stat-label">Total de Vendas</div>
+            <div class="stat-value" id="totalSales">0</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">Produtos Únicos</div>
+            <div class="stat-value" id="uniqueProducts">0</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">Valor Total</div>
+            <div class="stat-value" id="totalValue">R$ 0,00</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">Período</div>
+            <div class="stat-value" id="period" style="font-size: 16px;">-</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">Pastas Processadas</div>
+            <div class="stat-value" id="totalFolders">0</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">Arquivos XML</div>
+            <div class="stat-value" id="totalFiles">0</div>
+          </div>
+        </div>
+
+        <div id="alerts" style="margin-top: 24px;"></div>
+
+        <h3 style="margin-top: 32px; margin-bottom: 16px;">🛒 Produtos Vendidos (Consolidado)</h3>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Código</th>
+                <th>Produto</th>
+                <th class="text-center">Qtd. Total</th>
+                <th class="text-right">Valor Unit. Médio</th>
+                <th class="text-right">Valor Total</th>
+                <th class="text-center">Tipo</th>
+              </tr>
+            </thead>
+            <tbody id="productsTable"></tbody>
+          </table>
+        </div>
+
+        <div style="margin-top: 24px; display: flex; gap: 12px; flex-wrap: wrap;">
+          <button class="btn btn-primary" id="exportBtn">
+            📥 Baixar Excel Completo
+          </button>
+          <button class="btn btn-primary" id="exportProductsBtn">
+            📋 Baixar Lista de Produtos
+          </button>
+          <button class="btn btn-primary" id="exportSalesBtn">
+            🧾 Baixar Vendas Detalhadas
+          </button>
+          <button class="btn btn-primary" id="exportByFolderBtn">
+            📂 Baixar Análise por Pasta
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const uploadZone = document.getElementById('uploadZone');
+    const fileInput = document.getElementById('fileInput');
+    const fileList = document.getElementById('fileList');
+    const progress = document.getElementById('progress');
+    const progressFill = document.getElementById('progressFill');
+    const progressText = document.getElementById('progressText');
+    const results = document.getElementById('results');
+
+    let parsedData = {
+      sales: [],
+      products: {},
+      folders: {},
+      summary: {},
+      xmlTypes: { satcfe: 0, nfce: 0 }
+    };
+
+    // Upload zone interactions
+    uploadZone.addEventListener('click', () => fileInput.click());
+
+    uploadZone.addEventListener('dragover', (e) => {
+      e.preventDefault();
+      uploadZone.classList.add('dragover');
+    });
+
+    uploadZone.addEventListener('dragleave', () => {
+      uploadZone.classList.remove('dragover');
+    });
+
+    uploadZone.addEventListener('drop', (e) => {
+      e.preventDefault();
+      uploadZone.classList.remove('dragover');
+      
+      const items = e.dataTransfer.items;
+      const files = [];
+      
+      for (let i = 0; i < items.length; i++) {
+        const item = items[i].webkitGetAsEntry();
+        if (item) {
+          traverseFileTree(item, files);
+        }
+      }
+      
+      setTimeout(() => {
+        if (files.length > 0) {
+          processFiles(files);
+        }
+      }, 500);
+    });
+
+    fileInput.addEventListener('change', (e) => {
+      const files = Array.from(e.target.files);
+      if (files.length > 0) {
+        processFiles(files);
+      }
+    });
+
+    function traverseFileTree(item, files) {
+      if (item.isFile) {
+        item.file((file) => {
+          if (file.name.endsWith('.xml')) {
+            files.push(file);
+          }
+        });
+      } else if (item.isDirectory) {
+        const dirReader = item.createReader();
+        dirReader.readEntries((entries) => {
+          for (let i = 0; i < entries.length; i++) {
+            traverseFileTree(entries[i], files);
+          }
+        });
+      }
+    }
+
+    async function processFiles(files) {
+      const filesByFolder = {};
+      
+      files.forEach(file => {
+        const pathParts = file.webkitRelativePath ? file.webkitRelativePath.split('/') : [file.name];
+        const folderName = pathParts.length > 1 ? pathParts[pathParts.length - 2] : 'Raiz';
+        
+        if (!filesByFolder[folderName]) {
+          filesByFolder[folderName] = [];
+        }
+        filesByFolder[folderName].push(file);
+      });
+
+      fileList.style.display = 'block';
+      fileList.innerHTML = '';
+      
+      Object.keys(filesByFolder).sort().forEach(folderName => {
+        const folderDiv = document.createElement('div');
+        folderDiv.className = 'folder-group';
+        
+        const folderHeader = document.createElement('div');
+        folderHeader.className = 'folder-header';
+        folderHeader.innerHTML = `
+          <span>📁 ${folderName}</span>
+          <span class="badge badge-success">${filesByFolder[folderName].length} arquivo(s)</span>
+        `;
+        folderDiv.appendChild(folderHeader);
+        
+        filesByFolder[folderName].forEach(file => {
+          const item = document.createElement('div');
+          item.className = 'file-item';
+          item.innerHTML = `
+            <div>
+              <div class="file-name">📄 ${file.name}</div>
+            </div>
+            <span class="badge badge-success">✓</span>
+          `;
+          folderDiv.appendChild(item);
+        });
+        
+        fileList.appendChild(folderDiv);
+      });
+
+      progress.style.display = 'block';
+      progressText.textContent = 'Processando arquivos XML...';
+
+      parsedData = {
+        sales: [],
+        products: {},
+        folders: {},
+        summary: {
+          totalSales: 0,
+          totalValue: 0,
+          dates: [],
+          totalFolders: Object.keys(filesByFolder).length,
+          totalFiles: files.length
+        },
+        xmlTypes: { satcfe: 0, nfce: 0 }
+      };
+
+      console.log(`🚀 Iniciando processamento de ${files.length} arquivo(s) em ${Object.keys(filesByFolder).length} pasta(s)`);
+
+      let processedCount = 0;
+
+      for (const file of files) {
+        processedCount++;
+        progressFill.style.width = `${(processedCount / files.length) * 100}%`;
+        progressText.textContent = `Processando ${processedCount} de ${files.length}...`;
+        
+        const pathParts = file.webkitRelativePath ? file.webkitRelativePath.split('/') : [file.name];
+        const folderName = pathParts.length > 1 ? pathParts[pathParts.length - 2] : 'Raiz';
+        
+        const text = await file.text();
+        parseXML(text, file.name, folderName);
+        
+        await new Promise(resolve => setTimeout(resolve, 10));
+      }
+
+      console.log(`✅ Processamento concluído!`);
+      console.log(`   SAT-CF-e: ${parsedData.xmlTypes.satcfe} | NFC-e: ${parsedData.xmlTypes.nfce}`);
+      console.log(`   Total: ${parsedData.summary.totalSales} vendas, ${Object.keys(parsedData.products).length} produtos únicos`);
+
+      progressText.textContent = 'Concluído!';
+      setTimeout(() => {
+        progress.style.display = 'none';
+        displayResults();
+      }, 500);
+    }
+
+    function parseXML(xmlText, fileName, folderName) {
+      try {
+        const parser = new DOMParser();
+        const xmlDoc = parser.parseFromString(xmlText, 'text/xml');
+
+        const parserError = xmlDoc.querySelector('parsererror');
+        if (parserError) {
+          console.error(`❌ Erro ao fazer parse do XML ${fileName}:`, parserError.textContent);
+          return;
+        }
+
+        // Detectar tipo de XML
+        const isSATCFe = xmlDoc.querySelector('CFe') !== null;
+        const isNFCe = xmlDoc.querySelector('nfeProc') !== null || xmlDoc.querySelector('NFe') !== null;
+
+        if (isSATCFe) {
+          parsedData.xmlTypes.satcfe++;
+          parseSATCFe(xmlDoc, fileName, folderName);
+        } else if (isNFCe) {
+          parsedData.xmlTypes.nfce++;
+          parseNFCe(xmlDoc, fileName, folderName);
+        } else {
+          console.warn(`⚠️ Tipo de XML não reconhecido: ${fileName}`);
+        }
+
+      } catch (error) {
+        console.error(`❌ Erro ao processar ${fileName}:`, error);
+      }
+    }
+
+    function parseSATCFe(xmlDoc, fileName, folderName) {
+      const nCFe = xmlDoc.querySelector('nCFe')?.textContent || '';
+      const dEmi = xmlDoc.querySelector('dEmi')?.textContent || '';
+      const hEmi = xmlDoc.querySelector('hEmi')?.textContent || '';
+      const vCFe = parseFloat(xmlDoc.querySelector('vCFe')?.textContent || '0');
+      const caixa = xmlDoc.querySelector('numeroCaixa')?.textContent || '';
+      
+      const cMP = xmlDoc.querySelector('cMP')?.textContent || '';
+      const paymentMap = {
+        '01': 'Dinheiro', '02': 'Cheque', '03': 'Cartão Crédito', '04': 'Cartão Débito',
+        '05': 'Crédito Loja', '10': 'Vale Alimentação', '11': 'Vale Refeição',
+        '12': 'Vale Presente', '13': 'Vale Combustível', '15': 'Boleto',
+        '90': 'Sem Pagamento', '99': 'Outros'
+      };
+      const paymentMethod = paymentMap[cMP] || 'Outros';
+
+      const dateStr = dEmi ? dEmi.replace(/(\d{4})(\d{2})(\d{2})/, '$3/$2/$1') : '';
+      const timeStr = hEmi ? hEmi.replace(/(\d{2})(\d{2})(\d{2})/, '$1:$2:$3') : '';
+      const dateTime = `${dateStr} ${timeStr}`;
+
+      if (dateStr) {
+        parsedData.summary.dates.push(dateStr);
+      }
+
+      if (!parsedData.folders[folderName]) {
+        parsedData.folders[folderName] = {
+          totalSales: 0,
+          totalValue: 0,
+          products: {}
+        };
+      }
+
+      const items = xmlDoc.querySelectorAll('det');
+      
+      console.log(`📄 [${folderName}] ${fileName} - SAT CF-e ${nCFe} com ${items.length} item(ns)`);
+      
+      items.forEach(item => {
+        const cProd = item.querySelector('cProd')?.textContent || '';
+        const xProd = item.querySelector('xProd')?.textContent || '';
+        const qCom = parseFloat(item.querySelector('qCom')?.textContent || '0');
+        const vUnCom = parseFloat(item.querySelector('vUnCom')?.textContent || '0');
+        const vProd = parseFloat(item.querySelector('vProd')?.textContent || '0');
+        const vItem = parseFloat(item.querySelector('vItem')?.textContent || vProd);
+        const ncm = item.querySelector('NCM')?.textContent || '';
+        const uCom = item.querySelector('uCom')?.textContent || '';
+
+        addSaleData(folderName, nCFe, dateStr, timeStr, dateTime, caixa, paymentMethod, 
+                    cProd, xProd, qCom, vUnCom, vItem, vCFe, ncm, uCom, 'SAT-CF-e');
+      });
+
+      parsedData.summary.totalSales += 1;
+      parsedData.summary.totalValue += vCFe;
+      parsedData.folders[folderName].totalSales += 1;
+      parsedData.folders[folderName].totalValue += vCFe;
+    }
+
+    function parseNFCe(xmlDoc, fileName, folderName) {
+      const nNF = xmlDoc.querySelector('nNF')?.textContent || '';
+      const dhEmi = xmlDoc.querySelector('dhEmi')?.textContent || '';
+      
+      let dateStr = '';
+      let timeStr = '';
+      if (dhEmi) {
+        const dt = new Date(dhEmi);
+        dateStr = dt.toLocaleDateString('pt-BR');
+        timeStr = dt.toLocaleTimeString('pt-BR');
+      }
+      const dateTime = `${dateStr} ${timeStr}`;
+
+      const vNF = parseFloat(xmlDoc.querySelector('vNF')?.textContent || '0');
+      
+      const tPag = xmlDoc.querySelector('tPag')?.textContent || '';
+      const xPag = xmlDoc.querySelector('xPag')?.textContent || '';
+      const paymentMap = {
+        '01': 'Dinheiro', '02': 'Cheque', '03': 'Cartão Crédito', '04': 'Cartão Débito',
+        '05': 'Crédito Loja', '10': 'Vale Alimentação', '11': 'Vale Refeição',
+        '12': 'Vale Presente', '13': 'Vale Combustível', '15': 'Boleto',
+        '90': 'Sem Pagamento', '99': xPag || 'Outros'
+      };
+      const paymentMethod = paymentMap[tPag] || xPag || 'Outros';
+
+      if (dateStr) {
+        parsedData.summary.dates.push(dateStr);
+      }
+
+      if (!parsedData.folders[folderName]) {
+        parsedData.folders[folderName] = {
+          totalSales: 0,
+          totalValue: 0,
+          products: {}
+        };
+      }
+
+      const items = xmlDoc.querySelectorAll('det');
+      
+      console.log(`📄 [${folderName}] ${fileName} - NFC-e ${nNF} com ${items.length} item(ns)`);
+      
+      items.forEach(item => {
+        const cProd = item.querySelector('cProd')?.textContent || '';
+        const xProd = item.querySelector('xProd')?.textContent || '';
+        const qCom = parseFloat(item.querySelector('qCom')?.textContent || '0');
+        const vUnCom = parseFloat(item.querySelector('vUnCom')?.textContent || '0');
+        const vProd = parseFloat(item.querySelector('vProd')?.textContent || '0');
+        const ncm = item.querySelector('NCM')?.textContent || '';
+        const uCom = item.querySelector('uCom')?.textContent || '';
+
+        addSaleData(folderName, nNF, dateStr, timeStr, dateTime, '-', paymentMethod, 
+                    cProd, xProd, qCom, vUnCom, vProd, vNF, ncm, uCom, 'NFC-e');
+      });
+
+      parsedData.summary.totalSales += 1;
+      parsedData.summary.totalValue += vNF;
+      parsedData.folders[folderName].totalSales += 1;
+      parsedData.folders[folderName].totalValue += vNF;
+    }
+
+    function addSaleData(folderName, docNumber, dateStr, timeStr, dateTime, caixa, paymentMethod, 
+                         cProd, xProd, qCom, vUnCom, vProd, vTotal, ncm, uCom, xmlType) {
+      parsedData.sales.push({
+        pasta: folderName,
+        tipoXML: xmlType,
+        numeroDocumento: docNumber,
+        data: dateStr,
+        hora: timeStr,
+        dataHora: dateTime,
+        caixa,
+        pagamento: paymentMethod,
+        codigoProduto: cProd,
+        produto: xProd,
+        quantidade: qCom,
+        valorUnitario: vUnCom,
+        valorTotal: vProd,
+        ncm,
+        unidade: uCom,
+        valorVenda: vTotal
+      });
+
+      // Agregar produtos globalmente
+      if (!parsedData.products[cProd]) {
+        parsedData.products[cProd] = {
+          codigo: cProd, nome: xProd, ncm, unidade: uCom,
+          quantidadeTotal: 0, valorTotal: 0, vendas: 0, valoresUnitarios: [], xmlTypes: []
+        };
+      }
+      parsedData.products[cProd].quantidadeTotal += qCom;
+      parsedData.products[cProd].valorTotal += vProd;
+      parsedData.products[cProd].vendas += 1;
+      parsedData.products[cProd].valoresUnitarios.push(vUnCom);
+      if (!parsedData.products[cProd].xmlTypes.includes(xmlType)) {
+        parsedData.products[cProd].xmlTypes.push(xmlType);
+      }
+
+      // Agregar produtos por pasta
+      if (!parsedData.folders[folderName].products[cProd]) {
+        parsedData.folders[folderName].products[cProd] = {
+          codigo: cProd, nome: xProd, ncm, unidade: uCom,
+          quantidadeTotal: 0, valorTotal: 0, vendas: 0
+        };
+      }
+      parsedData.folders[folderName].products[cProd].quantidadeTotal += qCom;
+      parsedData.folders[folderName].products[cProd].valorTotal += vProd;
+      parsedData.folders[folderName].products[cProd].vendas += 1;
+    }
+
+    function displayResults() {
+      results.style.display = 'block';
+
+      document.getElementById('totalSales').textContent = parsedData.summary.totalSales;
+      document.getElementById('uniqueProducts').textContent = Object.keys(parsedData.products).length;
+      document.getElementById('totalValue').textContent = parsedData.summary.totalValue.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+      document.getElementById('totalFolders').textContent = parsedData.summary.totalFolders;
+      document.getElementById('totalFiles').textContent = parsedData.summary.totalFiles;
+
+      const dates = [...new Set(parsedData.summary.dates)].sort();
+      const period = dates.length > 0 ? `${dates[0]} a ${dates[dates.length - 1]}` : '-';
+      document.getElementById('period').textContent = period;
+
+      const alertsDiv = document.getElementById('alerts');
+      alertsDiv.innerHTML = `
+        <div class="alert alert-info">
+          <span style="font-size: 24px;">ℹ️</span>
+          <div>
+            <strong>Análise consolidada de ${parsedData.summary.totalFolders} pasta(s)!</strong> 
+            Processados ${parsedData.xmlTypes.satcfe} SAT-CF-e e ${parsedData.xmlTypes.nfce} NFC-e.
+          </div>
+        </div>
+      `;
+
+      const tbody = document.getElementById('productsTable');
+      tbody.innerHTML = '';
+
+      const productsList = Object.values(parsedData.products).sort((a, b) => b.valorTotal - a.valorTotal);
+
+      productsList.forEach(prod => {
+        const avgPrice = prod.valoresUnitarios.reduce((a, b) => a + b, 0) / prod.valoresUnitarios.length;
+        
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td><strong>${prod.codigo}</strong></td>
+          <td>${prod.nome}</td>
+          <td class="text-center">${prod.quantidadeTotal.toFixed(2)} ${prod.unidade}</td>
+          <td class="text-right">${avgPrice.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</td>
+          <td class="text-right"><strong>${prod.valorTotal.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</strong></td>
+          <td class="text-center">
+            ${prod.xmlTypes.map(t => `<span class="badge badge-info">${t}</span>`).join(' ')}
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
+
+      results.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+
+    // Exportar Excel completo
+    document.getElementById('exportBtn').addEventListener('click', () => {
+      const wb = XLSX.utils.book_new();
+
+      const summaryData = [
+        ['RESUMO DA ANÁLISE CONSOLIDADA DE VENDAS'],
+        [''],
+        ['Total de Vendas', parsedData.summary.totalSales],
+        ['Produtos Únicos', Object.keys(parsedData.products).length],
+        ['Valor Total', parsedData.summary.totalValue],
+        ['Pastas Processadas', parsedData.summary.totalFolders],
+        ['Arquivos XML', parsedData.summary.totalFiles],
+        ['SAT-CF-e', parsedData.xmlTypes.satcfe],
+        ['NFC-e', parsedData.xmlTypes.nfce],
+        ['Período', document.getElementById('period').textContent],
+        [''],
+        ['Gerado em', new Date().toLocaleString('pt-BR')]
+      ];
+      const ws1 = XLSX.utils.aoa_to_sheet(summaryData);
+      XLSX.utils.book_append_sheet(wb, ws1, 'Resumo');
+
+      const productsData = [
+        ['Código', 'Produto', 'NCM', 'Unidade', 'Qtd. Total', 'Valor Unit. Médio', 'Valor Total', 'Nº Vendas', 'Tipos XML']
+      ];
+      Object.values(parsedData.products).forEach(prod => {
+        const avgPrice = prod.valoresUnitarios.reduce((a, b) => a + b, 0) / prod.valoresUnitarios.length;
+        productsData.push([prod.codigo, prod.nome, prod.ncm, prod.unidade, prod.quantidadeTotal, avgPrice, prod.valorTotal, prod.vendas, prod.xmlTypes.join(', ')]);
+      });
+      const ws2 = XLSX.utils.aoa_to_sheet(productsData);
+      XLSX.utils.book_append_sheet(wb, ws2, 'Produtos');
+
+      const salesData = [
+        ['Pasta', 'Tipo XML', 'Nº Documento', 'Data', 'Hora', 'Caixa', 'Pagamento', 'Cód. Produto', 'Produto', 'Qtd', 'Valor Unit.', 'Valor Prod.', 'Valor Venda', 'NCM', 'Unidade']
+      ];
+      parsedData.sales.forEach(sale => {
+        salesData.push([sale.pasta, sale.tipoXML, sale.numeroDocumento, sale.data, sale.hora, sale.caixa, sale.pagamento, sale.codigoProduto, sale.produto, sale.quantidade, sale.valorUnitario, sale.valorTotal, sale.valorVenda, sale.ncm, sale.unidade]);
+      });
+      const ws3 = XLSX.utils.aoa_to_sheet(salesData);
+      XLSX.utils.book_append_sheet(wb, ws3, 'Vendas Detalhadas');
+
+      const fileName = `analise-vendas-consolidada-${new Date().toISOString().split('T')[0]}.xlsx`;
+      XLSX.writeFile(wb, fileName);
+    });
+
+    // Exportar apenas produtos
+    document.getElementById('exportProductsBtn').addEventListener('click', () => {
+      const wb = XLSX.utils.book_new();
+      
+      const productsData = [
+        ['Código', 'Produto', 'NCM', 'Unidade', 'Qtd. Total', 'Valor Unit. Médio', 'Valor Total', 'Nº Vendas', 'Tipos XML']
+      ];
+      Object.values(parsedData.products).forEach(prod => {
+        const avgPrice = prod.valoresUnitarios.reduce((a, b) => a + b, 0) / prod.valoresUnitarios.length;
+        productsData.push([prod.codigo, prod.nome, prod.ncm, prod.unidade, prod.quantidadeTotal, avgPrice, prod.valorTotal, prod.vendas, prod.xmlTypes.join(', ')]);
+      });
+      
+      const ws = XLSX.utils.aoa_to_sheet(productsData);
+      XLSX.utils.book_append_sheet(wb, ws, 'Produtos');
+      
+      const fileName = `produtos-vendidos-consolidado-${new Date().toISOString().split('T')[0]}.xlsx`;
+      XLSX.writeFile(wb, fileName);
+    });
+
+    // Exportar apenas vendas
+    document.getElementById('exportSalesBtn').addEventListener('click', () => {
+      const wb = XLSX.utils.book_new();
+      
+      const salesData = [
+        ['Pasta', 'Tipo XML', 'Nº Documento', 'Data', 'Hora', 'Caixa', 'Pagamento', 'Cód. Produto', 'Produto', 'Qtd', 'Valor Unit.', 'Valor Prod.', 'Valor Venda', 'NCM', 'Unidade']
+      ];
+      parsedData.sales.forEach(sale => {
+        salesData.push([sale.pasta, sale.tipoXML, sale.numeroDocumento, sale.data, sale.hora, sale.caixa, sale.pagamento, sale.codigoProduto, sale.produto, sale.quantidade, sale.valorUnitario, sale.valorTotal, sale.valorVenda, sale.ncm, sale.unidade]);
+      });
+      
+      const ws = XLSX.utils.aoa_to_sheet(salesData);
+      XLSX.utils.book_append_sheet(wb, ws, 'Vendas');
+      
+      const fileName = `vendas-detalhadas-consolidado-${new Date().toISOString().split('T')[0]}.xlsx`;
+      XLSX.writeFile(wb, fileName);
+    });
+
+    // Exportar análise por pasta
+    document.getElementById('exportByFolderBtn').addEventListener('click', () => {
+      const wb = XLSX.utils.book_new();
+      
+      const folderSummaryData = [
+        ['Pasta', 'Total de Vendas', 'Valor Total', 'Produtos Únicos']
+      ];
+      Object.keys(parsedData.folders).sort().forEach(folderName => {
+        const folder = parsedData.folders[folderName];
+        folderSummaryData.push([
+          folderName,
+          folder.totalSales,
+          folder.totalValue,
+          Object.keys(folder.products).length
+        ]);
+      });
+      const ws1 = XLSX.utils.aoa_to_sheet(folderSummaryData);
+      XLSX.utils.book_append_sheet(wb, ws1, 'Resumo por Pasta');
+
+      Object.keys(parsedData.folders).sort().forEach(folderName => {
+        const folder = parsedData.folders[folderName];
+        const productsData = [
+          ['Código', 'Produto', 'NCM', 'Unidade', 'Qtd. Total', 'Valor Total', 'Nº Vendas']
+        ];
+        Object.values(folder.products).forEach(prod => {
+          productsData.push([prod.codigo, prod.nome, prod.ncm, prod.unidade, prod.quantidadeTotal, prod.valorTotal, prod.vendas]);
+        });
+        const ws = XLSX.utils.aoa_to_sheet(productsData);
+        const sheetName = folderName.substring(0, 31);
+        XLSX.utils.book_append_sheet(wb, ws, sheetName);
+      });
+      
+      const fileName = `analise-por-pasta-${new Date().toISOString().split('T')[0]}.xlsx`;
+      XLSX.writeFile(wb, fileName);
+    });
+  </script>
+</body>
+</html>

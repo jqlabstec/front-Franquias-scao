@@ -1,0 +1,149 @@
+<!doctype html>
+<html lang="pt-BR">
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Conciliação Bancária</title>
+  <link rel="stylesheet" href="../../saidbar/saidebar.css" />
+  <link rel="stylesheet" href="./index.css" />
+  <script>window.SIDEBAR_ACTIVE = 'bank-reconciliation';</script>
+  <script src="../../saidbar/saidebar.js" defer></script>
+  <script src="./index.js" defer></script>
+</head>
+
+<body>
+  <div class="app-layout">
+    <aside id="sidebar-root"></aside>
+    <div class="app-content">
+      <main class="shell">
+
+        <!-- Card de Upload -->
+        <section class="card">
+          <div class="card-head">
+            <h1>Conciliação Bancária</h1>
+          </div>
+
+          <form id="uploadForm" class="upload-form">
+            <div class="field">
+              <label for="csvFile">Arquivo CSV do Banco (separador: ponto e vírgula)</label>
+              <input type="file" id="csvFile" accept=".csv" required />
+            </div>
+            <div style="margin-top: 1rem;">
+              <button class="btn-primary" type="submit">Processar Conciliação</button>
+              <button type="button" class="btn-ghost" id="reprocessBtn">
+                🔄 Reprocessar Conciliações
+              </button>
+            </div>
+          </form>
+
+          <div id="uploadStatus" class="banner hidden"></div>
+        </section>
+
+        <!-- Card de Resultados -->
+        <section class="card" id="resultsCard" style="display:none;">
+          <div class="card-head">
+            <h2>Resultados da Conciliação</h2>
+            <button class="btn-ghost" id="clearResults">Limpar</button>
+          </div>
+
+          <div class="stats-grid">
+            <div class="stat-box ok">
+              <div class="stat-label">Conciliadas</div>
+              <div class="stat-value" id="statMatched">0</div>
+            </div>
+            <div class="stat-box warn">
+              <div class="stat-label">Não Encontradas</div>
+              <div class="stat-value" id="statNotFound">0</div>
+            </div>
+            <div class="stat-box danger">
+              <div class="stat-label">Divergências</div>
+              <div class="stat-value" id="statMismatch">0</div>
+            </div>
+            <div class="stat-box">
+              <div class="stat-label">Total Processado</div>
+              <div class="stat-value" id="statTotal">0</div>
+            </div>
+          </div>
+
+          <!-- Tabs -->
+          <div class="tabs">
+            <button class="tab-btn active" data-tab="matched">Conciliadas</button>
+            <button class="tab-btn" data-tab="notFound">Não Encontradas</button>
+            <button class="tab-btn" data-tab="mismatch">Divergências</button>
+          </div>
+
+          <!-- Tab: Conciliadas -->
+          <div class="tab-content active" id="tab-matched">
+            <div class="table-wrap">
+              <table class="tbl">
+                <thead>
+                  <tr>
+                    <th>Data</th>
+                    <th>Código TX</th>
+                    <th>Valor Banco</th>
+                    <th>Valor Sistema</th>
+                    <th>Status</th>
+                  </tr>
+                </thead>
+                <tbody id="tbody-matched">
+                  <tr>
+                    <td colspan="5" class="muted">Nenhum registro</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- Tab: Não Encontradas -->
+          <div class="tab-content" id="tab-notFound">
+            <div class="table-wrap">
+              <table class="tbl">
+                <thead>
+                  <tr>
+                    <th>Data</th>
+                    <th>Código TX</th>
+                    <th>Valor Banco</th>
+                    <th>Cliente</th>
+                    <th>Comprador</th>
+                  </tr>
+                </thead>
+                <tbody id="tbody-notFound">
+                  <tr>
+                    <td colspan="5" class="muted">Nenhum registro</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- Tab: Divergências -->
+          <div class="tab-content" id="tab-mismatch">
+            <div class="table-wrap">
+              <table class="tbl">
+                <thead>
+                  <tr>
+                    <th>Data</th>
+                    <th>Código TX</th>
+                    <th>Valor Banco</th>
+                    <th>Valor Sistema</th>
+                    <th>Diferença</th>
+                  </tr>
+                </thead>
+                <tbody id="tbody-mismatch">
+                  <tr>
+                    <td colspan="5" class="muted">Nenhum registro</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+        </section>
+
+      </main>
+    </div>
+  </div>
+</body>
+
+</html>

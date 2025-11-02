@@ -119,6 +119,22 @@ function ingRowTemplate(ing){
   row.querySelector('[data-field="quantity"]').value = ing?.quantity != null ? Number(ing.quantity) : '';
   row.querySelector('[data-field="wastagePercent"]').value = ing?.wastageFactor != null ? (Number(ing.wastageFactor) * 100) : 0;
 
+  // ✅ Função para selecionar produto
+  function selectProduct(p) {
+    nameInput.value = p.name;
+    productIdInput.value = String(p.id);
+    unitInput.value = p.unitOfMeasure || 'un';
+    costInput.value = p.currentCostPerUnit || 0;
+    
+    nameInput.style.borderColor = 'green';
+    errorMsg.style.display = 'none';
+    
+    hints.style.display = 'none';
+    hints.innerHTML = '';
+    
+    recalcTotals();
+  }
+
   // ✅ Autocomplete de produtos
   nameInput.addEventListener('input', () => {
     const term = nameInput.value.trim().toLowerCase();
@@ -166,19 +182,10 @@ function ingRowTemplate(ing){
         opt.style.backgroundColor = 'white';
       });
       
-      opt.addEventListener('click', () => {
-        nameInput.value = p.name;
-        productIdInput.value = String(p.id);
-        unitInput.value = p.unitOfMeasure || 'un';
-        costInput.value = p.currentCostPerUnit || 0;
-        
-        nameInput.style.borderColor = 'green';
-        errorMsg.style.display = 'none';
-        
-        hints.style.display = 'none';
-        hints.innerHTML = '';
-        
-        recalcTotals();
+      // ✅ CORREÇÃO: usar mousedown ao invés de click
+      opt.addEventListener('mousedown', (e) => {
+        e.preventDefault(); // Previne o blur
+        selectProduct(p);
       });
       
       hints.appendChild(opt);
@@ -187,18 +194,24 @@ function ingRowTemplate(ing){
     hints.style.display = 'block';
   });
 
-  // Validar ao sair do campo
+  // ✅ Validar ao sair do campo (com delay maior)
   nameInput.addEventListener('blur', () => {
     setTimeout(() => {
       hints.style.display = 'none';
-      hints.innerHTML = '';
       
       if (!productIdInput.value && nameInput.value.trim()) {
         errorMsg.textContent = '⚠️ Selecione um produto da lista';
         errorMsg.style.display = 'block';
         nameInput.style.borderColor = 'red';
       }
-    }, 200);
+    }, 300); // ✅ Aumentado de 200 para 300ms
+  });
+
+  // ✅ Ao focar novamente, mostrar sugestões se houver texto
+  nameInput.addEventListener('focus', () => {
+    if (nameInput.value.trim() && !productIdInput.value) {
+      nameInput.dispatchEvent(new Event('input'));
+    }
   });
 
   row.querySelector('.remove').addEventListener('click', () => {

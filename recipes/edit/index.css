@@ -280,3 +280,24 @@ body{ margin:0; color:var(--text); background:var(--bg);
 .ing-row .remove:hover {
   background: #c82333;
 }
+
+.hints {
+  position: absolute;
+  background: white;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  max-height: 200px;
+  overflow-y: auto;
+  z-index: 1000;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  width: 100%;
+  margin-top: 2px;
+}
+
+.prod-cell {
+  position: relative;
+}
+
+[data-field="name"] {
+  transition: border-color 0.2s;
+}

@@ -121,3 +121,17 @@ body{ background:var(--bg); color:var(--text); }
 .has-sidebar:not(.app-layout){
   display:grid; grid-template-columns:260px 1fr;
 }
+/* Badge de notificação */
+.sb-badge {
+  display: inline-block;
+  background-color: #e74c3c;
+  color: white;
+  font-size: 10px;
+  font-weight: bold;
+  padding: 2px 6px;
+  border-radius: 10px;
+  margin-left: 8px;
+  min-width: 16px;
+  text-align: center;
+  vertical-align: middle;
+}

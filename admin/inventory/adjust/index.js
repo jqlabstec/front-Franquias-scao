@@ -105,6 +105,9 @@ async function fetchTxns(q, token){
   if (q.productId) p.set('productId', String(q.productId));
   if (q.type) p.set('type', q.type);
   if (q.query) p.set('query', q.query);
+
+  console.log('📤 Enviando para API:', p.toString());
+  console.log('📤 Estado txState:', q);
   const r = await fetch(`${API}/inventory/txns?${p.toString()}`, {
     headers:{ Authorization:`Bearer ${token}` }
   });

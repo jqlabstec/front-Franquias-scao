@@ -1,0 +1,107 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Sugestão de Compras</title>
+  <link rel="stylesheet" href="../../saidbar/saidebar.css" />
+  <link rel="stylesheet" href="./index.css" />
+  <script>window.SIDEBAR_ACTIVE = 'purchase-suggestions';</script>
+  <script src="../../saidbar/saidebar.js" defer></script>
+  <script src="./index.js" defer></script>
+</head>
+<body>
+  <div class="app-layout">
+    <aside id="sidebar-root"></aside>
+    <div class="app-content">
+      <main class="shell">
+
+        <!-- Header -->
+        <section class="card">
+          <div class="card-head">
+            <h1>🛒 Sugestão de Compras</h1>
+            <div class="actions">
+              <button class="btn-ghost" id="refreshBtn">🔄 Atualizar</button>
+              <button class="btn-primary" id="exportBtn">📥 Exportar CSV</button>
+            </div>
+          </div>
+
+          <!-- Stats -->
+          <div class="stats-grid">
+            <div class="stat-box danger">
+              <div class="stat-label">Crítico</div>
+              <div class="stat-value" id="statCritical">0</div>
+            </div>
+            <div class="stat-box warn">
+              <div class="stat-label">Alto</div>
+              <div class="stat-value" id="statHigh">0</div>
+            </div>
+            <div class="stat-box">
+              <div class="stat-label">Médio</div>
+              <div class="stat-value" id="statMedium">0</div>
+            </div>
+            <div class="stat-box ok">
+              <div class="stat-label">Baixo</div>
+              <div class="stat-value" id="statLow">0</div>
+            </div>
+            <div class="stat-box">
+              <div class="stat-label">Total de Produtos</div>
+              <div class="stat-value" id="statTotal">0</div>
+            </div>
+            <div class="stat-box">
+              <div class="stat-label">Custo Estimado</div>
+              <div class="stat-value" id="statCost">R$ 0,00</div>
+            </div>
+          </div>
+
+          <!-- Filtros -->
+          <div class="filters">
+            <label>
+              Urgência:
+              <select id="filterUrgency">
+                <option value="">Todas</option>
+                <option value="CRITICAL">Crítico</option>
+                <option value="HIGH">Alto</option>
+                <option value="MEDIUM">Médio</option>
+                <option value="LOW">Baixo</option>
+              </select>
+            </label>
+          </div>
+        </section>
+
+        <!-- Tabela -->
+        <section class="card">
+          <div class="card-head">
+            <h2>Produtos para Comprar</h2>
+          </div>
+
+          <div class="table-wrap">
+            <table class="tbl">
+              <thead>
+                <tr>
+                  <th>Urgência</th>
+                  <th>Código</th>
+                  <th>Produto</th>
+                  <th>Estoque Atual</th>
+                  <th>Estoque Mínimo</th>
+                  <th>Qtd Sugerida</th>
+                  <th>Unidade</th>
+                  <th>Dias até Acabar</th>
+                  <th>Preço Unit.</th>
+                  <th>Custo Estimado</th>
+                </tr>
+              </thead>
+              <tbody id="tbody-suggestions">
+                <tr>
+                  <td colspan="10" class="muted">Carregando...</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+      </main>
+    </div>
+  </div>
+</body>
+</html>
