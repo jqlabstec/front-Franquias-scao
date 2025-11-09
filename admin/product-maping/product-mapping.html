@@ -1,0 +1,169 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Mapeamento de Produtos | Vidaleve</title>
+  <link rel="stylesheet" href="../../saidbar/saidebar.css" />
+  <link rel="stylesheet" href="./product-mapping.css" />
+  <script>window.SIDEBAR_ACTIVE = 'product-mapping';</script>
+  <script src="../../saidbar/saidebar.js" defer></script>
+  <script src="./product-mapping.js" defer></script>
+</head>
+<body>
+  <div class="app-layout">
+    <aside id="sidebar-root"></aside>
+    <div class="app-content">
+      <main class="shell">
+
+        <!-- Header -->
+        <section class="card">
+          <div class="card-head">
+            <h1>🔗 Mapeamento de Produtos</h1>
+            <div class="actions">
+              <button class="btn-ghost" id="refreshBtn">🔄 Atualizar</button>
+            </div>
+          </div>
+
+          <!-- Stats -->
+          <div class="stats-grid">
+            <div class="stat-box">
+              <div class="stat-label">Produtos Não Mapeados</div>
+              <div class="stat-value" id="statTotal">-</div>
+            </div>
+            <div class="stat-box warn">
+              <div class="stat-label">Receita Afetada</div>
+              <div class="stat-value" id="statRevenue">R$ -</div>
+            </div>
+            <div class="stat-box danger">
+              <div class="stat-label">Vendas Sem CMV Real</div>
+              <div class="stat-value" id="statItems">-</div>
+            </div>
+          </div>
+
+          <!-- Alert -->
+          <div class="alert alert-warning" id="impactAlert" style="display: none;">
+            <strong>⚠️ Atenção!</strong>
+            <span id="alertMessage"></span>
+          </div>
+
+          <!-- Filtros -->
+          <div class="filters">
+            <label>
+              Buscar:
+              <input type="text" id="searchInput" placeholder="🔍 Nome ou código do produto...">
+            </label>
+          </div>
+        </section>
+
+        <!-- Tabela -->
+        <section class="card">
+          <div class="card-head">
+            <h2>Produtos Descobertos</h2>
+          </div>
+
+          <div class="table-wrap">
+            <table class="tbl">
+              <thead>
+                <tr>
+                  <th class="text-left">Produto (XML)</th>
+                  <th>Código</th>
+                  <th class="text-right">Qtd Vendas</th>
+                  <th class="text-right">Receita Total</th>
+                  <th class="text-right">Preço Médio</th>
+                  <th class="text-center">Ações</th>
+                </tr>
+              </thead>
+              <tbody id="tbody-products">
+                <tr>
+                  <td colspan="6" class="muted text-center">Carregando...</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+      </main>
+    </div>
+  </div>
+
+  <!-- Modal de Mapeamento -->
+  <div id="mappingModal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>🔗 Mapear Produto</h2>
+        <button class="modal-close" onclick="closeMappingModal()">&times;</button>
+      </div>
+      <div class="modal-body">
+        <!-- Produto Info -->
+        <div class="product-info">
+          <h3 id="modalProductName">-</h3>
+          <div class="product-meta">
+            <span>Código: <strong id="modalProductCode">-</strong></span>
+            <span>Vendas: <strong id="modalSalesCount">-</strong></span>
+            <span>Receita: <strong id="modalRevenue">R$ -</strong></span>
+          </div>
+        </div>
+
+        <!-- Buscar Receita -->
+        <div class="form-group">
+          <label>Buscar Receita</label>
+          <input type="text" id="recipeSearch" placeholder="Digite o nome da receita..." class="form-control">
+        </div>
+
+        <!-- Lista de Receitas -->
+        <div class="recipes-list" id="recipesList">
+          <div class="text-center muted">Digite para buscar receitas...</div>
+        </div>
+
+        <!-- Receita Selecionada -->
+        <div id="selectedRecipeInfo" class="selected-recipe" style="display: none;">
+          <h4>✅ Receita Selecionada</h4>
+          <div class="recipe-details">
+            <div><strong>Nome:</strong> <span id="selectedRecipeName">-</span></div>
+            <div><strong>Categoria:</strong> <span id="selectedRecipeCategory">-</span></div>
+            <div><strong>CMV:</strong> <span id="selectedRecipeCost">R$ -</span></div>
+            <div><strong>Margem Estimada:</strong> <span id="selectedRecipeMargin">-%</span></div>
+          </div>
+        </div>
+
+        <!-- Opções -->
+        <div class="form-group">
+          <label class="checkbox-label">
+            <input type="checkbox" id="recalculateOldSales" checked>
+            <span>Recalcular vendas antigas (recomendado)</span>
+          </label>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn-ghost" onclick="closeMappingModal()">Cancelar</button>
+        <button class="btn-primary" id="confirmMappingBtn" onclick="confirmMapping()" disabled>
+          Confirmar Mapeamento
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal de Resultado -->
+  <div id="resultModal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2 id="resultTitle">✅ Sucesso!</h2>
+        <button class="modal-close" onclick="closeResultModal()">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div class="result-stats" id="resultStats"></div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn-primary" onclick="closeResultModal()">Fechar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Loading Overlay -->
+  <div id="loadingOverlay" class="loading-overlay" style="display: none;">
+    <div class="loading-spinner"></div>
+    <p id="loadingMessage">Processando...</p>
+  </div>
+</body>
+</html>

@@ -31,6 +31,8 @@
   function linkMap(){
     return {
       'sales-import': new URL('admin/sales/import/index.html', ROOT_DIR).href,
+      'sales-import-excel': new URL('admin/sales/import-excel/index.html', ROOT_DIR).href,
+      'sales-index': new URL('admin/sales/index/index.html', ROOT_DIR).href,
       'welcome': new URL('welcome/bemVindo.html', ROOT_DIR).href,
       'user-create': new URL('admin/users/create/index.html', ROOT_DIR).href,
       'users-list': new URL('admin/users/index/index.html', ROOT_DIR).href,
@@ -52,6 +54,7 @@
       'purchase-suggestions': new URL('admin/purchase-suggestions/index.html', ROOT_DIR).href, // ✅ NOVO
       'recipes-list': new URL('recipes/index/index.html', ROOT_DIR).href,
       'recipes-create': new URL('recipes/create/index.html', ROOT_DIR).href,
+      'product-mapping': new URL('admin/product-maping/product-mapping.html', ROOT_DIR).href,
     };
   }
 
@@ -59,6 +62,8 @@
     const p = location.pathname;
 
     if (p.includes('/admin/sales/import')) return 'sales-import';
+    if (p.includes('/admin/sales/import-excel')) return 'sales-import-ecxel';
+    if (p.includes('/admin/sales/import-excel')) return 'sales-index';
     if (p.includes('/recipes/create')) return 'recipes-create';
     if (p.includes('/recipes/index')) return 'recipes-list';
     if (p.includes('/admin/inventory/products/create')) return 'products-create';
@@ -80,6 +85,7 @@
     if (p.includes('/admin/finance/revenue')) return 'finance-revenue';
     if (p.includes('/Cash')) return 'finance-cash-register';
     if (p.includes('/admin/dre/index')) return 'finance-dre';
+    if (p.includes('/admin/product-maping/product-mapping.html')) return 'product-mapping';    
 
     return 'welcome';
   }

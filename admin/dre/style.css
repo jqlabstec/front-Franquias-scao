@@ -434,3 +434,31 @@ select:focus {
   line-height: 1.8;
   color: #64748b;
 }
+
+/* Cores para valores negativos */
+.value.negative {
+  color: #dc2626;
+}
+
+/* Cores para valores positivos */
+.value {
+  color: #059669;
+}
+
+/* Highlight para linhas importantes */
+tr.highlight {
+  background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+  font-weight: 700;
+}
+
+/* Subsections */
+tr.subsection {
+  background: #f1f5f9;
+  font-weight: 600;
+}
+
+/* Section headers */
+tr.section-header {
+  background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
+  font-weight: 700;
+}

@@ -1,0 +1,136 @@
+<!doctype html>
+<html lang="pt-BR">
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Vendas · Listagem</title>
+  <link rel="stylesheet" href="../../../saidbar/saidebar.css" />
+  <link rel="stylesheet" href="./index.css" />
+  <script>window.SIDEBAR_ACTIVE = 'sales';</script>
+  <script src="../../../saidbar/saidebar.js" defer></script>
+  <script src="./index.js" defer></script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.all.min.js" defer></script>
+</head>
+
+<body>
+  <div class="app-layout">
+    <aside id="sidebar-root"></aside>
+    <div class="app-content">
+      <main class="shell">
+        <section class="card">
+          <!-- ✅ CABEÇALHO -->
+          <div class="card-head">
+            <h1>💰 Vendas</h1>
+            <div class="head-actions">
+              <a class="btn-ghost" href="../import-excel/index.html">📊 Importar Excel</a>
+            </div>
+          </div>
+
+          <!-- ✅ ESTATÍSTICAS -->
+          <div class="stats-grid">
+            <div class="stat-card">
+              <div class="stat-icon">💵</div>
+              <div class="stat-value" id="statTotal">R$ 0,00</div>
+              <div class="stat-label">Total de Vendas</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-icon">📦</div>
+              <div class="stat-value" id="statCount">0</div>
+              <div class="stat-label">Quantidade</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-icon">📊</div>
+              <div class="stat-value" id="statAverage">R$ 0,00</div>
+              <div class="stat-label">Ticket Médio</div>
+            </div>
+            <div class="stat-card ok">
+              <div class="stat-icon">✅</div>
+              <div class="stat-value" id="statWithExcel">0</div>
+              <div class="stat-label">Com Dados Excel</div>
+            </div>
+          </div>
+
+          <!-- ✅ FILTROS -->
+          <div class="filters">
+            <div class="filter-row">
+              <div class="filter-group">
+                <label>📅 Data Inicial</label>
+                <input type="date" id="filterStartDate" class="input" />
+              </div>
+              <div class="filter-group">
+                <label>📅 Data Final</label>
+                <input type="date" id="filterEndDate" class="input" />
+              </div>
+              <div class="filter-group">
+                <label>🔍 Cupom Fiscal</label>
+                <input type="text" id="filterFiscalNumber" class="input" placeholder="Buscar cupom..." />
+              </div>
+              <div class="filter-group">
+                <label>📊 Status</label>
+                <select id="filterStatus" class="input">
+                  <option value="">Todos</option>
+                  <option value="XML_ONLY">Apenas XML</option>
+                  <option value="EXCEL_MATCHED">Com Excel</option>
+                  <option value="COMPLETED">Completo</option>
+                </select>
+              </div>
+            </div>
+            <div class="filter-actions">
+              <button class="btn-primary" id="btnFilter">🔍 Filtrar</button>
+              <button class="btn-ghost" id="btnClearFilters">🔄 Limpar</button>
+            </div>
+          </div>
+
+          <!-- ✅ TABELA -->
+          <div class="table-wrap">
+            <table class="tbl">
+              <thead>
+                <tr>
+                  <th>Cupom Fiscal</th>
+                  <th>Data</th>
+                  <th>Valor Total</th>
+                  <th>Desconto</th>
+                  <th>Gorjeta</th>
+                  <th>Operador</th>
+                  <th>Plataforma</th>
+                  <th>Mesa</th>
+                  <th>Status</th>
+                  <th>Ações</th>
+                </tr>
+              </thead>
+              <tbody id="salesBody">
+                <tr>
+                  <td colspan="10" class="muted">Carregando...</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <!-- ✅ PAGINAÇÃO -->
+          <div class="pager">
+            <button id="prevBtn" class="btn-ghost">&laquo; Anterior</button>
+            <span id="pageInfo" class="page-info">-</span>
+            <button id="nextBtn" class="btn-ghost">Próxima &raquo;</button>
+          </div>
+        </section>
+      </main>
+    </div>
+  </div>
+
+  <!-- ✅ MODAL DE DETALHES -->
+  <div id="detailsModal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>📄 Detalhes da Venda</h2>
+        <button class="btn-close" id="btnCloseModal">✕</button>
+      </div>
+      <div class="modal-body" id="modalBody">
+        <!-- Conteúdo dinâmico -->
+      </div>
+    </div>
+  </div>
+</body>
+
+</html> 

@@ -1,0 +1,120 @@
+<!doctype html>
+<html lang="pt-BR">
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Vendas · Importar Excel</title>
+  <link rel="stylesheet" href="../../../saidbar/saidebar.css" />
+  <link rel="stylesheet" href="./index.css" />
+  <script>window.SIDEBAR_ACTIVE = 'sales-import-excel';</script>
+  <script src="../../../saidbar/saidebar.js" defer></script>
+  <script src="./index.js" defer></script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.all.min.js" defer></script>
+</head>
+
+<body>
+  <div class="app-layout">
+    <aside id="sidebar-root"></aside>
+    <div class="app-content">
+      <main class="shell">
+        <section class="card">
+          <div class="card-head">
+            <h1>📊 Importar Excel de Vendas</h1>
+            <a class="btn-ghost" href="../index/index.html">Ver vendas</a>
+          </div>
+
+          <p class="subtitle">
+            Envie o <strong>Relatório Geral de Vendas</strong> para enriquecer os dados com informações de pagamento, operador, mesa e gorjeta.
+          </p>
+
+          <!-- ✅ ÁREA DE UPLOAD -->
+          <div class="upload-section">
+            <div class="upload-area" id="uploadArea">
+              <div class="upload-icon">📁</div>
+              <p class="upload-text"><strong>Clique para selecionar</strong> ou arraste o arquivo aqui</p>
+              <p class="upload-hint">Apenas arquivos .xlsx ou .xls</p>
+            </div>
+
+            <input type="file" id="fileInput" accept=".xlsx,.xls" style="display: none;">
+
+            <div class="file-info" id="fileInfo">
+              <div class="file-icon">📄</div>
+              <div class="file-details">
+                <strong id="fileName">-</strong>
+                <span id="fileSize" class="muted">-</span>
+              </div>
+              <button class="btn-ghost btn-sm" id="btnRemoveFile" type="button">✕</button>
+            </div>
+
+            <div class="progress-bar" id="progressBar">
+              <div class="progress-fill" id="progressFill"></div>
+            </div>
+
+            <div class="actions">
+              <button class="btn-primary" id="uploadBtn" disabled>
+                <span id="uploadBtnText">Importar Excel</span>
+              </button>
+              <button class="btn-ghost" id="btnClear" type="button">Limpar</button>
+            </div>
+          </div>
+
+          <div id="status" class="banner hidden"></div>
+
+          <!-- ✅ ESTATÍSTICAS -->
+          <h2>📈 Última Importação</h2>
+          <div class="stats-grid">
+            <div class="stat-card ok">
+              <div class="stat-icon">✅</div>
+              <div class="stat-value" id="statMatched">-</div>
+              <div class="stat-label">Vendas Atualizadas</div>
+            </div>
+            <div class="stat-card warn">
+              <div class="stat-icon">⚠️</div>
+              <div class="stat-value" id="statNotFound">-</div>
+              <div class="stat-label">Não Encontradas</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-icon">💳</div>
+              <div class="stat-value" id="statPayments">-</div>
+              <div class="stat-label">Pagamentos Criados</div>
+            </div>
+          </div>
+
+          <!-- ✅ VENDAS SEM EXCEL -->
+          <div class="card-head" style="margin-top: 32px;">
+            <h2>⚠️ Vendas sem Dados do Excel</h2>
+            <button class="btn-ghost" id="btnRefreshPending" type="button">🔄 Atualizar</button>
+          </div>
+
+          <div class="table-wrap">
+            <table class="tbl">
+              <thead>
+                <tr>
+                  <th>Cupom Fiscal</th>
+                  <th>Data</th>
+                  <th>Valor</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody id="pendingBody">
+                <tr>
+                  <td colspan="4" class="muted">Carregando...</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="pager">
+            <button id="pendingPrevBtn" class="btn-ghost">&laquo; Anterior</button>
+            <span id="pendingPageInfo" class="page-info">-</span>
+            <button id="pendingNextBtn" class="btn-ghost">Próxima &raquo;</button>
+          </div>
+        </section>
+      </main>
+    </div>
+  </div>
+</body>
+
+</html>
