@@ -462,3 +462,29 @@ tr.section-header {
   background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
   font-weight: 700;
 }
+.btn-secondary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  background: #fff;
+  color: #16a34a;
+  border: 1px solid #16a34a;
+  padding: 10px 16px;
+  border-radius: 10px;
+  cursor: pointer;
+  text-decoration: none;
+  font-weight: 600;
+  transition: background 0.2s ease, color 0.2s ease;
+  font-size: 0.95rem;
+}
+
+.btn-secondary:hover {
+  background: #f0fdf4;
+  border-color: #15803d;
+  color: #15803d;
+}
+
+.btn-secondary:active {
+  transform: translateY(1px);
+}

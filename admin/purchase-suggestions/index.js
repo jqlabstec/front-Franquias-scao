@@ -55,7 +55,7 @@ function renderTable(suggestions) {
   }
 }
 
-async function loadSuggestions(urgencyFilter = '') {
+async function loadSuggestions(urgencyFilter = '', showLoading = false) {
   const auth = getAuth();
   if (!auth?.token) {
     location.href = '../../login/index.html';
@@ -63,6 +63,18 @@ async function loadSuggestions(urgencyFilter = '') {
   }
 
   try {
+    // ✅ Mostrar loading se solicitado
+    if (showLoading) {
+      Swal.fire({
+        title: 'Atualizando...',
+        html: 'Carregando sugestões de compra',
+        allowOutsideClick: false,
+        didOpen: () => {
+          Swal.showLoading();
+        }
+      });
+    }
+
     const url = urgencyFilter 
       ? `${API}/purchase-suggestions?urgency=${urgencyFilter}`
       : `${API}/purchase-suggestions`;
@@ -88,9 +100,40 @@ async function loadSuggestions(urgencyFilter = '') {
     // Render table
     renderTable(data.suggestions || []);
 
+    // ✅ Fechar loading e mostrar sucesso se foi refresh manual
+    if (showLoading) {
+      Swal.close();
+      
+      // Toast de sucesso (opcional)
+      const Toast = Swal.mixin({
+        toast: true,
+        position: 'top-end',
+        showConfirmButton: false,
+        timer: 2000,
+        timerProgressBar: true,
+      });
+      
+      Toast.fire({
+        icon: 'success',
+        title: 'Atualizado com sucesso!'
+      });
+    }
+
   } catch (error) {
     console.error('Erro ao carregar sugestões:', error);
-    alert(error.message || 'Erro ao carregar sugestões');
+    
+    // ✅ Fechar loading se estiver aberto
+    if (showLoading) {
+      Swal.close();
+    }
+    
+    // ✅ Mostrar erro com SweetAlert2
+    Swal.fire({
+      icon: 'error',
+      title: 'Erro ao Carregar',
+      text: error.message || 'Não foi possível carregar as sugestões',
+      confirmButtonText: 'OK'
+    });
   }
 }
 
@@ -99,6 +142,16 @@ async function exportCSV() {
   if (!auth?.token) return;
 
   try {
+    // ✅ Loading durante export
+    Swal.fire({
+      title: 'Exportando...',
+      html: 'Gerando arquivo CSV',
+      allowOutsideClick: false,
+      didOpen: () => {
+        Swal.showLoading();
+      }
+    });
+
     const response = await fetch(`${API}/purchase-suggestions/export`, {
       headers: { Authorization: `Bearer ${auth.token}` }
     });
@@ -117,9 +170,25 @@ async function exportCSV() {
     a.remove();
     window.URL.revokeObjectURL(url);
 
+    // ✅ Sucesso
+    Swal.fire({
+      icon: 'success',
+      title: 'Exportado!',
+      text: 'O arquivo CSV foi baixado com sucesso',
+      confirmButtonText: 'OK',
+      timer: 2000
+    });
+
   } catch (error) {
     console.error('Erro ao exportar:', error);
-    alert('Erro ao exportar CSV');
+    
+    // ✅ Erro
+    Swal.fire({
+      icon: 'error',
+      title: 'Erro ao Exportar',
+      text: error.message || 'Não foi possível exportar o CSV',
+      confirmButtonText: 'OK'
+    });
   }
 }
 
@@ -130,18 +199,18 @@ document.addEventListener('DOMContentLoaded', async () => {
     return;
   }
 
-  // Load initial data
+  // Load initial data (sem loading na primeira carga)
   await loadSuggestions();
 
   // Filter
   document.getElementById('filterUrgency').addEventListener('change', (e) => {
-    loadSuggestions(e.target.value);
+    loadSuggestions(e.target.value, false); // Sem loading no filtro
   });
 
-  // Refresh
+  // ✅ Refresh com loading
   document.getElementById('refreshBtn').addEventListener('click', () => {
     const filter = document.getElementById('filterUrgency').value;
-    loadSuggestions(filter);
+    loadSuggestions(filter, true); // COM loading no refresh manual
   });
 
   // Export

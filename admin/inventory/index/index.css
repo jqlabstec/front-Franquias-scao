@@ -292,6 +292,62 @@ body {
   border-top: 1px solid var(--border);
 }
 
+/* ✅ Customização do SweetAlert2 */
+.swal2-popup {
+  border-radius: 18px !important;
+  font-family: system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, "Helvetica Neue", Arial, "Noto Sans" !important;
+}
+
+.swal2-title {
+  color: var(--text) !important;
+  font-size: 24px !important;
+  font-weight: 700 !important;
+}
+
+.swal2-html-container {
+  color: var(--muted) !important;
+  font-size: 16px !important;
+  line-height: 1.6 !important;
+}
+
+.swal2-confirm {
+  background: linear-gradient(180deg, var(--ok), #16a34a) !important;
+  border-radius: 10px !important;
+  padding: 10px 24px !important;
+  font-weight: 700 !important;
+  box-shadow: none !important;
+}
+
+.swal2-cancel {
+  background: #fff !important;
+  border: 1px solid var(--border) !important;
+  color: var(--text) !important;
+  border-radius: 10px !important;
+  padding: 10px 24px !important;
+  font-weight: 700 !important;
+  box-shadow: none !important;
+}
+
+.swal2-icon.swal2-success {
+  border-color: var(--ok) !important;
+  color: var(--ok) !important;
+}
+
+.swal2-icon.swal2-error {
+  border-color: var(--danger) !important;
+  color: var(--danger) !important;
+}
+
+.swal2-icon.swal2-warning {
+  border-color: var(--warn) !important;
+  color: var(--warn) !important;
+}
+
+.swal2-icon.swal2-question {
+  border-color: #3b82f6 !important;
+  color: #3b82f6 !important;
+}
+
 @media (max-width: 768px) {
   .shell {
     padding: 80px 16px 16px;
@@ -313,4 +369,23 @@ body {
   .pagination {
     flex-direction: column;
   }
+}
+
+/* ✅ Garantir que SweetAlert2 fique acima de tudo */
+.swal2-container {
+  z-index: 99999 !important;
+}
+
+/* ✅ Ajustar z-index do modal para não conflitar */
+.modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999; /* Mantém o modal alto, mas abaixo do Swal */
 }

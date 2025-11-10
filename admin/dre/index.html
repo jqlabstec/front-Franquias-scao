@@ -1,5 +1,6 @@
 <!doctype html>
 <html lang="pt-BR">
+
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -8,12 +9,15 @@
   <!-- Sidebar e estilos -->
   <link rel="stylesheet" href="../../../saidbar/saidebar.css" />
   <link rel="stylesheet" href="./style.css" />
-  <script>window.SIDEBAR_ACTIVE='dre';</script>
+  <script>window.SIDEBAR_ACTIVE = 'dre';</script>
   <script src="../../../saidbar/saidebar.js" defer></script>
 
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.all.min.js" defer></script>
   <!-- Script da página -->
   <script src="./script.js" defer></script>
 </head>
+
 <body>
   <div class="app-layout">
     <aside id="sidebar-root"></aside>
@@ -26,8 +30,12 @@
               <h1>📊 DRE - Demonstrativo de Resultados</h1>
               <p class="muted">Análise financeira detalhada do período</p>
             </div>
-            
+
             <div class="dre-filters">
+
+              <button id="btnRecalculateCMV" class="btn-secondary" style="margin-left: 10px;">
+                🔄 Recalcular CMV
+              </button>
               <div class="mom-toggle">
                 <label>
                   <input type="checkbox" id="momMode" /> Comparar meses (MoM)
@@ -98,4 +106,5 @@
     </div>
   </div>
 </body>
+
 </html>

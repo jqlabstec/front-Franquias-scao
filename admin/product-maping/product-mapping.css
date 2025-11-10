@@ -593,3 +593,72 @@ body {
     gap: 8px;
   }
 }
+
+
+/* ✅ Customização do SweetAlert2 */
+.swal2-popup {
+  border-radius: 18px !important;
+  font-family: system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, "Helvetica Neue", Arial, "Noto Sans" !important;
+}
+
+.swal2-title {
+  color: var(--text) !important;
+  font-size: 24px !important;
+  font-weight: 700 !important;
+}
+
+.swal2-html-container {
+  color: var(--muted) !important;
+  font-size: 16px !important;
+  line-height: 1.6 !important;
+}
+
+.swal2-confirm {
+  background: linear-gradient(180deg, var(--primary), var(--primary-dark)) !important;
+  border-radius: 10px !important;
+  padding: 10px 24px !important;
+  font-weight: 700 !important;
+  box-shadow: none !important;
+}
+
+.swal2-cancel {
+  background: #fff !important;
+  border: 1px solid var(--border) !important;
+  color: var(--text) !important;
+  border-radius: 10px !important;
+  padding: 10px 24px !important;
+  font-weight: 700 !important;
+  box-shadow: none !important;
+}
+
+.swal2-icon.swal2-success {
+  border-color: var(--ok) !important;
+  color: var(--ok) !important;
+}
+
+.swal2-icon.swal2-error {
+  border-color: var(--danger) !important;
+  color: var(--danger) !important;
+}
+
+.swal2-icon.swal2-warning {
+  border-color: var(--warn) !important;
+  color: var(--warn) !important;
+}
+
+.swal2-icon.swal2-question {
+  border-color: var(--primary) !important;
+  color: var(--primary) !important;
+}
+
+/* Estilo para HTML customizado no Swal */
+.swal2-html-container ul {
+  text-align: left;
+  margin: 12px 0;
+  padding-left: 24px;
+}
+
+.swal2-html-container ul li {
+  margin: 8px 0;
+  color: var(--text);
+}

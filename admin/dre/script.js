@@ -1074,5 +1074,133 @@ document.addEventListener('DOMContentLoaded', () => {
     loadButton.addEventListener('click', loadDreBasedOnMode);
   }
 
+  const btnRecalculateCMV = document.getElementById('btnRecalculateCMV');
+  if (btnRecalculateCMV) {
+    btnRecalculateCMV.addEventListener('click', recalculateCMV);
+  }
+
   toggleViewMode();
 });
+
+// ========== RECALCULAR CMV ==========
+async function recalculateCMV() {
+  const auth = getAuth();
+  if (!auth?.token) {
+    await Swal.fire({ 
+      icon: 'error', 
+      title: 'Erro', 
+      text: 'Você precisa estar logado!' 
+    });
+    return;
+  }
+
+  const momCheckbox = document.getElementById('momMode');
+  
+  // Se estiver no modo MoM, não permitir
+  if (momCheckbox && momCheckbox.checked) {
+    await Swal.fire({ 
+      icon: 'warning', 
+      title: 'Modo Não Suportado', 
+      text: 'O recálculo de CMV só está disponível no modo de mês único. Desative o modo comparativo.' 
+    });
+    return;
+  }
+
+  const yearEl = document.getElementById('yearSelect');
+  const monthEl = document.getElementById('monthSelect');
+
+  if (!yearEl || !monthEl) {
+    await Swal.fire({ 
+      icon: 'error', 
+      title: 'Erro', 
+      text: 'Elementos de filtro não encontrados!' 
+    });
+    return;
+  }
+
+  const year = yearEl.value;
+  const month = monthEl.value;
+
+  if (!year || !month) {
+    await Swal.fire({ 
+      icon: 'warning', 
+      title: 'Atenção', 
+      text: 'Selecione ano e mês!' 
+    });
+    return;
+  }
+
+  // Confirmação
+  const result = await Swal.fire({
+    icon: 'question',
+    title: 'Recalcular CMV?',
+    html: `
+      <p>Isso vai recalcular o CMV de <strong>todas as vendas</strong> de <strong>${month}/${year}</strong>.</p>
+      <p style="color: #f59e0b; margin-top: 12px;">
+        ⚠️ Este processo pode demorar alguns minutos dependendo do volume de vendas.
+      </p>
+    `,
+    showCancelButton: true,
+    confirmButtonText: 'Sim, recalcular',
+    cancelButtonText: 'Cancelar',
+    confirmButtonColor: '#16a34a',
+  });
+
+  if (!result.isConfirmed) return;
+
+  const franchiseId = getFranchiseId();
+  const qsFranchise = franchiseId ? `&franchiseId=${franchiseId}` : '';
+
+  try {
+    // Loading
+    Swal.fire({
+      title: 'Recalculando CMV...',
+      html: 'Processando vendas do período',
+      allowOutsideClick: false,
+      didOpen: () => Swal.showLoading()
+    });
+
+    const url = `${API_BASE}/dashboard/recalculate-cmv?year=${year}&month=${month}${qsFranchise}`;
+    const response = await fetch(url, {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${auth.token}` },
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      throw new Error(data.details || data.error || 'Erro ao recalcular CMV');
+    }
+
+    console.log('✅ CMV recalculado:', data);
+
+    // Sucesso
+    await Swal.fire({
+      icon: 'success',
+      title: 'CMV Recalculado!',
+      html: `
+        <div style="text-align: left; margin-top: 16px;">
+          <p><strong>📊 Resumo:</strong></p>
+          <ul style="list-style: none; padding-left: 0;">
+            <li>✅ ${data.data.salesUpdated} vendas atualizadas</li>
+            <li>✅ ${data.data.itemsUpdated} itens recalculados</li>
+            <li>💰 Custo total: R$ ${data.data.totalCostRecalculated.toFixed(2)}</li>
+            ${data.data.errors.length > 0 ? `<li style="color: #f59e0b;">⚠️ ${data.data.errors.length} erros</li>` : ''}
+          </ul>
+        </div>
+      `,
+      confirmButtonText: 'Recarregar DRE'
+    });
+
+    // Recarregar DRE automaticamente
+    loadDre();
+  } catch (error) {
+    console.error('❌ Erro ao recalcular CMV:', error);
+    await Swal.fire({
+      icon: 'error',
+      title: 'Erro ao Recalcular',
+      text: error.message || 'Não foi possível recalcular o CMV',
+    });
+  }
+}
+

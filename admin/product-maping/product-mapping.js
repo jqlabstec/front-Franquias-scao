@@ -71,7 +71,6 @@ async function loadUnmappedProducts() {
     console.log('📡 Fazendo requisição para:', `${API}/retroactive-cmv/unmapped`);
     console.log('🔑 Token:', auth.token ? 'Presente' : 'Ausente');
 
-    // ⭐ REMOVIDO franchiseId da URL - o backend pega do user autenticado
     const response = await fetch(`${API}/retroactive-cmv/unmapped`, {
       headers: { 
         'Authorization': `Bearer ${auth.token}`,
@@ -101,7 +100,14 @@ async function loadUnmappedProducts() {
   } catch (error) {
     console.error('❌ Erro ao carregar produtos:', error);
     hideLoading();
-    alert('Erro ao carregar produtos: ' + error.message);
+    
+    // ✅ SweetAlert2 para erro
+    Swal.fire({
+      icon: 'error',
+      title: 'Erro ao Carregar',
+      text: error.message || 'Não foi possível carregar os produtos',
+      confirmButtonText: 'OK'
+    });
   }
 }
 
@@ -380,7 +386,14 @@ async function selectRecipe(recipeId) {
 
   } catch (error) {
     console.error('❌ Erro ao carregar receita:', error);
-    alert('Erro ao carregar receita: ' + error.message);
+    
+    // ✅ SweetAlert2 para erro
+    Swal.fire({
+      icon: 'error',
+      title: 'Erro ao Carregar Receita',
+      text: error.message || 'Não foi possível carregar os detalhes da receita',
+      confirmButtonText: 'OK'
+    });
   }
 }
 
@@ -398,13 +411,47 @@ async function confirmMapping() {
   const auth = requireAuth();
   if (!auth) return;
 
-  if (!confirm(`Confirmar mapeamento de "${currentMappingProduct.name}" para "${selectedRecipe.name}"?\n\nIsso irá:\n- Vincular o produto à receita\n- Recalcular CMV de vendas passadas\n- Dar baixa retroativa no estoque`)) {
+  // ✅ SweetAlert2 para confirmação
+  const result = await Swal.fire({
+    icon: 'question',
+    title: 'Confirmar Mapeamento?',
+    html: `
+      <div style="text-align: left; margin-top: 16px;">
+        <p><strong>Produto:</strong> ${currentMappingProduct.name}</p>
+        <p><strong>Receita:</strong> ${selectedRecipe.name}</p>
+        <hr style="margin: 16px 0; border: none; border-top: 1px solid #e5e7eb;">
+        <p style="margin-bottom: 8px;"><strong>Esta ação irá:</strong></p>
+        <ul style="margin: 0; padding-left: 20px;">
+          <li>Vincular o produto à receita</li>
+          <li>Recalcular CMV de vendas passadas</li>
+          <li>Dar baixa retroativa no estoque</li>
+        </ul>
+      </div>
+    `,
+    showCancelButton: true,
+    confirmButtonText: 'Sim, mapear',
+    cancelButtonText: 'Cancelar',
+    customClass: {
+      confirmButton: 'swal2-confirm',
+      cancelButton: 'swal2-cancel'
+    }
+  });
+
+  if (!result.isConfirmed) {
     console.log('⚠️ Mapeamento cancelado pelo usuário');
     return;
   }
 
   try {
-    showLoading('Mapeando produto e recalculando CMV...');
+    // ✅ Loading
+    Swal.fire({
+      title: 'Mapeando Produto...',
+      html: 'Aguarde enquanto recalculamos o CMV e ajustamos o estoque',
+      allowOutsideClick: false,
+      didOpen: () => {
+        Swal.showLoading();
+      }
+    });
 
     console.log('📡 Enviando requisição...');
     console.log('📋 Endpoint:', `${API}/retroactive-cmv/link`);
@@ -413,8 +460,6 @@ async function confirmMapping() {
       recipeId: selectedRecipe.id
     });
 
-    // ⭐ ENDPOINT CORRETO: /retroactive-cmv/link
-    // ⭐ REMOVIDO franchiseId do body - o backend pega do user autenticado
     const response = await fetch(`${API}/retroactive-cmv/link`, {
       method: 'POST',
       headers: {
@@ -435,65 +480,77 @@ async function confirmMapping() {
       throw new Error(error?.error || error?.message || 'Erro ao mapear produto');
     }
 
-    const result = await response.json();
-    console.log('✅ Resultado:', result);
+    const resultData = await response.json();
+    console.log('✅ Resultado:', resultData);
 
-    hideLoading();
     closeMappingModal();
-    showResultModal(result.result || result.data || result);
+    
+    // ✅ Mostrar resultado com SweetAlert2
+    await showResultModal(resultData.result || resultData.data || resultData);
 
-    // Recarregar lista após 2 segundos
-    setTimeout(() => {
-      console.log('🔄 Recarregando produtos...');
-      loadUnmappedProducts();
-    }, 2000);
+    // Recarregar lista
+    console.log('🔄 Recarregando produtos...');
+    await loadUnmappedProducts();
 
   } catch (error) {
     console.error('❌ Erro ao mapear produto:', error);
-    hideLoading();
-    alert('Erro ao mapear produto: ' + error.message);
+    
+    // ✅ SweetAlert2 para erro
+    Swal.fire({
+      icon: 'error',
+      title: 'Erro ao Mapear',
+      text: error.message || 'Não foi possível mapear o produto',
+      confirmButtonText: 'OK'
+    });
   }
 }
 
 // ========== MOSTRAR RESULTADO ==========
-function showResultModal(data) {
+async function showResultModal(data) {
   console.log('📊 [showResultModal] Mostrando resultado:', data);
   
-  const statsHTML = `
-    <div class="result-stat">
-      <div class="result-stat-value">${fmtNumber(data.itemsUpdated || 0)}</div>
-      <div class="result-stat-label">Itens Atualizados</div>
-    </div>
-    <div class="result-stat">
-      <div class="result-stat-value">${fmtNumber(data.salesUpdated || 0)}</div>
-      <div class="result-stat-label">Vendas Recalculadas</div>
-    </div>
-    <div class="result-stat">
-      <div class="result-stat-value">${fmtNumber(data.inventoryMovements || 0)}</div>
-      <div class="result-stat-label">Movimentações de Estoque</div>
-    </div>
-    <div class="result-stat">
-      <div class="result-stat-value">${fmtMoney(data.totalCostRecalculated || 0)}</div>
-      <div class="result-stat-label">CMV Recalculado</div>
-    </div>
-  `;
-
-  // Mostrar erros se houver
+  let errorsHTML = '';
   if (data.errors && data.errors.length > 0) {
-    const errorsHTML = `
-      <div style="margin-top: 20px; padding: 12px; background: #fef2f2; border-left: 3px solid #ef4444; border-radius: 6px;">
+    errorsHTML = `
+      <div style="margin-top: 20px; padding: 12px; background: #fef2f2; border-left: 3px solid #ef4444; border-radius: 6px; text-align: left;">
         <strong style="color: #991b1b;">⚠️ Avisos:</strong>
         <ul style="margin: 8px 0 0 20px; color: #991b1b;">
           ${data.errors.map(err => `<li>${err}</li>`).join('')}
         </ul>
       </div>
     `;
-    document.getElementById('resultStats').innerHTML = statsHTML + errorsHTML;
-  } else {
-    document.getElementById('resultStats').innerHTML = statsHTML;
   }
 
-  document.getElementById('resultModal').classList.add('active');
+  // ✅ SweetAlert2 para resultado
+  await Swal.fire({
+    icon: 'success',
+    title: 'Mapeamento Concluído!',
+    html: `
+      <div style="text-align: left; margin-top: 16px;">
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 16px;">
+          <div style="background: #f7fafc; padding: 16px; border-radius: 10px; text-align: center;">
+            <div style="font-size: 28px; font-weight: 700; color: #667eea;">${fmtNumber(data.itemsUpdated || 0)}</div>
+            <div style="font-size: 12px; color: #64748b; margin-top: 4px;">Itens Atualizados</div>
+          </div>
+          <div style="background: #f7fafc; padding: 16px; border-radius: 10px; text-align: center;">
+            <div style="font-size: 28px; font-weight: 700; color: #667eea;">${fmtNumber(data.salesUpdated || 0)}</div>
+            <div style="font-size: 12px; color: #64748b; margin-top: 4px;">Vendas Recalculadas</div>
+          </div>
+          <div style="background: #f7fafc; padding: 16px; border-radius: 10px; text-align: center;">
+            <div style="font-size: 28px; font-weight: 700; color: #667eea;">${fmtNumber(data.inventoryMovements || 0)}</div>
+            <div style="font-size: 12px; color: #64748b; margin-top: 4px;">Movimentações de Estoque</div>
+          </div>
+          <div style="background: #f7fafc; padding: 16px; border-radius: 10px; text-align: center;">
+            <div style="font-size: 28px; font-weight: 700; color: #22c55e;">${fmtMoney(data.totalCostRecalculated || 0)}</div>
+            <div style="font-size: 12px; color: #64748b; margin-top: 4px;">CMV Recalculado</div>
+          </div>
+        </div>
+        ${errorsHTML}
+      </div>
+    `,
+    confirmButtonText: 'Fechar',
+    width: '600px'
+  });
 }
 
 function closeResultModal() {

@@ -42,7 +42,6 @@ function renderTable(tbodyId, items, columns) {
 // ✅ Carregar dados salvos com pageSize maior
 async function loadReconciliations() {
   const auth = getAuth();
-  const uploadStatus = document.getElementById('uploadStatus');
   
   try {
     // ✅ Adicionar pageSize=1000 na query
@@ -57,9 +56,14 @@ async function loadReconciliations() {
     updateUI(data);
   } catch (error) {
     console.error('Erro ao carregar conciliações:', error);
-    uploadStatus.textContent = 'Erro ao carregar dados salvos';
-    uploadStatus.classList.remove('hidden');
-    uploadStatus.classList.add('warn');
+    
+    // ✅ SweetAlert2 para erro
+    Swal.fire({
+      icon: 'error',
+      title: 'Erro ao Carregar',
+      text: 'Não foi possível carregar os dados salvos',
+      confirmButtonText: 'OK'
+    });
   }
 }
 
@@ -109,12 +113,28 @@ function updateUI(data) {
 // ✅ Reprocessar conciliações
 async function reprocessAll() {
   const auth = getAuth();
-  const uploadStatus = document.getElementById('uploadStatus');
   
-  if (!confirm('Reprocessar todas as conciliações? Isso pode demorar alguns segundos.')) return;
+  // ✅ SweetAlert2 para confirmação
+  const result = await Swal.fire({
+    icon: 'question',
+    title: 'Reprocessar Conciliações?',
+    text: 'Isso pode demorar alguns segundos.',
+    showCancelButton: true,
+    confirmButtonText: 'Sim, reprocessar',
+    cancelButtonText: 'Cancelar'
+  });
 
-  uploadStatus.textContent = 'Reprocessando...';
-  uploadStatus.classList.remove('hidden', 'warn');
+  if (!result.isConfirmed) return;
+
+  // ✅ Loading
+  Swal.fire({
+    title: 'Reprocessando...',
+    text: 'Aguarde enquanto as conciliações são reprocessadas',
+    allowOutsideClick: false,
+    didOpen: () => {
+      Swal.showLoading();
+    }
+  });
 
   try {
     const response = await fetch(`${API}/bank-reconciliation/reprocess`, {
@@ -126,16 +146,27 @@ async function reprocessAll() {
 
     if (!response.ok) throw new Error(data?.message);
 
-    uploadStatus.textContent = `✅ ${data.updated} conciliações reprocessadas!`;
-    uploadStatus.classList.remove('warn');
+    // ✅ Sucesso
+    await Swal.fire({
+      icon: 'success',
+      title: 'Reprocessamento Concluído!',
+      text: `${data.updated} conciliações foram reprocessadas`,
+      confirmButtonText: 'OK'
+    });
     
     // Recarregar dados
     await loadReconciliations();
 
   } catch (error) {
     console.error('Erro ao reprocessar:', error);
-    uploadStatus.textContent = error.message;
-    uploadStatus.classList.add('warn');
+    
+    // ✅ Erro
+    Swal.fire({
+      icon: 'error',
+      title: 'Erro ao Reprocessar',
+      text: error.message || 'Ocorreu um erro ao reprocessar as conciliações',
+      confirmButtonText: 'OK'
+    });
   }
 }
 
@@ -148,7 +179,6 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   const uploadForm = document.getElementById('uploadForm');
   const csvFile = document.getElementById('csvFile');
-  const uploadStatus = document.getElementById('uploadStatus');
   const resultsCard = document.getElementById('resultsCard');
   const clearResults = document.getElementById('clearResults');
   const reprocessBtn = document.getElementById('reprocessBtn');
@@ -175,17 +205,28 @@ document.addEventListener('DOMContentLoaded', async () => {
     
     const file = csvFile.files[0];
     if (!file) {
-      uploadStatus.textContent = 'Selecione um arquivo CSV';
-      uploadStatus.classList.remove('hidden');
-      uploadStatus.classList.add('warn');
+      // ✅ SweetAlert2 para validação
+      Swal.fire({
+        icon: 'warning',
+        title: 'Arquivo Necessário',
+        text: 'Selecione um arquivo CSV para continuar',
+        confirmButtonText: 'OK'
+      });
       return;
     }
 
     const formData = new FormData();
     formData.append('file', file);
 
-    uploadStatus.textContent = 'Processando...';
-    uploadStatus.classList.remove('hidden', 'warn');
+    // ✅ Loading
+    Swal.fire({
+      title: 'Processando...',
+      text: 'Importando e conciliando transações',
+      allowOutsideClick: false,
+      didOpen: () => {
+        Swal.showLoading();
+      }
+    });
 
     try {
       const response = await fetch(`${API}/bank-reconciliation/import`, {
@@ -202,8 +243,19 @@ document.addEventListener('DOMContentLoaded', async () => {
         throw new Error(data?.message || 'Erro ao processar conciliação');
       }
 
-      uploadStatus.textContent = `✅ Importação concluída! ${data.created} criadas, ${data.updated} atualizadas. ${data.summary?.matched || 0} conciliadas.`;
-      uploadStatus.classList.remove('warn');
+      // ✅ Sucesso
+      await Swal.fire({
+        icon: 'success',
+        title: 'Importação Concluída!',
+        html: `
+          <div style="text-align: left; margin-top: 16px;">
+            <p><strong>${data.created}</strong> transações criadas</p>
+            <p><strong>${data.updated}</strong> transações atualizadas</p>
+            <p><strong>${data.summary?.matched || 0}</strong> conciliadas automaticamente</p>
+          </div>
+        `,
+        confirmButtonText: 'OK'
+      });
 
       // Recarregar dados
       await loadReconciliations();
@@ -213,8 +265,14 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     } catch (error) {
       console.error('Erro na conciliação:', error);
-      uploadStatus.textContent = error.message || 'Erro ao processar arquivo';
-      uploadStatus.classList.add('warn');
+      
+      // ✅ Erro
+      Swal.fire({
+        icon: 'error',
+        title: 'Erro ao Processar',
+        text: error.message || 'Erro ao processar arquivo',
+        confirmButtonText: 'OK'
+      });
     }
   });
 
@@ -227,6 +285,5 @@ document.addEventListener('DOMContentLoaded', async () => {
   clearResults.addEventListener('click', () => {
     resultsCard.style.display = 'none';
     csvFile.value = '';
-    uploadStatus.classList.add('hidden');
   });
 });

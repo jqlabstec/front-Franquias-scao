@@ -23,7 +23,7 @@ let PRODUCTS_CACHE = [];
 async function fetchProducts(token, q = '') {
   const qs = new URLSearchParams();
   if (q) qs.set('q', q);
-  qs.set('pageSize', '1000'); // ✅ Aumentar limite
+  qs.set('pageSize', '1000');
   
   const r = await fetch(`${API}/products?${qs.toString()}`, { 
     headers: { Authorization: `Bearer ${token}` } 
@@ -182,9 +182,8 @@ function ingRowTemplate(ing){
         opt.style.backgroundColor = 'white';
       });
       
-      // ✅ CORREÇÃO: usar mousedown ao invés de click
       opt.addEventListener('mousedown', (e) => {
-        e.preventDefault(); // Previne o blur
+        e.preventDefault();
         selectProduct(p);
       });
       
@@ -194,7 +193,6 @@ function ingRowTemplate(ing){
     hints.style.display = 'block';
   });
 
-  // ✅ Validar ao sair do campo (com delay maior)
   nameInput.addEventListener('blur', () => {
     setTimeout(() => {
       hints.style.display = 'none';
@@ -204,19 +202,31 @@ function ingRowTemplate(ing){
         errorMsg.style.display = 'block';
         nameInput.style.borderColor = 'red';
       }
-    }, 300); // ✅ Aumentado de 200 para 300ms
+    }, 300);
   });
 
-  // ✅ Ao focar novamente, mostrar sugestões se houver texto
   nameInput.addEventListener('focus', () => {
     if (nameInput.value.trim() && !productIdInput.value) {
       nameInput.dispatchEvent(new Event('input'));
     }
   });
 
-  row.querySelector('.remove').addEventListener('click', () => {
-    row.remove();
-    recalcTotals();
+  // ✅ Remover ingrediente com confirmação
+  row.querySelector('.remove').addEventListener('click', async () => {
+    const result = await Swal.fire({
+      icon: 'question',
+      title: 'Remover Ingrediente?',
+      text: 'Esta ação não pode ser desfeita',
+      showCancelButton: true,
+      confirmButtonText: 'Sim, remover',
+      cancelButtonText: 'Cancelar',
+      confirmButtonColor: '#dc2626',
+    });
+
+    if (result.isConfirmed) {
+      row.remove();
+      recalcTotals();
+    }
   });
 
   row.querySelectorAll('input, select').forEach(inp => {
@@ -239,7 +249,7 @@ function readIngredients(){
     return {
       type,
       productId: productIdRaw ? Number(productIdRaw) : null,
-      name: null, // ✅ Sempre null porque agora sempre tem productId
+      name: null,
       unitOfMeasure,
       quantity,
       conversionFactor: null,
@@ -277,9 +287,28 @@ function renderImagePreview(imageUrl, recipeId, authToken) {
     `;
     
     document.getElementById('btnRemoveImage')?.addEventListener('click', async () => {
-      if (!confirm('Deseja remover a imagem?')) return;
+      // ✅ Confirmação com SweetAlert2
+      const result = await Swal.fire({
+        icon: 'question',
+        title: 'Remover Imagem?',
+        text: 'Esta ação não pode ser desfeita',
+        showCancelButton: true,
+        confirmButtonText: 'Sim, remover',
+        cancelButtonText: 'Cancelar',
+        confirmButtonColor: '#dc2626',
+      });
+
+      if (!result.isConfirmed) return;
       
       try {
+        // ✅ Loading
+        Swal.fire({
+          title: 'Removendo...',
+          html: 'Aguarde',
+          allowOutsideClick: false,
+          didOpen: () => Swal.showLoading()
+        });
+
         const r = await fetch(`${API}/recipes/${recipeId}/image`, {
           method: 'DELETE',
           headers: { Authorization: `Bearer ${authToken}` },
@@ -291,9 +320,20 @@ function renderImagePreview(imageUrl, recipeId, authToken) {
         }
         
         renderImagePreview(null, recipeId, authToken);
-        await Swal.fire({ icon: 'success', title: 'Imagem removida!' });
+        
+        // ✅ Sucesso
+        await Swal.fire({ 
+          icon: 'success', 
+          title: 'Imagem Removida!',
+          timer: 2000,
+          showConfirmButton: false
+        });
       } catch (err) {
-        await Swal.fire({ icon: 'error', title: 'Erro', text: err.message });
+        await Swal.fire({ 
+          icon: 'error', 
+          title: 'Erro', 
+          text: err.message 
+        });
       }
     });
   } else {
@@ -313,7 +353,11 @@ function renderImagePreview(imageUrl, recipeId, authToken) {
       if (!file) return;
       
       if (file.size > 5 * 1024 * 1024) {
-        await Swal.fire({ icon: 'error', title: 'Erro', text: 'Imagem muito grande! Máximo 5MB.' });
+        await Swal.fire({ 
+          icon: 'error', 
+          title: 'Arquivo Muito Grande', 
+          text: 'A imagem deve ter no máximo 5MB' 
+        });
         return;
       }
       
@@ -321,6 +365,14 @@ function renderImagePreview(imageUrl, recipeId, authToken) {
       formData.append('image', file);
       
       try {
+        // ✅ Loading
+        Swal.fire({
+          title: 'Enviando Imagem...',
+          html: 'Aguarde',
+          allowOutsideClick: false,
+          didOpen: () => Swal.showLoading()
+        });
+
         const r = await fetch(`${API}/recipes/${recipeId}/image`, {
           method: 'POST',
           headers: { Authorization: `Bearer ${authToken}` },
@@ -331,9 +383,20 @@ function renderImagePreview(imageUrl, recipeId, authToken) {
         if (!r.ok) throw new Error(data.message || 'Erro ao enviar imagem');
         
         renderImagePreview(data.imageUrl, recipeId, authToken);
-        await Swal.fire({ icon: 'success', title: 'Imagem enviada!' });
+        
+        // ✅ Sucesso
+        await Swal.fire({ 
+          icon: 'success', 
+          title: 'Imagem Enviada!',
+          timer: 2000,
+          showConfirmButton: false
+        });
       } catch (err) {
-        await Swal.fire({ icon: 'error', title: 'Erro', text: err.message });
+        await Swal.fire({ 
+          icon: 'error', 
+          title: 'Erro ao Enviar', 
+          text: err.message 
+        });
       }
     });
   }
@@ -377,6 +440,14 @@ document.addEventListener('DOMContentLoaded', async () => {
     return; 
   }
 
+  // ✅ Loading inicial
+  Swal.fire({
+    title: 'Carregando...',
+    html: 'Buscando dados da receita',
+    allowOutsideClick: false,
+    didOpen: () => Swal.showLoading()
+  });
+
   // ✅ Carregar produtos
   try {
     PRODUCTS_CACHE = await fetchProducts(auth.token);
@@ -389,12 +460,15 @@ document.addEventListener('DOMContentLoaded', async () => {
   try {
     const recipe = await fetchRecipe(id, auth.token);
     fillForm(recipe, id, auth.token);
+    
+    // ✅ Fechar loading
+    Swal.close();
   } catch (err) {
     await Swal.fire({ 
       icon: 'error', 
-      title: 'Erro', 
-      text: err.message || 'Falha ao carregar', 
-      confirmButtonText: 'Ok' 
+      title: 'Erro ao Carregar', 
+      text: err.message || 'Não foi possível carregar a receita', 
+      confirmButtonText: 'Voltar' 
     });
     location.href = '../index/index.html';
     return;
@@ -406,7 +480,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     recalcTotals();
   });
 
-  // Salvar
+  // ✅ Salvar com validação e loading
   document.getElementById('btnSave').addEventListener('click', async () => {
     const body = {
       name: document.getElementById('name').value.trim(),
@@ -419,22 +493,22 @@ document.addEventListener('DOMContentLoaded', async () => {
       ingredients: readIngredients(),
     };
 
+    // ✅ Validações
     if (!body.name) {
       await Swal.fire({ 
         icon: 'warning', 
-        title: 'Atenção', 
-        text: 'Informe o nome da receita.' 
+        title: 'Nome Obrigatório', 
+        text: 'Informe o nome da receita' 
       });
       return;
     }
 
-    // ✅ Validar ingredientes
     for (let i = 0; i < body.ingredients.length; i++) {
       const ing = body.ingredients[i];
       if (!ing.productId) {
         await Swal.fire({ 
           icon: 'error', 
-          title: 'Erro', 
+          title: 'Produto Não Selecionado', 
           text: `Ingrediente ${i + 1}: Selecione um produto da lista` 
         });
         return;
@@ -442,26 +516,38 @@ document.addEventListener('DOMContentLoaded', async () => {
       if (!ing.quantity || ing.quantity <= 0) {
         await Swal.fire({ 
           icon: 'error', 
-          title: 'Erro', 
-          text: `Ingrediente ${i + 1}: Quantidade deve ser maior que zero` 
+          title: 'Quantidade Inválida', 
+          text: `Ingrediente ${i + 1}: A quantidade deve ser maior que zero` 
         });
         return;
       }
     }
 
     try {
+      // ✅ Loading
+      Swal.fire({
+        title: 'Salvando...',
+        html: 'Atualizando receita',
+        allowOutsideClick: false,
+        didOpen: () => Swal.showLoading()
+      });
+
       await updateRecipe(id, body, auth.token);
+      
+      // ✅ Sucesso
       await Swal.fire({ 
         icon: 'success', 
-        title: 'Salvo', 
-        text: 'Receita atualizada com sucesso!' 
+        title: 'Receita Atualizada!',
+        text: 'As alterações foram salvas com sucesso',
+        confirmButtonText: 'Ver Receita'
       });
+      
       window.location.href = `../detail/index.html?id=${id}`;
     } catch (err) {
       await Swal.fire({ 
         icon: 'error', 
-        title: 'Erro ao salvar', 
-        text: err.message || 'Falha ao salvar' 
+        title: 'Erro ao Salvar', 
+        text: err.message || 'Não foi possível salvar a receita' 
       });
     }
   });

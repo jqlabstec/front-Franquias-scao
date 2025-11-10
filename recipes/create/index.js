@@ -18,7 +18,7 @@ let PRODUCTS_CACHE = [];
 async function fetchProducts(token, q = '') {
   const qs = new URLSearchParams();
   if (q) qs.set('q', q);
-  qs.set('pageSize', '1000'); // ✅ Carregar até 1000 produtos
+  qs.set('pageSize', '1000');
   
   const r = await fetch(`${API}/products?${qs.toString()}`, { 
     headers: { Authorization: `Bearer ${token}` } 
@@ -62,7 +62,23 @@ function addIngRow() {
   const hints = row.querySelector('.hints');
   const errorMsg = row.querySelector('.error-msg');
 
-  // ✅ Limpar seleção ao digitar
+  // ✅ Função para selecionar produto
+  function selectProduct(p) {
+    input.value = p.name;
+    input.dataset.productId = String(p.id);
+    unitEl.value = p.unitOfMeasure || 'un';
+    costEl.value = p.currentCostPerUnit || 0;
+    
+    input.style.borderColor = 'green';
+    errorMsg.style.display = 'none';
+    
+    hints.style.display = 'none';
+    hints.innerHTML = '';
+    
+    recalcTotals();
+  }
+
+  // ✅ Autocomplete ao digitar
   input.addEventListener('input', () => {
     const term = input.value.trim().toLowerCase();
     
@@ -109,21 +125,10 @@ function addIngRow() {
         opt.style.backgroundColor = 'white';
       });
       
-      opt.addEventListener('click', () => {
-        // ✅ Preencher dados do produto
-        input.value = p.name;
-        input.dataset.productId = String(p.id);
-        unitEl.value = p.unitOfMeasure || 'un';
-        costEl.value = p.currentCostPerUnit || 0;
-        
-        // ✅ Validação OK
-        input.style.borderColor = 'green';
-        errorMsg.style.display = 'none';
-        
-        hints.style.display = 'none';
-        hints.innerHTML = '';
-        
-        recalcTotals();
+      // ✅ CORREÇÃO: usar mousedown ao invés de click
+      opt.addEventListener('mousedown', (e) => {
+        e.preventDefault(); // Previne o blur do input
+        selectProduct(p);
       });
       
       hints.appendChild(opt);
@@ -132,11 +137,10 @@ function addIngRow() {
     hints.style.display = 'block';
   });
 
-  // ✅ Validar ao sair do campo
+  // ✅ Validar ao sair do campo (com delay maior)
   input.addEventListener('blur', () => {
     setTimeout(() => {
       hints.style.display = 'none';
-      hints.innerHTML = '';
       
       // Se não selecionou nenhum produto
       if (!input.dataset.productId && input.value.trim()) {
@@ -144,12 +148,32 @@ function addIngRow() {
         errorMsg.style.display = 'block';
         input.style.borderColor = 'red';
       }
-    }, 200);
+    }, 300); // ✅ Aumentado de 200 para 300ms
   });
 
-  row.querySelector('.remove').addEventListener('click', () => { 
-    row.remove(); 
-    recalcTotals(); 
+  // ✅ Ao focar novamente, mostrar sugestões se houver texto
+  input.addEventListener('focus', () => {
+    if (input.value.trim() && !input.dataset.productId) {
+      input.dispatchEvent(new Event('input'));
+    }
+  });
+
+  // ✅ Remover ingrediente com confirmação
+  row.querySelector('.remove').addEventListener('click', async () => {
+    const result = await Swal.fire({
+      icon: 'question',
+      title: 'Remover Ingrediente?',
+      text: 'Esta ação não pode ser desfeita',
+      showCancelButton: true,
+      confirmButtonText: 'Sim, remover',
+      cancelButtonText: 'Cancelar',
+      confirmButtonColor: '#dc2626',
+    });
+
+    if (result.isConfirmed) {
+      row.remove();
+      recalcTotals();
+    }
   });
 
   ['quantity', 'wastageFactor'].forEach(cls => {
@@ -238,9 +262,20 @@ document.addEventListener('DOMContentLoaded', async () => {
     return;
   }
 
+  // ✅ Loading inicial
+  Swal.fire({
+    title: 'Carregando...',
+    html: 'Buscando produtos disponíveis',
+    allowOutsideClick: false,
+    didOpen: () => Swal.showLoading()
+  });
+
   try {
     PRODUCTS_CACHE = await fetchProducts(auth.token);
     console.log(`✅ ${PRODUCTS_CACHE.length} produtos carregados`);
+    
+    // ✅ Fechar loading
+    Swal.close();
   } catch (e) {
     console.warn('Falha ao carregar produtos', e);
     await Swal.fire({ 
@@ -270,46 +305,93 @@ document.addEventListener('DOMContentLoaded', async () => {
       const payload = collectForm();
 
       // ✅ Validações
-      if (!payload.name) throw new Error('Informe o nome da receita');
-      if (!payload.ingredients?.length) throw new Error('Inclua ao menos um ingrediente');
+      if (!payload.name) {
+        await Swal.fire({ 
+          icon: 'warning', 
+          title: 'Nome Obrigatório', 
+          text: 'Informe o nome da receita' 
+        });
+        return;
+      }
+
+      if (!payload.ingredients?.length) {
+        await Swal.fire({ 
+          icon: 'warning', 
+          title: 'Ingredientes Obrigatórios', 
+          text: 'Inclua ao menos um ingrediente' 
+        });
+        return;
+      }
       
       // ✅ Validar se todos os ingredientes têm productId
       for (let i = 0; i < payload.ingredients.length; i++) {
         const ing = payload.ingredients[i];
+        
         if (!ing.productId) {
-          throw new Error(`Ingrediente ${i + 1}: Selecione um produto da lista`);
+          await Swal.fire({ 
+            icon: 'error', 
+            title: 'Produto Não Selecionado', 
+            text: `Ingrediente ${i + 1}: Selecione um produto da lista` 
+          });
+          return;
         }
+        
         if (!ing.unitOfMeasure) {
-          throw new Error(`Ingrediente ${i + 1}: Unidade de medida não encontrada`);
+          await Swal.fire({ 
+            icon: 'error', 
+            title: 'Unidade Não Encontrada', 
+            text: `Ingrediente ${i + 1}: Unidade de medida não encontrada` 
+          });
+          return;
         }
+        
         if (!ing.quantity || ing.quantity <= 0) {
-          throw new Error(`Ingrediente ${i + 1}: Quantidade deve ser maior que zero`);
+          await Swal.fire({ 
+            icon: 'error', 
+            title: 'Quantidade Inválida', 
+            text: `Ingrediente ${i + 1}: Quantidade deve ser maior que zero` 
+          });
+          return;
         }
       }
+
+      // ✅ Loading ao salvar
+      Swal.fire({
+        title: 'Salvando...',
+        html: 'Criando receita',
+        allowOutsideClick: false,
+        didOpen: () => Swal.showLoading()
+      });
 
       // Cria receita
       const created = await createRecipe(payload, auth.token);
 
       // Upload de imagem (se houver)
-      const imageInput = document.getElementById('imageFile');
+      const imageInput = document.getElementById('imageUrl');
       const imageFile = imageInput?.files?.[0] || null;
+      
       if (imageFile) {
+        Swal.update({
+          html: 'Enviando imagem...'
+        });
+        
         await uploadRecipeImage(created.id, imageFile, auth.token);
       }
 
+      // ✅ Sucesso
       await Swal.fire({ 
         icon: 'success', 
-        title: 'Receita criada com sucesso!', 
-        timer: 1600, 
-        showConfirmButton: false 
+        title: 'Receita Criada!', 
+        text: 'A receita foi criada com sucesso',
+        confirmButtonText: 'Ver Receita'
       });
       
       location.href = `../detail/index.html?id=${created.id}`;
     } catch (err) {
       await Swal.fire({ 
         icon: 'error', 
-        title: 'Erro', 
-        text: err.message || 'Falha ao salvar', 
+        title: 'Erro ao Salvar', 
+        text: err.message || 'Não foi possível salvar a receita', 
         confirmButtonText: 'Ok' 
       });
     }

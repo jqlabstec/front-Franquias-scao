@@ -93,6 +93,16 @@ async function openEditModal(productId) {
   if (!auth?.token) return;
 
   try {
+    // ✅ Loading
+    Swal.fire({
+      title: 'Carregando...',
+      html: 'Buscando dados do produto',
+      allowOutsideClick: false,
+      didOpen: () => {
+        Swal.showLoading();
+      }
+    });
+
     // Buscar dados do produto
     const response = await fetch(`${API}/products/${productId}`, {
       headers: { Authorization: `Bearer ${auth.token}` }
@@ -101,6 +111,9 @@ async function openEditModal(productId) {
     if (!response.ok) throw new Error('Erro ao carregar produto');
 
     const product = await response.json();
+
+    // Fechar loading
+    Swal.close();
 
     // Preencher modal
     document.getElementById('editProductId').value = product.id;
@@ -116,7 +129,13 @@ async function openEditModal(productId) {
     // Mostrar modal
     document.getElementById('editModal').classList.remove('hidden');
   } catch (error) {
-    alert(error.message || 'Erro ao carregar produto');
+    // ✅ SweetAlert2 para erro
+    Swal.fire({
+      icon: 'error',
+      title: 'Erro ao Carregar',
+      text: error.message || 'Não foi possível carregar o produto',
+      confirmButtonText: 'OK'
+    });
   }
 }
 
@@ -129,11 +148,28 @@ async function saveProduct() {
   if (!auth?.token) return;
 
   const productId = document.getElementById('editProductId').value;
+  
+  // ✅ Validação básica
+  const name = document.getElementById('editName').value.trim();
+  const code = document.getElementById('editCode').value.trim();
+  const unitOfMeasure = document.getElementById('editUnitOfMeasure').value.trim();
+  const currentCostPerUnit = parseFloat(document.getElementById('editCurrentCostPerUnit').value);
+
+  if (!name || !code || !unitOfMeasure || isNaN(currentCostPerUnit)) {
+    Swal.fire({
+      icon: 'warning',
+      title: 'Campos Obrigatórios',
+      text: 'Preencha todos os campos obrigatórios (Nome, Código, Unidade e Custo)',
+      confirmButtonText: 'OK'
+    });
+    return;
+  }
+
   const data = {
-    name: document.getElementById('editName').value,
-    code: document.getElementById('editCode').value,
-    unitOfMeasure: document.getElementById('editUnitOfMeasure').value,
-    currentCostPerUnit: parseFloat(document.getElementById('editCurrentCostPerUnit').value),
+    name,
+    code,
+    unitOfMeasure,
+    currentCostPerUnit,
     ncm: document.getElementById('editNcm').value || null,
     minQty: parseFloat(document.getElementById('editMinQty').value) || null,
     leadTimeDays: parseInt(document.getElementById('editLeadTimeDays').value) || null,
@@ -141,6 +177,19 @@ async function saveProduct() {
   };
 
   try {
+    // ✅ Fechar modal ANTES do loading
+    closeEditModal();
+
+    // ✅ Loading
+    Swal.fire({
+      title: 'Salvando...',
+      html: 'Atualizando produto',
+      allowOutsideClick: false,
+      didOpen: () => {
+        Swal.showLoading();
+      }
+    });
+
     const response = await fetch(`${API}/products/${productId}`, {
       method: 'PATCH',
       headers: {
@@ -155,14 +204,26 @@ async function saveProduct() {
       throw new Error(error.message || 'Erro ao salvar produto');
     }
 
-    alert('Produto atualizado com sucesso!');
-    closeEditModal();
+    // ✅ Sucesso
+    await Swal.fire({
+      icon: 'success',
+      title: 'Produto Atualizado!',
+      text: 'As alterações foram salvas com sucesso',
+      confirmButtonText: 'OK',
+      timer: 2000
+    });
     
     // Recarregar lista
     const state = window.currentState || { q: '', page: 1 };
     load(state);
   } catch (error) {
-    alert(error.message || 'Erro ao salvar produto');
+    // ✅ SweetAlert2 para erro
+    Swal.fire({
+      icon: 'error',
+      title: 'Erro ao Salvar',
+      text: error.message || 'Não foi possível salvar o produto',
+      confirmButtonText: 'OK'
+    });
   }
 }
 
@@ -190,9 +251,15 @@ async function load(state){
     nextBtn.disabled = !pagination.hasNextPage;
   }catch(e){
     document.getElementById('tbody').innerHTML = '<tr><td colspan="9" class="muted">Sem resultados</td></tr>';
-    status.textContent = e.message || 'Erro ao carregar';
-    status.classList.remove('hidden'); 
-    status.classList.add('warn');
+    
+    // ✅ SweetAlert2 para erro de carregamento
+    Swal.fire({
+      icon: 'error',
+      title: 'Erro ao Carregar',
+      text: e.message || 'Não foi possível carregar os produtos',
+      confirmButtonText: 'OK'
+    });
+    
     pageInfo.textContent = '-'; 
     prevBtn.disabled = nextBtn.disabled = true;
   }
