@@ -55,21 +55,42 @@ async function listPurchases(params, token){
   return data;
 }
 
-function renderList(items){
+function renderList(items) {
   const tb = document.getElementById('tbody');
   tb.innerHTML = '';
-  if (!items?.length){
-    const tr = document.createElement('tr'); 
+
+  if (!items?.length) {
+    const tr = document.createElement('tr');
     const td = document.createElement('td');
-    td.colSpan = 8; // ✅ Ajustado para 8 colunas
-    td.className = 'muted'; 
+    td.colSpan = 8;
+    td.className = 'muted';
     td.textContent = 'Sem resultados';
-    tr.appendChild(td); 
-    tb.appendChild(tr); 
+    tr.appendChild(td);
+    tb.appendChild(tr);
     return;
   }
-  for(const it of items){
+
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+
+  // ✅ Ordena por vencimento: vencidas e mais próximas primeiro, sem data por último
+  const sorted = [...items].sort((a, b) => {
+    const da = a.paymentDueDate ? new Date(a.paymentDueDate) : new Date('9999-12-31');
+    const db = b.paymentDueDate ? new Date(b.paymentDueDate) : new Date('9999-12-31');
+    return da - db;
+  });
+
+  for (const it of sorted) {
     const tr = document.createElement('tr');
+
+    // ✅ Highlight: vermelho = vencida não paga, amarelo = vence hoje não paga
+    if (!it.isPaid && it.paymentDueDate) {
+      const due = new Date(it.paymentDueDate);
+      due.setHours(0, 0, 0, 0);
+      if (due < today)                          tr.style.backgroundColor = '#fee2e2';
+      else if (due.getTime() === today.getTime()) tr.style.backgroundColor = '#fef9c3';
+    }
+
     tr.innerHTML = `
       <td>${fmtDateOnlyUTC(it.purchaseDate)}</td>
       <td>${it.invoiceNumber || '—'}</td>

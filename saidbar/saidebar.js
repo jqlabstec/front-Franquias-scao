@@ -126,6 +126,52 @@
     }
   }
 
+
+  // ✅ Badge de boletos vencidos ou vencendo hoje
+async function loadPurchasesDueBadge() {
+  try {
+    const auth = getAuth();
+    if (!auth?.token) return;
+
+    const today = new Date();
+    today.setHours(23, 59, 59, 999);
+    const todayStr = today.toISOString().split('T')[0];
+
+    // Busca compras não pagas com vencimento até hoje
+    const response = await fetch(
+      `${API_BASE}/purchases?isPaid=false&dateTo=${todayStr}&pageSize=500`,
+      { headers: { Authorization: `Bearer ${auth.token}` } }
+    );
+
+    if (!response.ok) return;
+
+    const data = await response.json();
+    const items = data.items || [];
+
+    const now = new Date();
+    now.setHours(0, 0, 0, 0);
+
+    const count = items.filter(i => {
+      if (!i.paymentDueDate) return false;
+      const due = new Date(i.paymentDueDate);
+      due.setHours(0, 0, 0, 0);
+      return due <= now; // vencidas ou vence hoje
+    }).length;
+
+    const badge = document.getElementById('purchases-due-badge');
+    if (badge) {
+      if (count > 0) {
+        badge.textContent = count;
+        badge.style.display = 'inline-block';
+      } else {
+        badge.style.display = 'none';
+      }
+    }
+  } catch (error) {
+    console.error('Erro ao carregar badge de compras:', error);
+  }
+}
+
   async function mount(){
     const active = window.SIDEBAR_ACTIVE || detectActive();
     const role = await getRole();
@@ -177,8 +223,14 @@
     // ✅ Carregar badge
     await loadPurchaseSuggestionBadge();
 
+    await loadPurchasesDueBadge();
+    setInterval(loadPurchasesDueBadge, 5 * 60 * 1000);
     // ✅ Atualizar badge a cada 5 minutos
     setInterval(loadPurchaseSuggestionBadge, 5 * 60 * 1000);
+
+
+
+    
   }
 
   document.addEventListener('DOMContentLoaded', mount);

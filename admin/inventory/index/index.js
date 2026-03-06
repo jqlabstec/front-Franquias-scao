@@ -10,16 +10,16 @@ function buildQuery(state){
   const p = new URLSearchParams();
   p.set('page', state.page);
   p.set('pageSize', PAGE_SIZE);
-  if (state.q) p.set('query', state.q);
+  if (state.q) p.set('q', state.q); // era 'query', agora 'q' para bater com o backend
   return p.toString();
 }
 
-async function fetchItems(state, token){
-  const r = await fetch(`${API}/products?${buildQuery(state)}`, {
-    headers:{ Authorization:`Bearer ${token}` }
+async function fetchItems(state, token) {
+  const r = await fetch(`${API}/inventory/items?${buildQuery(state)}`, {
+    headers: { Authorization: `Bearer ${token}` }
   });
-  const data = await r.json().catch(()=> ({}));
-  if(!r.ok) throw new Error(data?.message || 'Falha ao carregar produtos');
+  const data = await r.json().catch(() => ({}));
+  if (!r.ok) throw new Error(data?.message || 'Falha ao carregar estoque');
   return data;
 }
 
@@ -46,7 +46,7 @@ function renderRows(items){
   if(!Array.isArray(items) || items.length===0){
     const tr = document.createElement('tr'); 
     const td = document.createElement('td');
-    td.colSpan = 9;
+    td.colSpan = 10;
     td.className = 'muted'; 
     td.textContent = 'Sem resultados';
     tr.appendChild(td); 
@@ -63,19 +63,20 @@ function renderRows(items){
       tr.style.backgroundColor = '#fee2e2';
     }
     
-    tr.innerHTML = `
-      <td class="text-left"><strong>${it.name ?? `#${it.id}`}</strong></td>
-      <td>${it.code ?? '—'}</td>
-      <td>${it.unitOfMeasure ?? '—'}</td>
-      <td class="text-right">${fmt(it.currentQty, 2)}</td>
-      <td class="text-right">${fmt(it.minQty, 2)}</td>
-      <td class="text-right">${fmtMoney(it.currentCostPerUnit)}</td>
-      <td>${it.ncm ?? '—'}</td>
-      <td class="text-center">${fmtDate(it.updatedAt)}</td>
-      <td class="text-center">
-        <button class="btn-edit" data-id="${it.id}">✏️ Editar</button>
-      </td>
-    `;
+tr.innerHTML = `
+  <td class="text-left"><strong>${it.product?.name ?? `#${it.productId}`}</strong></td>
+  <td>${it.product?.unitOfMeasure ?? '—'}</td>
+  <td class="text-right">${fmt(it.currentQty)}</td>
+  <td class="text-right">${fmt(it.minQty)}</td>
+  <td class="text-right">${fmt(it.purchaseIn)}</td>
+  <td class="text-right">${fmt(it.salesOut)}</td>
+  <td class="text-right">${fmt(it.adjustIn)}</td>
+  <td class="text-right">${fmt(it.adjustOut)}</td>
+  <td class="text-right">${fmtMoney(it.avgUnitCost)}</td>
+    <td class="text-center">
+    <button class="btn-edit" data-id="${it.productId}">✏️ Editar</button>
+  </td>
+`;
     tbody.appendChild(tr);
   }
 
@@ -245,12 +246,12 @@ async function load(state){
     const data = await fetchItems(state, auth.token);
     renderRows(data.items);
     
-    const pagination = data.pagination;
-    pageInfo.textContent = `Página ${pagination.page} de ${pagination.pageCount} — ${pagination.total} produtos`;
-    prevBtn.disabled = !pagination.hasPreviousPage;
-    nextBtn.disabled = !pagination.hasNextPage;
+const pagination = data.pageInfo;
+pageInfo.textContent = `Página ${pagination.page} de ${pagination.totalPages} — ${pagination.totalItems} itens`;
+prevBtn.disabled = !pagination.hasPrev;
+nextBtn.disabled = !pagination.hasNext;
   }catch(e){
-    document.getElementById('tbody').innerHTML = '<tr><td colspan="9" class="muted">Sem resultados</td></tr>';
+    document.getElementById('tbody').innerHTML = '<tr><td colspan="10" class="muted">Sem resultados</td></tr>';
     
     // ✅ SweetAlert2 para erro de carregamento
     Swal.fire({

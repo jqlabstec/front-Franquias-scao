@@ -48,15 +48,18 @@ function renderTable() {
 
   tbody.innerHTML = filteredProducts
     .map((p) => {
-      const statusPill = p.isImported
-        ? '<span class="pill ok">Importado</span>'
-        : '<span class="pill warn">Pendente</span>';
+const statusPill = !p.isImported
+  ? '<span class="pill warn">Pendente</span>'
+  : p.hasCost
+    ? '<span class="pill ok">Com custo</span>'
+    : '<span class="pill error">Sem custo</span>';
 
-      const actions = p.isImported
-        ? `<button class="btn-sm btn-ghost" onclick="viewRecipe(${p.importedRecipeId})">Ver Receita</button>`
-        : `<button class="btn-sm btn-primary" onclick="openImportDialog(${p.id})">Importar</button>
-           <button class="btn-sm btn-danger" onclick="deleteProduct(${p.id})">🗑️</button>`;
-
+const actions = !p.isImported
+  ? `<button class="btn-sm btn-primary" onclick="openImportDialog(${p.id})">Importar</button>
+     <button class="btn-sm btn-danger" onclick="deleteProduct(${p.id})">🗑️</button>`
+  : p.hasCost
+    ? `<button class="btn-sm btn-ghost" onclick="viewRecipe(${p.importedRecipeId})">Ver Receita</button>`
+    : `<button class="btn-sm btn-primary" onclick="viewRecipe(${p.importedRecipeId})">Cadastrar Custo</button>`;
       return `
         <tr>
           <td>${p.externalCode}</td>
@@ -97,9 +100,10 @@ function applyFilters() {
   filteredProducts = allProducts.filter((p) => {
     const matchQuery = p.name.toLowerCase().includes(q) || p.externalCode.includes(q);
     const matchStatus =
-      !status ||
-      (status === 'pending' && !p.isImported) ||
-      (status === 'imported' && p.isImported);
+  !status ||
+  (status === 'pending' && !p.isImported) ||
+  (status === 'imported' && p.isImported) ||
+  (status === 'no-cost' && p.isImported && !p.hasCost);
 
     return matchQuery && matchStatus;
   });

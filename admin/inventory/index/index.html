@@ -6,16 +6,10 @@
   <title>Produtos</title>
   <link rel="stylesheet" href="../../../saidbar/saidebar.css" />
   <link rel="stylesheet" href="./index.css" />
-  
-  <!-- ✅ SweetAlert2 CSS -->
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
-  
   <script>window.SIDEBAR_ACTIVE = 'products-list';</script>
   <script src="../../../saidbar/saidebar.js" defer></script>
-  
-  <!-- ✅ SweetAlert2 JS -->
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-  
   <script src="./index.js" defer></script>
 </head>
 <body>
@@ -26,35 +20,36 @@
 
         <section class="card">
           <div class="card-head">
-            <h1>📦 Produtos</h1>
+            <h1>📦 Estoque</h1>
             <a href="../products/create/index.html" class="btn-primary">+ Novo Produto</a>
           </div>
 
           <form id="filterForm" class="filters">
-            <input type="text" id="q" placeholder="Buscar por nome, código ou NCM..." />
+            <input type="text" id="q" placeholder="Buscar por nome ou NCM..." />
             <button type="submit" class="btn-primary">🔍 Buscar</button>
             <button type="button" id="clearBtn" class="btn-ghost">Limpar</button>
           </form>
 
           <div id="status" class="banner hidden"></div>
 
-          <div class="table-wrap">
-            <table class="tbl">
+          <div class="table-wrap" style="overflow-x: auto;">
+            <table class="tbl" style="min-width: 1000px;">
               <thead>
                 <tr>
                   <th class="text-left">Produto</th>
-                  <th>Código</th>
                   <th>Unidade</th>
-                  <th>Estoque Atual</th>
-                  <th>Estoque Mínimo</th>
-                  <th>Custo Unit.</th>
-                  <th>NCM</th>
-                  <th>Atualizado</th>
-                  <th>Ações</th>
+                  <th class="text-right">Saldo Atual</th>
+                  <th class="text-right">Mínimo</th>
+                  <th class="text-right">Entradas (Compras)</th>
+                  <th class="text-right">Saídas (Vendas)</th>
+                  <th class="text-right">Ajustes +</th>
+                  <th class="text-right">Ajustes −</th>
+                  <th class="text-right">Custo Médio</th>
+                  <th class="text-center">Ações</th>
                 </tr>
               </thead>
               <tbody id="tbody">
-                <tr><td colspan="9" class="muted">Carregando...</td></tr>
+                <tr><td colspan="10" class="muted">Carregando...</td></tr>
               </tbody>
             </table>
           </div>
@@ -70,7 +65,7 @@
     </div>
   </div>
 
-  <!-- ✅ MODAL DE EDIÇÃO -->
+  <!-- MODAL DE EDIÇÃO -->
   <div id="editModal" class="modal hidden">
     <div class="modal-content">
       <div class="modal-header">

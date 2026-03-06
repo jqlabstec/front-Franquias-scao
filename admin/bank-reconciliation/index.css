@@ -284,3 +284,82 @@ body {
   border-color: #f59e0b !important;
   color: #f59e0b !important;
 }
+#tab-notFound .tbl th:last-child,
+#tab-notFound .tbl td:last-child {
+  width: 120px;
+  text-align: center;
+}
+
+.pill.info {
+  background: #eff6ff;
+  color: #1e40af;
+  border: 1px solid #bfdbfe;
+}
+
+.btn-sm {
+  padding: 6px 10px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.btn-sm.btn-primary {
+  background: linear-gradient(180deg, #22c55e, #16a34a);
+  color: #fff;
+}
+
+.tbl {
+  min-width: 900px;
+}
+
+#tab-notFound .tbl {
+  min-width: 900px;
+}
+
+/* Modal */
+.modal {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.4);
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.modal.hidden {
+  display: none;
+}
+
+.modal-box {
+  background: #fff;
+  border-radius: 18px;
+  box-shadow: var(--shadow);
+  padding: 24px;
+  width: min(100%, 560px);
+  max-height: 80vh;
+  overflow-y: auto;
+}
+
+.modal-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.modal-head h3 {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 700;
+}
+
+.modal-body .field input[type="text"] {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  font-size: 14px;
+}
