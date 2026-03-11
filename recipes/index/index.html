@@ -11,6 +11,7 @@
 
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.all.min.js" defer></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 
   <script>window.SIDEBAR_ACTIVE = 'recipes-list';</script>
   <script src="../../../saidbar/saidebar.js" defer></script>
@@ -23,10 +24,16 @@
     <div class="app-content">
       <main class="shell">
         <section class="card">
+          <!-- Substitui o card-head -->
           <div class="card-head">
             <h1>Lista de Receitas</h1>
-            <a class="btn-ghost" href="../create/index.html" style="display:none;">Nova receita</a>
+            <div style="display:flex;gap:8px;align-items:center;">
+              <a class="btn-ghost" href="../create/index.html" style="display:none;">Nova receita</a>
+              <button id="btnDownloadTemplate" class="btn-ghost" type="button">📥 Baixar Modelo</button>
+              <button id="btnImportRecipes" class="btn-primary" type="button">📤 Importar Receitas</button>
+            </div>
           </div>
+          <input type="file" id="fileInputRecipes" accept=".xlsx,.xls" style="display:none" />
 
           <div class="filters">
             <input id="q" type="text" placeholder="Buscar por nome ou código" />

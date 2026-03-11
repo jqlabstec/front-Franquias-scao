@@ -37,6 +37,9 @@
       cursor: pointer;
       transition: background 0.15s;
       border-bottom: 1px solid #f0f0f0;
+      display: flex;
+      align-items: center;
+      gap: 8px;
     }
 
     .autocomplete-item:last-child {
@@ -45,6 +48,16 @@
 
     .autocomplete-item:hover {
       background: #f5f5f7;
+    }
+
+    /* ✅ Badge de categoria no autocomplete */
+    .autocomplete-item .item-cat {
+      font-size: 11px;
+      font-weight: 600;
+      padding: 1px 7px;
+      border-radius: 999px;
+      white-space: nowrap;
+      margin-left: auto;
     }
 
     .muted-hint {
@@ -67,7 +80,6 @@
       color: #581c87;
     }
 
-    /* ✅ Estilos da paginação */
     .pager {
       display: flex;
       align-items: center;
@@ -116,6 +128,7 @@
             <a class="btn-ghost" href="../index/index.html">Ver saldos</a>
           </div>
 
+          <!-- FORMULÁRIO DE AJUSTE -->
           <form id="form" class="filters"
             style="display:grid;grid-template-columns:repeat(2,minmax(220px,1fr));gap:8px;">
             <div class="field autocomplete" style="grid-column: span 1;">
@@ -164,9 +177,21 @@
 
           <div id="status" class="banner hidden"></div>
 
+          <!-- HISTÓRICO DE MOVIMENTAÇÕES -->
           <h2 style="margin:24px 0 12px;">Últimas movimentações</h2>
-          <div class="filters" style="display:flex;gap:8px;margin-bottom:16px;">
-            <input id="txQuery" type="text" placeholder="Filtrar por nome ou código" style="flex:1;" />
+
+          <div class="filters" style="display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap;">
+            <input id="txQuery" type="text" placeholder="Filtrar por nome ou código" style="flex:1;min-width:160px;" />
+
+            <!-- ✅ Filtro por categoria -->
+            <select id="txCategory">
+              <option value="">Categoria: Todas</option>
+              <option value="Hortifruti">🥦 Hortifruti</option>
+              <option value="Cozinha">🍳 Cozinha</option>
+              <option value="Congelados e Atacado">🧊 Congelados e Atacado</option>
+              <option value="Descartáveis e Bebidas">🧃 Descartáveis e Bebidas</option>
+            </select>
+
             <select id="txType" style="min-width:180px;">
               <option value="">Tipo: Todos</option>
               <option value="ADJUST_IN">ADJUST_IN</option>
@@ -177,6 +202,7 @@
               <option value="PRODUCTION_YIELD">PRODUCTION_YIELD</option>
               <option value="RETURN">RETURN</option>
             </select>
+
             <button id="txSearch" class="btn-primary" type="button">Buscar</button>
             <button id="txClear" class="btn-ghost" type="button">Limpar</button>
           </div>
@@ -187,6 +213,7 @@
                 <tr>
                   <th>Data</th>
                   <th>Produto</th>
+                  <th>Categoria</th><!-- ✅ -->
                   <th>Tipo</th>
                   <th>Qtd</th>
                   <th>Custo Unit.</th>
@@ -197,13 +224,12 @@
               </thead>
               <tbody id="txBody">
                 <tr>
-                  <td colspan="8" class="muted">Carregando...</td>
+                  <td colspan="9" class="muted">Carregando...</td>
                 </tr>
               </tbody>
             </table>
           </div>
 
-          <!-- ✅ PAGINAÇÃO ADICIONADA -->
           <div class="pager">
             <button id="txPrevBtn" class="btn-ghost">&laquo; Anterior</button>
             <span id="txPageInfo" class="page-info">-</span>

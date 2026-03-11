@@ -59,13 +59,27 @@ body {
   flex-wrap: wrap;
 }
 
-.filters input {
+.filters input,
+.filters select {
   flex: 1;
   min-width: 250px;
   padding: 10px 12px;
   border: 1px solid var(--border);
   border-radius: 10px;
   font-size: 14px;
+  background: #fff;
+  color: var(--text);
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%2364748b' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  padding-right: 32px;
+  cursor: pointer;
+}
+
+.filters select {
+  min-width: 200px;
+  flex: 0 1 auto;
 }
 
 .btn-primary {
@@ -277,11 +291,24 @@ body {
   font-size: 14px;
 }
 
-.field input {
+.field input,
+.field select {
   padding: 10px 12px;
   border: 1px solid var(--border);
   border-radius: 10px;
   font-size: 14px;
+  background: #fff;
+  color: var(--text);
+}
+
+.field select {
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%2364748b' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  background-size: 12px;
+  padding-right: 32px;
+  cursor: pointer;
 }
 
 .modal-footer {

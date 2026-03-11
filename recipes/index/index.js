@@ -1,6 +1,9 @@
 // index.js (corrigido e com carregamento de imagem robusto)
 const API = window.API_BASE_URL || 'http://localhost:3000/api/v1';
 
+const btnPrimaryStyle = 'padding:10px 12px;border:none;border-radius:10px;background:linear-gradient(180deg,#22c55e,#16a34a);color:#fff;font-weight:700;cursor:pointer;';
+const btnGhostStyle   = 'padding:10px 12px;border:1px solid #e5e7eb;border-radius:10px;background:#fff;color:#0f172a;font-weight:600;cursor:pointer;';
+
 function getAuth() {
   try {
     return JSON.parse(localStorage.getItem('auth')) || JSON.parse(sessionStorage.getItem('auth'));
@@ -148,6 +151,46 @@ function renderGrid(items = []) {
   items.forEach(r => grid.appendChild(mountCard(r)));
 }
 
+function downloadRecipeTemplate() {
+  const XLSX = window.XLSX;
+  const data = [
+    ['nome_receita*', 'categoria', 'nome_ingrediente*', 'quantidade*', 'unidade*', 'custo_unitario', 'sku_produto', 'observacao'],
+    ['Abacate com leite', 'Vitaminas', 'abacate',  0.160, 'kg', 1.10, '', 'Importação inicial'],
+    ['Abacate com leite', 'Vitaminas', 'leite',    0.350, 'L',  1.86, '', 'Importação inicial'],
+    ['Açaí G',           'sobremesas', 'Açaí',    0.440, 'kg', 5.38, '', 'Importação inicial'],
+  ];
+
+  const ws = XLSX.utils.aoa_to_sheet(data);
+  ws['!cols'] = [{ wch: 25 }, { wch: 18 }, { wch: 25 }, { wch: 12 }, { wch: 8 }, { wch: 16 }, { wch: 14 }, { wch: 22 }];
+
+  // Formatar coluna quantidade (D) como número com 3 casas decimais
+  const range = XLSX.utils.decode_range(ws['!ref']);
+  for (let row = 1; row <= range.e.r; row++) {
+    const cell = ws[XLSX.utils.encode_cell({ r: row, c: 3 })];
+    if (cell && cell.t === 'n') cell.z = '0.000';
+  }
+
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, 'Importação');
+  XLSX.writeFile(wb, 'modelo_receitas.xlsx');
+}
+
+async function importRecipesExcel(file) {
+  const auth = getAuth();
+  const formData = new FormData();
+  formData.append('file', file);
+
+  const r = await fetch(`${API}/recipes/import-excel`, {
+    method: 'POST',
+    headers: { Authorization: `Bearer ${auth.token}` },
+    body: formData,
+  });
+
+  const data = await r.json();
+  if (!r.ok) throw new Error(data.message || 'Falha na importação');
+  return data;
+}
+
 document.addEventListener('DOMContentLoaded', async () => {
   const auth = getAuth();
   if (!auth?.token) {
@@ -179,6 +222,78 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (document.getElementById('tag')) document.getElementById('tag').value = '';
     load();
   });
+
+  document.getElementById('btnDownloadTemplate').addEventListener('click', downloadRecipeTemplate);
+
+document.getElementById('btnImportRecipes').addEventListener('click', () => {
+  document.getElementById('fileInputRecipes').click();
+});
+
+document.getElementById('fileInputRecipes').addEventListener('change', async (e) => {
+  const file = e.target.files[0];
+  if (!file) return;
+  e.target.value = '';
+
+  const { isConfirmed } = await Swal.fire({
+    title: 'Importar receitas',
+    html: `<p>Arquivo: <strong>${file.name}</strong></p>
+           <p style="color:#555;font-size:13px;">Receitas existentes terão seus ingredientes atualizados. Ingredientes não encontrados no estoque ficam como nome livre para mapeamento posterior.</p>`,
+    icon: 'question',
+    showCancelButton: true,
+    confirmButtonText: 'Importar',
+    cancelButtonText: 'Cancelar',
+    buttonsStyling: false,
+    didRender: () => {
+      Swal.getConfirmButton()?.setAttribute('style', btnPrimaryStyle);
+      Swal.getCancelButton()?.setAttribute('style', btnGhostStyle);
+      Swal.getActions().style.gap = '8px';
+    },
+  });
+
+  if (!isConfirmed) return;
+
+  Swal.fire({ title: 'Importando...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
+
+  try {
+    const result = await importRecipesExcel(file);
+
+    let html = `
+      <p>✅ <strong>${result.created}</strong> receitas criadas</p>
+      <p>🔄 <strong>${result.updated}</strong> receitas atualizadas</p>
+    `;
+    if (result.skipped) html += `<p>⏭️ <strong>${result.skipped}</strong> com erro</p>`;
+    if (result.errors?.length) {
+      html += `<details style="margin-top:8px;text-align:left">
+        <summary style="cursor:pointer;color:#b91c1c">Ver erros (${result.errors.length})</summary>
+        <ul style="font-size:12px;margin-top:4px">${result.errors.map(e => `<li><strong>${e.recipe}</strong>: ${e.erro}</li>`).join('')}</ul>
+      </details>`;
+    }
+
+    await Swal.fire({
+      title: 'Importação concluída',
+      html,
+      icon: 'success',
+      buttonsStyling: false,
+      didRender: () => {
+        Swal.getConfirmButton()?.setAttribute('style', btnPrimaryStyle);
+        Swal.getActions().style.gap = '8px';
+      },
+    });
+
+    load();
+  } catch (err) {
+    Swal.fire({
+      icon: 'error',
+      title: 'Erro',
+      text: err.message,
+      buttonsStyling: false,
+      didRender: () => {
+        Swal.getConfirmButton()?.setAttribute('style', btnPrimaryStyle);
+        Swal.getActions().style.gap = '8px';
+      },
+    });
+  }
+});
 
   await load();
 });
